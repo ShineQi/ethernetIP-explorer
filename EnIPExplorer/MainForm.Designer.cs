@@ -45,6 +45,11 @@
             this.functionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openInterfaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendListIdentityDiscoverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.addClassInstanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addInstanceAttributToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -121,6 +126,8 @@
             this.imageList1.Images.SetKeyName(5, "computer.png");
             this.imageList1.Images.SetKeyName(6, "text_list_bullets.png");
             this.imageList1.Images.SetKeyName(7, "disconnect.png");
+            this.imageList1.Images.SetKeyName(8, "bullet_purple.png");
+            this.imageList1.Images.SetKeyName(9, "pencil.png");
             // 
             // DeviceLabel
             // 
@@ -176,6 +183,7 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.functionsToolStripMenuItem,
+            this.optionsToolStripMenuItem,
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
@@ -202,7 +210,10 @@
             // 
             this.functionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openInterfaceToolStripMenuItem,
-            this.sendListIdentityDiscoverToolStripMenuItem});
+            this.sendListIdentityDiscoverToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.addClassInstanceToolStripMenuItem,
+            this.addInstanceAttributToolStripMenuItem});
             this.functionsToolStripMenuItem.Name = "functionsToolStripMenuItem";
             this.functionsToolStripMenuItem.Size = new System.Drawing.Size(71, 20);
             this.functionsToolStripMenuItem.Text = "Functions";
@@ -221,6 +232,40 @@
             this.sendListIdentityDiscoverToolStripMenuItem.Size = new System.Drawing.Size(217, 22);
             this.sendListIdentityDiscoverToolStripMenuItem.Text = "Send ListIdentity (Discover)";
             this.sendListIdentityDiscoverToolStripMenuItem.Click += new System.EventHandler(this.sendListIdentityDiscoverToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(214, 6);
+            // 
+            // addClassInstanceToolStripMenuItem
+            // 
+            this.addClassInstanceToolStripMenuItem.Name = "addClassInstanceToolStripMenuItem";
+            this.addClassInstanceToolStripMenuItem.Size = new System.Drawing.Size(217, 22);
+            this.addClassInstanceToolStripMenuItem.Text = "Add Class Instance";
+            this.addClassInstanceToolStripMenuItem.Click += new System.EventHandler(this.addClassInstanceToolStripMenuItem_Click);
+            // 
+            // addInstanceAttributToolStripMenuItem
+            // 
+            this.addInstanceAttributToolStripMenuItem.Name = "addInstanceAttributToolStripMenuItem";
+            this.addInstanceAttributToolStripMenuItem.Size = new System.Drawing.Size(217, 22);
+            this.addInstanceAttributToolStripMenuItem.Text = "Add Instance Attribut";
+            this.addInstanceAttributToolStripMenuItem.Click += new System.EventHandler(this.addInstanceAttributToolStripMenuItem_Click);
+            // 
+            // optionsToolStripMenuItem
+            // 
+            this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.settingsToolStripMenuItem});
+            this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.optionsToolStripMenuItem.Text = "Options";
+            // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.settingsToolStripMenuItem.Text = "Settings";
+            this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -256,6 +301,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainForm";
             this.Text = "Ethernet/IP Explorer";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.Panel2.PerformLayout();
@@ -294,6 +340,11 @@
         private System.Windows.Forms.ToolStripMenuItem openInterfaceToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sendListIdentityDiscoverToolStripMenuItem;
         private System.Windows.Forms.ImageList imageList1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem addClassInstanceToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addInstanceAttributToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
     }
 }
 
