@@ -56,7 +56,7 @@ namespace System.Net.EnIPStack
             }
         }
 
-        public static byte[] GetPath(ushort Class, ushort? Instance, ushort? Attribut)
+        public static byte[] GetPath(ushort Class, ushort? Instance=null, ushort? Attribut=null)
         {
 
             byte[] path = new byte[12];
@@ -64,6 +64,7 @@ namespace System.Net.EnIPStack
             int size=0;
             Fit(path,ref size,Class,0x20);
 
+            // It seems that this Instance value is required : 0 is used to access class data
             if (Instance != null)
                 Fit(path, ref size, Instance.Value, 0x24);
    
@@ -79,7 +80,11 @@ namespace System.Net.EnIPStack
         public static byte[] GetPath(String path)
         {
             String[] s=path.Split('.');
-            return GetPath(Convert.ToUInt16(s[0]), Convert.ToUInt16(s[1]), Convert.ToUInt16(s[2]));
+            if (s.Length==3)
+                return GetPath(Convert.ToUInt16(s[0]), Convert.ToUInt16(s[1]), Convert.ToUInt16(s[2]));
+            if (s.Length == 2)
+                return GetPath(Convert.ToUInt16(s[0]), Convert.ToUInt16(s[1]), null);
+            return null;
 
         }
     }
@@ -211,15 +216,12 @@ namespace System.Net.EnIPStack
             retVal[14] = (byte)(2 + Path.Length);
 
             retVal[16] = Service;
-            retVal[17] = (byte)(Path.Length / 2);
+            retVal[17] = (byte)(Path.Length >> 1);
 
-            Buffer.BlockCopy(Path, 0, retVal, 10+8, Path.Length);
+            Array.Copy(Path, 0, retVal, 10+8, Path.Length);
 
             if (Data != null)
-            {
-                int offset = retVal.Length - Data.Length;
-                Buffer.BlockCopy(Data, 0, retVal, 10+8 + Path.Length, Data.Length);
-            }
+                Array.Copy(Data, 0, retVal, 10 + 8 + Path.Length, Data.Length);
 
             return retVal;
         }        

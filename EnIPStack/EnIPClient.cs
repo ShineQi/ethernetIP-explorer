@@ -66,11 +66,16 @@ namespace System.Net.EnIPStack
             }
         }
 
-        public void DiscoverServers()
+        public void DiscoverServers(IPEndPoint ep)
         {
             EncapsulationPacket p = new EncapsulationPacket(EncapsulationCommands.ListIdentity);
             p.Command = (ushort)EncapsulationCommands.ListIdentity;
-            udp.Send(p, udp.GetBroadcastAddress());
+            udp.Send(p, ep);
+        }
+
+        public void DiscoverServers()
+        {
+            DiscoverServers(udp.GetBroadcastAddress());
         }
     }
 
@@ -212,7 +217,7 @@ namespace System.Net.EnIPStack
             }
         }
 
-        public bool GetClassInstanceAttribut_Data(byte[] ClassDataPath, ControlNetService Service, ref int Offset, ref int Lenght, out byte[] packet)
+        public bool SetClassInstanceAttribut_Data(byte[] ClassDataPath, ControlNetService Service, byte[] data, ref int Offset, ref int Lenght, out byte[] packet)
         {
 
             packet = this.packet;
@@ -224,6 +229,47 @@ namespace System.Net.EnIPStack
                 m.Service = (byte)Service;
 
                 EncapsulationPacket p = new EncapsulationPacket(EncapsulationCommands.SendRRData, SessionHandle, m.toByteArray());
+                p.Encapsulateddata = data;
+                Tcpclient.Client.Send(p.toByteArray());
+
+                Lenght = Tcpclient.Client.Receive(packet);
+                if (Lenght > 24)
+                {
+                    Offset = 0;
+                    p = new EncapsulationPacket(packet, ref Offset);
+                    if ((p.IsOK) && (p.Command == (ushort)EncapsulationCommands.SendRRData))
+                    {
+                        m = new UCMM_RR_Packet(packet, ref Offset);
+                        if (m.IsOK)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                Trace.WriteLine("Service not supported : " + Service.ToString());
+                return false;
+            }
+            catch
+            {
+                Trace.TraceWarning("Error while sending request");
+                return false;
+            }
+        }
+
+        public bool GetClassInstanceAttribut_Data(byte[] ClassDataPath, ControlNetService Service, ref int Offset, ref int Lenght, out byte[] packet)
+        {
+
+            return SetClassInstanceAttribut_Data(ClassDataPath, Service, null, ref Offset, ref Lenght, out packet);
+
+            packet = this.packet;
+
+            try
+            {
+                UCMM_RR_Packet m = new UCMM_RR_Packet();
+                m.Path = ClassDataPath;
+                m.Service = (byte)Service;
+
+                EncapsulationPacket p = new EncapsulationPacket(EncapsulationCommands.SendRRData, SessionHandle, m.toByteArray());                
                 Tcpclient.Client.Send(p.toByteArray());
 
                 Lenght = Tcpclient.Client.Receive(packet);
@@ -272,7 +318,7 @@ namespace System.Net.EnIPStack
                 Offset += 2;
                 for (int i = 0; i < NbClasses; i++)
                 {
-                    SupportedClassLists.Add(new EnIPClass(BitConverter.ToUInt16(packet, Offset), this));
+                    SupportedClassLists.Add(new EnIPClass(this, BitConverter.ToUInt16(packet, Offset)));
                     Offset += 2;
                 }
             }
@@ -298,7 +344,7 @@ namespace System.Net.EnIPStack
 
         public EnIPRemoteDevice RemoteDevice;
 
-        public EnIPClass(ushort Id, EnIPRemoteDevice RemoteDevice)
+        public EnIPClass(EnIPRemoteDevice RemoteDevice, ushort Id)
         {
             this.Id = Id;
             this.RemoteDevice = RemoteDevice;
@@ -386,6 +432,19 @@ namespace System.Net.EnIPStack
             this.RemoteDevice = Instance.RemoteDevice;
         }
 
+        public bool SetInstanceAttributData()
+        {
+
+            byte[] ClassDataPath = Path.GetPath(Instance.Class.Id, Instance.Id, Id);
+
+            int Offset = 0;
+            int Lenght = 0;
+            byte[] packet;
+
+            return RemoteDevice.SetClassInstanceAttribut_Data(ClassDataPath, ControlNetService.SetAttributeSingle, RawData, ref Offset, ref Lenght, out packet);
+            
+        }
+
         public bool GetInstanceAttributData()
         {
 
@@ -403,7 +462,5 @@ namespace System.Net.EnIPStack
             return false;
         }
     }
-
-
 }
 

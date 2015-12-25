@@ -147,6 +147,7 @@
             this.propertyGrid.Name = "propertyGrid";
             this.propertyGrid.Size = new System.Drawing.Size(317, 478);
             this.propertyGrid.TabIndex = 1;
+            this.propertyGrid.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid_PropertyValueChanged);
             // 
             // PropertiesLabel
             // 
@@ -201,6 +202,7 @@
             // 
             // quitToolStripMenuItem
             // 
+            this.quitToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.cross;
             this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
             this.quitToolStripMenuItem.Size = new System.Drawing.Size(97, 22);
             this.quitToolStripMenuItem.Text = "Quit";
@@ -220,35 +222,41 @@
             // 
             // openInterfaceToolStripMenuItem
             // 
+            this.openInterfaceToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.add;
             this.openInterfaceToolStripMenuItem.Name = "openInterfaceToolStripMenuItem";
-            this.openInterfaceToolStripMenuItem.Size = new System.Drawing.Size(217, 22);
+            this.openInterfaceToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.openInterfaceToolStripMenuItem.Text = "Open Interface";
             this.openInterfaceToolStripMenuItem.Click += new System.EventHandler(this.openInterfaceToolStripMenuItem_Click);
             // 
             // sendListIdentityDiscoverToolStripMenuItem
             // 
             this.sendListIdentityDiscoverToolStripMenuItem.Enabled = false;
+            this.sendListIdentityDiscoverToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.magnifier;
             this.sendListIdentityDiscoverToolStripMenuItem.Name = "sendListIdentityDiscoverToolStripMenuItem";
-            this.sendListIdentityDiscoverToolStripMenuItem.Size = new System.Drawing.Size(217, 22);
+            this.sendListIdentityDiscoverToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.sendListIdentityDiscoverToolStripMenuItem.Text = "Send ListIdentity (Discover)";
             this.sendListIdentityDiscoverToolStripMenuItem.Click += new System.EventHandler(this.sendListIdentityDiscoverToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(214, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(226, 6);
             // 
             // addClassInstanceToolStripMenuItem
             // 
+            this.addClassInstanceToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.pencil;
             this.addClassInstanceToolStripMenuItem.Name = "addClassInstanceToolStripMenuItem";
-            this.addClassInstanceToolStripMenuItem.Size = new System.Drawing.Size(217, 22);
+            this.addClassInstanceToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I)));
+            this.addClassInstanceToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.addClassInstanceToolStripMenuItem.Text = "Add Class Instance";
             this.addClassInstanceToolStripMenuItem.Click += new System.EventHandler(this.addClassInstanceToolStripMenuItem_Click);
             // 
             // addInstanceAttributToolStripMenuItem
             // 
+            this.addInstanceAttributToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.bullet_purple;
             this.addInstanceAttributToolStripMenuItem.Name = "addInstanceAttributToolStripMenuItem";
-            this.addInstanceAttributToolStripMenuItem.Size = new System.Drawing.Size(217, 22);
+            this.addInstanceAttributToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
+            this.addInstanceAttributToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.addInstanceAttributToolStripMenuItem.Text = "Add Instance Attribut";
             this.addInstanceAttributToolStripMenuItem.Click += new System.EventHandler(this.addInstanceAttributToolStripMenuItem_Click);
             // 
@@ -262,6 +270,7 @@
             // 
             // settingsToolStripMenuItem
             // 
+            this.settingsToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.application_form;
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.settingsToolStripMenuItem.Text = "Settings";
@@ -278,6 +287,7 @@
             // 
             // helpToolStripMenuItem1
             // 
+            this.helpToolStripMenuItem1.Image = global::EnIPExplorer.Properties.Resources.information;
             this.helpToolStripMenuItem1.Name = "helpToolStripMenuItem1";
             this.helpToolStripMenuItem1.Size = new System.Drawing.Size(107, 22);
             this.helpToolStripMenuItem1.Text = "Help";
@@ -285,6 +295,7 @@
             // 
             // aboutToolStripMenuItem
             // 
+            this.aboutToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.information;
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.aboutToolStripMenuItem.Text = "About";

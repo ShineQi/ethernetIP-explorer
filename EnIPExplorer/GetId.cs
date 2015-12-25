@@ -11,23 +11,19 @@ namespace EnIPExplorer
 {
     public partial class GetId : Form
     {
-        public GetId(String LblText)
+        public GetId(String LblText, int Numbase)
         {
 
             InitializeComponent();
             DialogResult = DialogResult.Cancel;
             label1.Text = LblText;
+            Id.Value = Numbase;
 
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.OK;
-            Close();
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
             Close();
         }
 

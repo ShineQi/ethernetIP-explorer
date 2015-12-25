@@ -44,7 +44,8 @@ namespace EnIPExplorer
         public MainForm()
         {
             InitializeComponent();
-            Trace.Listeners.Add(new MyTraceListener(this));           
+            Trace.Listeners.Add(new MyTraceListener(this));
+            propertyGrid.ExpandAllGridItems();
         }
 
         void On_DeviceArrival(EnIPRemoteDevice device)
@@ -187,13 +188,20 @@ namespace EnIPExplorer
         {
             if (client == null)
             {
-                client = new EnIPClient("");
-                client.DeviceArrival += new DeviceArrivalHandler(On_DeviceArrival);
+                try
+                {
+                    client = new EnIPClient("");
+                    client.DeviceArrival += new DeviceArrivalHandler(On_DeviceArrival);
 
-                client.DiscoverServers();
+                    client.DiscoverServers();
 
-                openInterfaceToolStripMenuItem.Enabled = false;
-                sendListIdentityDiscoverToolStripMenuItem.Enabled = true;
+                    openInterfaceToolStripMenuItem.Enabled = false;
+                    sendListIdentityDiscoverToolStripMenuItem.Enabled = true;
+                }
+                catch
+                {
+                    MessageBox.Show("Local address unavailable", "Error in Open Interface", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -206,7 +214,14 @@ namespace EnIPExplorer
 
             if (!(tn.Tag is EnIPClass)) return;
 
-            GetId form = new GetId("Instance Id :");
+            int Numbase = 1;
+            foreach (TreeNode t in tn.Nodes)
+            {
+                int num = (t.Tag as EnIPClassInstance).Id;
+                Numbase = Math.Max(num + 1, Numbase);
+            }
+
+            GetId form = new GetId("Instance Id :", Numbase);
             DialogResult res = form.ShowDialog();
             if (res == DialogResult.OK)
             {
@@ -227,7 +242,14 @@ namespace EnIPExplorer
 
             if (!(tn.Tag is EnIPClassInstance)) return;
 
-            GetId form = new GetId("Attribut Id :");
+            int Numbase = 1;
+            foreach (TreeNode t in tn.Nodes)
+            {
+                int num = (t.Tag as EnIPInstanceAttribut).Id;
+                Numbase = Math.Max(num + 1, Numbase);
+            }
+
+            GetId form = new GetId("Attribut Id :", Numbase);
             DialogResult res = form.ShowDialog();
             if (res == DialogResult.OK)
             {
@@ -254,6 +276,11 @@ namespace EnIPExplorer
                 Properties.Settings.Default.Save();
             }
             catch { }
+        }
+
+        private void propertyGrid_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        {
+            Trace.WriteLine("No modification taken into account at this level");
         }
 
     }

@@ -95,6 +95,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="SettingsDialog.resx">
       <DependentUpon>SettingsDialog.cs</DependentUpon>
@@ -115,6 +116,13 @@
       <Link>README.txt</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="ico\cross.png" />
+    <None Include="ico\add.png" />
+    <None Include="ico\application_form.png" />
+    <None Include="ico\information.png" />
+    <None Include="ico\magnifier.png" />
+    <None Include="ico\bullet_purple.png" />
+    <None Include="ico\pencil.png" />
     <Content Include="Search.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

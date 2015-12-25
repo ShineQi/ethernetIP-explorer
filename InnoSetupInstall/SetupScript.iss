@@ -67,7 +67,7 @@ Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 Name: "{group}\Doc\Website"; Filename : "{#MyAppURL}"
 Name: "{group}\Doc\Readme"; Filename: "{app}\Readme.txt"
-Name: "{group}\Doc\Full source code"; Filename: "http://sourceforge.net/p/EnIPExplorer/code/HEAD/tarball?path=/trunk"
+Name: "{group}\Doc\Full source code"; Filename: "http://sourceforge.net/p/enipexplorer/code/HEAD/tarball"
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
