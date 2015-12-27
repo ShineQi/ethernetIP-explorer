@@ -47,7 +47,11 @@ namespace EnIPExplorer
         {
             InitializeComponent();
             Trace.Listeners.Add(new MyTraceListener(this));
-            propertyGrid.ExpandAllGridItems();
+
+            Size s = Properties.Settings.Default.GUI_FormSize;
+            if (s!= Size.Empty)
+                this.Size = s;
+
         }
 
         // Each time we received a reponse to udp brodcast ou unicast ListIdentity
@@ -63,12 +67,13 @@ namespace EnIPExplorer
                 if (server.Equals(device)) return;
 
             servers.Add(device);
-            TreeNode tn = new TreeNode(device.ep.Address.ToString() + " - " + device.ProductName, 0, 0);
+            TreeNode tn = new TreeNode(device.IPString() + " - " + device.ProductName, 0, 0);
             tn.Tag = device;
             devicesTreeView.Nodes.Add(tn);
 
         }
 
+        // fit an Icon according to the selected node
         private int Classe2Ico(CIPObjectLibrary clId)
         {
             switch (clId)
@@ -92,6 +97,7 @@ namespace EnIPExplorer
             }
         }
 
+        // A new Class inside the Treeview : name & icon
         private TreeNode ClassToTreeNode(EnIPClass Class)
         {
             TreeNode tn;
@@ -121,8 +127,13 @@ namespace EnIPExplorer
             return tn;
         }
 
+        // All selection on the TreeView
+        // Popup menu adaptation
+        // Generate network activity to read the selected element
         private void devicesTreeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
+
+            // A Device : top level
             if (e.Node.Tag is EnIPRemoteDevice)
             {
                 EnIPRemoteDevice device = (EnIPRemoteDevice)e.Node.Tag;
@@ -143,27 +154,44 @@ namespace EnIPExplorer
                     e.Node.Nodes.Add(ClassToTreeNode(clId));
                 }
                 e.Node.Expand();
+
+                popupAddAToolStripMenuItem.Visible = true;
             }
+            // A Class
             else if (e.Node.Tag is EnIPClass)
             {
                 EnIPClass EnClass = (EnIPClass)e.Node.Tag;
                 EnClass.GetClassData();
                 propertyGrid.SelectedObject = EnClass;
                 propertyGrid.ExpandAllGridItems();
+
+                popupAddCToolStripMenuItem.Visible = true;
+                popupAddIToolStripMenuItem.Visible = true;
+
             }
+            // An Instance
             else if (e.Node.Tag is EnIPClassInstance)
             {
                 EnIPClassInstance Instance = (EnIPClassInstance)e.Node.Tag;
                 Instance.GetClassInstanceData();
                 propertyGrid.SelectedObject = Instance;
                 propertyGrid.ExpandAllGridItems();
+
+                popupAddCToolStripMenuItem.Visible = true;
+                popupAddIToolStripMenuItem.Visible = true;
+                popupAddAToolStripMenuItem.Visible = true;
             }
+            // An Attribut
             else if (e.Node.Tag is EnIPInstanceAttribut)
             {
                 EnIPInstanceAttribut Att = (EnIPInstanceAttribut)e.Node.Tag;
                 Att.GetInstanceAttributData();
                 propertyGrid.SelectedObject = Att;
                 propertyGrid.ExpandAllGridItems();
+
+                popupAddCToolStripMenuItem.Visible = true;
+                popupAddIToolStripMenuItem.Visible = true;
+                popupAddAToolStripMenuItem.Visible = true;
             }
         }
 
@@ -213,7 +241,7 @@ namespace EnIPExplorer
 
                 try
                 {
-                    client = new EnIPClient(userinput);
+                    client = new EnIPClient(userinput, Properties.Settings.Default.TCP_LAN_Timeout);
                     client.DeviceArrival += new DeviceArrivalHandler(On_DeviceArrival);
 
                     client.DiscoverServers();
@@ -253,9 +281,12 @@ namespace EnIPExplorer
         {
             TreeNode tn = devicesTreeView.SelectedNode;
 
-            if (tn == null) return;
-
-            if (!(tn.Tag is EnIPRemoteDevice)) return;
+            // look the node or upper
+            for (; ; )
+            {
+                if (tn == null) return;
+                if (tn.Tag is EnIPRemoteDevice) break;
+            }
 
             int Numbase = 1;
             foreach (TreeNode t in tn.Nodes)
@@ -287,9 +318,12 @@ namespace EnIPExplorer
 
             TreeNode tn = devicesTreeView.SelectedNode;
 
-            if (tn == null) return;
-
-            if (!(tn.Tag is EnIPClass)) return;
+            // look the node or upper
+            for (; ; )
+            {
+                if (tn == null) return;
+                if (tn.Tag is EnIPClass) break;
+            }
 
             int Numbase = 1;
             foreach (TreeNode t in tn.Nodes)
@@ -323,9 +357,12 @@ namespace EnIPExplorer
         {
             TreeNode tn = devicesTreeView.SelectedNode;
 
-            if (tn == null) return;
-
-            if (!(tn.Tag is EnIPClassInstance)) return;
+            // look the node or upper
+            for (; ; )
+            {
+                if (tn == null) return;
+                if (tn.Tag is EnIPClassInstance) break;
+            }
 
             int Numbase = 1;
             foreach (TreeNode t in tn.Nodes)
@@ -366,6 +403,7 @@ namespace EnIPExplorer
         {
             try
             {
+                Properties.Settings.Default.GUI_FormSize = this.Size;
                 Properties.Settings.Default.Save();
             }
             catch { }
@@ -439,8 +477,33 @@ namespace EnIPExplorer
         {
             LogText.Text = "";
         }
+
+        #region PopupMenu
+
+        private void popupDeleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            deleteToolStripMenuItem_Click(null, null);
+        }
+
+        private void popupAddCToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            addClassToolStripMenuItem_Click(null, null);
+        }
+
+        private void popupAddIToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            addClassInstanceToolStripMenuItem_Click(null, null);
+        }
+
+        private void popupAddAToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            addInstanceAttributToolStripMenuItem_Click(null, null);
+        }
+
+        #endregion
     }
 
+    // Coming from Yabe @ Sourceforge 
     public class MyTraceListener : TraceListener
     {
         private MainForm m_form;

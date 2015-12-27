@@ -123,6 +123,7 @@ namespace System.Net.EnIPStack
         SocketAddrInfo_T2O = 0x8001,
         SequencedAddressItem = 0x8002
     }
+
     // Volume 1 : Table A-3.1 CIP Service Codes and Names
     public enum ControlNetService
     {

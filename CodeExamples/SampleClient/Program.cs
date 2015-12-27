@@ -37,7 +37,6 @@ namespace SampleClient
     {
         static void Main(string[] args)
         {
-
             TestDiscover();
             // Wait a little before next operation
             Thread.Sleep(1000);
@@ -49,13 +48,8 @@ namespace SampleClient
         //  Read the first analog value on a Wago PLC 750-8xx
         public static void TestReadLoop()
         {
-
             IPEndPoint ep = new IPEndPoint(IPAddress.Parse("172.20.54.58"), 0xAF12);
             EnIPRemoteDevice WagoPlc = new EnIPRemoteDevice(ep);
-
-            WagoPlc.Connect();
-
-            if (!WagoPlc.IsConnected()) return;
 
             // class 103, instance 1, attribut 1
             // could be class 4, Instance 104 (with status) or 107 (wihout), attribut 3 for all Input data
@@ -65,9 +59,16 @@ namespace SampleClient
 
             for (; ; )
             {
+                // Connect or try re-connect, could be made with a long delay
+                if (!WagoPlc.IsConnected())
+                    WagoPlc.Connect();
+                if (!WagoPlc.IsConnected())
+                    return;
+
                 // all data will be put in the byte[] RawData member of EnIPInstanceAttribut 
                 if (FirstAnalogInput.GetInstanceAttributData())
                     Console.WriteLine((FirstAnalogInput.RawData[1] << 8) | FirstAnalogInput.RawData[0]);
+
                 Thread.Sleep(200);
             }
         }
@@ -75,13 +76,8 @@ namespace SampleClient
         //  Write %IW1530
         public static void TestWriteLoop()
         {
-
             IPEndPoint ep = new IPEndPoint(IPAddress.Parse("172.20.54.58"), 0xAF12);
             EnIPRemoteDevice WagoPlc = new EnIPRemoteDevice(ep);
-
-            WagoPlc.Connect();
-
-            if (!WagoPlc.IsConnected()) return;
 
             // class 166, instance 1, attribut 1
             EnIPClass Class166 = new EnIPClass(WagoPlc, 166);
@@ -91,13 +87,20 @@ namespace SampleClient
             ushort i = 0;
             for (; ; )
             {
+                // Connect or try re-connect, could be made with a long delay
+                if (!WagoPlc.IsConnected())
+                    WagoPlc.Connect();
+                if (!WagoPlc.IsConnected())
+                    return;
+
                 FirstMemoryByte.RawData=BitConverter.GetBytes(i++);
                 if (FirstMemoryByte.SetInstanceAttributData())
                     Console.WriteLine("OK");
+
                 Thread.Sleep(200);
             }
         }
-
+       
         public static void TestDiscover()
         {
             // Attach the default network interface
@@ -110,7 +113,7 @@ namespace SampleClient
 
         static void client_DeviceArrival(EnIPRemoteDevice device)
         {
-            Console.WriteLine("Arrvial of : " + device.ep.Address.ToString() + " - " + device.ProductName);
+            Console.WriteLine("Arrvial of : " + device.IPString() + " - " + device.ProductName);
         }
     }
 }

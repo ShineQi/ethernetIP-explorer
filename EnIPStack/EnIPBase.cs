@@ -33,7 +33,6 @@ using System.Diagnostics;
 
 namespace System.Net.EnIPStack
 {
-
     // Volume 1 : C-1.4.2 Logical Segment
     // Remember for 16 bits address : (0x21 or 0x25 or 0x31) - 0x00 - 0xPF - 0xpf
     // also a pad 0x00 must be set  for 32 bits address
@@ -77,6 +76,8 @@ namespace System.Net.EnIPStack
             return Ret;
         }
 
+        // Given in the form Class.Instance or Class.Instance.Attribut
+        // for Class data should be Class.0
         public static byte[] GetPath(String path)
         {
             String[] s=path.Split('.');
@@ -155,7 +156,7 @@ namespace System.Net.EnIPStack
         }
     }   
 
-    // Volume 1 : paragaph 2-4 Message Router Request/Response Formats
+    // Volume 1 : paragraph 2-4 Message Router Request/Response Formats
     public class UCMM_RR_Packet
     {
         public byte Service;
@@ -229,7 +230,6 @@ namespace System.Net.EnIPStack
 
     public class SocketAddress
     {
-
         public short sin_family;
         public ushort sin_port;
         public uint sin_addr;

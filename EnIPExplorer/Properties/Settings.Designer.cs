@@ -82,5 +82,17 @@ namespace EnIPExplorer.Properties {
                 this["DefaultTreeFile"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0, 0")]
+        public global::System.Drawing.Size GUI_FormSize {
+            get {
+                return ((global::System.Drawing.Size)(this["GUI_FormSize"]));
+            }
+            set {
+                this["GUI_FormSize"] = value;
+            }
+        }
     }
 }

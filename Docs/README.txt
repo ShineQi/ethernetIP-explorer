@@ -12,7 +12,7 @@
 		This document is subject to change.
 
 	1.2 CREDITS
-		The projected was created by F. Chaxel, in 2016. 
+		The project was created by F. Chaxel, in 2016. 
 		Graphics are the usual FamFamFam: http://www.famfamfam.com/
 
 		It is inspired by the best Bacnet Explorer, Yabe :
@@ -83,3 +83,9 @@
 7.  MISC
 	Project web page is located at: 
 	https://sourceforge.net/projects/EnIPExplorer/
+
+8.  DEV. ROADMAP
+	Save&load Tree structure in a spreadsheet editable format 
+	Maybe decoding of standard classes :
+		but I don't understand how missing optional attributs values
+		could be detected, and my Wago Plc don't help me for that.

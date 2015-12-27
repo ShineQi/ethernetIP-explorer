@@ -39,11 +39,13 @@ namespace System.Net.EnIPStack
     public class EnIPClient
     {
         EnIPUDPTransport udp;
+        int TcpTimeout;
 
         public event DeviceArrivalHandler DeviceArrival;
 
-        public EnIPClient(String End_point)
+        public EnIPClient(String End_point, int TcpTimeout=100)
         {
+            this.TcpTimeout = TcpTimeout;
             udp = new EnIPUDPTransport(End_point, false);
             udp.Start();
             udp.MessageReceived += new MessageReceivedHandler(on_MessageReceived);
@@ -51,6 +53,7 @@ namespace System.Net.EnIPStack
 
         void on_MessageReceived(object sender, byte[] packet, EncapsulationPacket EncapPacket, int offset, int msg_length, System.Net.IPEndPoint remote_address)
         {
+            // ListIdentity response
             if ((EncapPacket.Command == (ushort)EncapsulationCommands.ListIdentity) && (EncapPacket.Length != 0) && EncapPacket.IsOK)
             {
                 if (DeviceArrival != null)
@@ -60,20 +63,22 @@ namespace System.Net.EnIPStack
                     offset += 2;
                     for (int i = 0; i < NbDevices; i++)
                     {
-                        EnIPRemoteDevice device = new EnIPRemoteDevice(remote_address, packet, ref offset);
+                        EnIPRemoteDevice device = new EnIPRemoteDevice(remote_address, TcpTimeout, packet, ref offset);
                         DeviceArrival(device);
                     }
                 }
             }
         }
 
+        // Unicast ListIdentity
         public void DiscoverServers(IPEndPoint ep)
         {
             EncapsulationPacket p = new EncapsulationPacket(EncapsulationCommands.ListIdentity);
             p.Command = (ushort)EncapsulationCommands.ListIdentity;
             udp.Send(p, ep);
+            Trace.WriteLine("Send ListIdentity to "+ep.Address.ToString());
         }
-
+        // Broadcast ListIdentity
         public void DiscoverServers()
         {
             DiscoverServers(udp.GetBroadcastAddress());
@@ -83,9 +88,10 @@ namespace System.Net.EnIPStack
     public class EnIPRemoteDevice
     {
         // Data comming from the reply to ListIdentity query
-        public ushort Length;
+        // get set are used by the property grid in EnIPExplorer
+        private ushort Length;
         public ushort EncapsulationVersion { get; set; }
-        public SocketAddress SocketAddress;
+        private SocketAddress SocketAddress;
         public ushort VendorId { get; set; }
         public ushort DeviceType { get; set; }
         public ushort ProductCode { get; set; }
@@ -96,19 +102,22 @@ namespace System.Net.EnIPStack
         public string ProductName { get; set; }
         public IdentityObjectState State { get; set; }
 
-        public IPEndPoint ep;
-        public UInt32 SessionHandle; // When Register Session is set
-        public TcpClient Tcpclient;
+        private IPEndPoint ep;
+        public string IPString() { return ep.Address.ToString(); }
+
+        private UInt32 SessionHandle; // When Register Session is set
+
+        private TcpClient Tcpclient;
+        private int Timeout=100;
 
         // A global packet for response frames
         byte[] packet = new byte[1500];
 
         public List<EnIPClass> SupportedClassLists = new List<EnIPClass>();
 
-        // The udp endpoint is given here, it's also the tcp one
-        public EnIPRemoteDevice(IPEndPoint ep, byte[] DataArray, ref int Offset)
+
+        private void FromListIdentityResponse(byte[] DataArray, ref int Offset)
         {
-            this.ep = ep;
             Offset += 2; // 0x000C 
 
             Length = BitConverter.ToUInt16(DataArray, Offset);
@@ -153,10 +162,19 @@ namespace System.Net.EnIPStack
 
             Offset += 1;
         }
-
-        public EnIPRemoteDevice(IPEndPoint ep)
+        // The udp endpoint is given here, it's also the tcp one
+        // this constuctor is used with the ListIdentity response buffer
+        public EnIPRemoteDevice(IPEndPoint ep, int TcpTimeout, byte[] DataArray, ref int Offset)
         {
             this.ep = ep;
+            Timeout = TcpTimeout;
+            FromListIdentityResponse(DataArray, ref Offset);
+        }
+
+        public EnIPRemoteDevice(IPEndPoint ep, int TcpTimeout=100)
+        {
+            this.ep = ep;
+            Timeout = TcpTimeout;
         }
 
         public void CopyData(EnIPRemoteDevice newset)
@@ -179,7 +197,11 @@ namespace System.Net.EnIPStack
             return ep.Equals(other.ep);
         }
 
-        public bool IsConnected() { return (Tcpclient != null); }
+        public bool IsConnected() 
+        {
+            if (Tcpclient == null) return false;
+            return Tcpclient.Connected; 
+        }
 
         public void Connect()
         {
@@ -188,7 +210,7 @@ namespace System.Net.EnIPStack
             {
                 Tcpclient = new TcpClient();
                 Tcpclient.Connect(ep);
-                Tcpclient.ReceiveTimeout = 100;
+                Tcpclient.ReceiveTimeout = this.Timeout;
             }
             catch
             {
@@ -208,6 +230,36 @@ namespace System.Net.EnIPStack
             catch { }
 
             Tcpclient = null;
+        }
+
+        // TCP ListIdentity for remote device
+        public bool DiscoverServer()
+        {
+            try
+            {
+                if (Tcpclient != null)
+                {
+                    EncapsulationPacket p = new EncapsulationPacket(EncapsulationCommands.ListIdentity);
+                    p.Command = (ushort)EncapsulationCommands.ListIdentity;
+                    Tcpclient.Client.Send(p.toByteArray());
+                    Trace.WriteLine("Send ListIdentity to " + ep.Address.ToString());
+
+                    int Length = Tcpclient.Client.Receive(packet);
+                    if (Length < 26) return false;
+
+                    int Offset = 0;
+                    EncapsulationPacket Encapacket = new EncapsulationPacket(packet, ref Offset);
+                    if ((Encapacket.Command == (ushort)EncapsulationCommands.ListIdentity) && (Encapacket.Length != 0) && Encapacket.IsOK)
+                    {
+                        Offset += 2;
+                        FromListIdentityResponse(packet, ref Offset);
+                        return true;
+                    }
+                }
+            }
+            catch { }
+
+            return false;
         }
 
         // Needed for a lot of operations
@@ -237,7 +289,7 @@ namespace System.Net.EnIPStack
             packet = this.packet;
 
             if (Tcpclient == null) return false;
-            if (SessionHandle == 0) RegisterSession();
+            RegisterSession();
             if (SessionHandle == 0) return false;
 
             try
@@ -286,7 +338,7 @@ namespace System.Net.EnIPStack
             if (Tcpclient == null)
                 return null;
 
-            if (SessionHandle == 0) RegisterSession();
+            RegisterSession();
             if (SessionHandle == 0) return null;
 
             // Class 2, Instance 1, Attribut 1
@@ -420,20 +472,17 @@ namespace System.Net.EnIPStack
 
         public bool SetInstanceAttributData()
         {
-
             byte[] ClassDataPath = Path.GetPath(Instance.Class.Id, Instance.Id, Id);
 
             int Offset = 0;
             int Lenght = 0;
             byte[] packet;
 
-            return RemoteDevice.SetClassInstanceAttribut_Data(ClassDataPath, ControlNetService.SetAttributeSingle, RawData, ref Offset, ref Lenght, out packet);
-            
+            return RemoteDevice.SetClassInstanceAttribut_Data(ClassDataPath, ControlNetService.SetAttributeSingle, RawData, ref Offset, ref Lenght, out packet);           
         }
 
         public bool GetInstanceAttributData()
         {
-
             byte[] ClassDataPath = Path.GetPath(Instance.Class.Id, Instance.Id, Id);
 
             int Offset = 0;
