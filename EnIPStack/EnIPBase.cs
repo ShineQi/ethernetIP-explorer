@@ -213,7 +213,7 @@ namespace System.Net.EnIPStack
 
             retVal[6] = 2;
             retVal[12] = 0xB2;
-            retVal[14] = (byte)(2 + Path.Length);
+            retVal[14] = (byte)(2 + Path.Length+(Data==null ? 0 : Data.Length));
 
             retVal[16] = Service;
             retVal[17] = (byte)(Path.Length >> 1);

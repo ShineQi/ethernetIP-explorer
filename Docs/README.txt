@@ -12,7 +12,7 @@
 		This document is subject to change.
 
 	1.2 CREDITS
-		The projected is created by me, F. Chaxel, in 2016. 
+		The projected was created by F. Chaxel, in 2016. 
 		Graphics are the usual FamFamFam: http://www.famfamfam.com/
 
 		It is inspired by the best Bacnet Explorer, Yabe :
@@ -41,6 +41,9 @@
 		  unique instance n°1 of the Message Router class n°2).
 		- If a class is selected, a network request is sent and the class data
 		  is read and displayed in the properties panel.
+		- With the shortcut key CTRL-C one can add classes in the list to try
+		  to read values (this will not add the class in the remote device,
+		  it's just give you the possibility to read). 
 	2.3 Read Class instances data
 		- For common classes (Identifity, MessageRouter, ...) one class instance
 		  is already visible and could be read out. Select it and the values are 
@@ -48,13 +51,13 @@
 		- With the shortcut key CTRL-I one can add instances in the list to try
 		  to read values (this will not add the instance in the remote device,
 		  it's just give you the possibility to read). 		
-	2.4 Attribut data
-		- With the shortcut key CTRL-A, same behaviour as §2.3
+	2.4 Attribut data (Read & Write)
+		- With the shortcut key CTRL-A, same behaviour as §2.2 and $2.3
 		- RawByte data could be modified at this level, and are sent to the 
 		  remote device (change a value then hit Enter key).
 
 3.  TESTS
-	The EnIPExplorer has been tested with really a too few number of others tools :
+	The EnIPExplorer has been tested with realy a too few number of others tools :
 		- Wireshark.
 		- Wago 750/881 	
 

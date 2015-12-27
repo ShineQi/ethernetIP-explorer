@@ -149,4 +149,16 @@ namespace System.Net.EnIPStack
         RemoveMember = 0x1B,
         GroupSync = 0x1C
     }
+
+    // Volume 1 : Table 5-2.2 Identity Object Instance Attributes 
+    public enum IdentityObjectState
+    {
+        NonExistant = 0,
+        DeviceSelfTesting = 1,
+        Standby = 2,
+        Operational = 3,
+        MajorRecoverableFault = 4,
+        MajorUnRecoverableFault = 5,
+        Default = 255
+    }
 }

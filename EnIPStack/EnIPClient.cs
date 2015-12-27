@@ -30,6 +30,7 @@ using System.Text;
 using System.Net.Sockets;
 using System.Net;
 using System.Diagnostics;
+using System.ComponentModel;
 
 namespace System.Net.EnIPStack
 {
@@ -59,7 +60,7 @@ namespace System.Net.EnIPStack
                     offset += 2;
                     for (int i = 0; i < NbDevices; i++)
                     {
-                        EnIPRemoteDevice device = new EnIPRemoteDevice(packet, remote_address, ref offset);
+                        EnIPRemoteDevice device = new EnIPRemoteDevice(remote_address, packet, ref offset);
                         DeviceArrival(device);
                     }
                 }
@@ -93,7 +94,7 @@ namespace System.Net.EnIPStack
         public short Status { get; set; }
         public uint SerialNumber { get; set; }
         public string ProductName { get; set; }
-        public byte State { get; set; }
+        public IdentityObjectState State { get; set; }
 
         public IPEndPoint ep;
         public UInt32 SessionHandle; // When Register Session is set
@@ -105,10 +106,9 @@ namespace System.Net.EnIPStack
         public List<EnIPClass> SupportedClassLists = new List<EnIPClass>();
 
         // The udp endpoint is given here, it's also the tcp one
-        public EnIPRemoteDevice(byte[] DataArray, IPEndPoint ep, ref int Offset)
+        public EnIPRemoteDevice(IPEndPoint ep, byte[] DataArray, ref int Offset)
         {
             this.ep = ep;
-
             Offset += 2; // 0x000C 
 
             Length = BitConverter.ToUInt16(DataArray, Offset);
@@ -149,7 +149,7 @@ namespace System.Net.EnIPStack
             ProductName = System.Text.ASCIIEncoding.ASCII.GetString(DataArray, Offset, strSize);
             Offset += strSize;
 
-            State = DataArray[Offset];
+            State = (IdentityObjectState)DataArray[Offset];
 
             Offset += 1;
         }
@@ -159,9 +159,24 @@ namespace System.Net.EnIPStack
             this.ep = ep;
         }
 
+        public void CopyData(EnIPRemoteDevice newset)
+        {
+            Length = newset.Length;
+            EncapsulationVersion = newset.EncapsulationVersion;
+            SocketAddress = newset.SocketAddress;
+            VendorId = newset.VendorId;
+            DeviceType=newset.DeviceType;
+            ProductCode = newset.ProductCode;
+            _Revision = newset._Revision;
+            Status = newset.Status;
+            SerialNumber = newset.SerialNumber;
+            ProductName = newset.ProductName;
+            State = newset.State;
+        }
+
         public bool Equals(EnIPRemoteDevice other)
         {
-            return ((ep.Equals(other.ep)) && (SerialNumber == other.SerialNumber));
+            return ep.Equals(other.ep);
         }
 
         public bool IsConnected() { return (Tcpclient != null); }
@@ -219,17 +234,20 @@ namespace System.Net.EnIPStack
 
         public bool SetClassInstanceAttribut_Data(byte[] ClassDataPath, ControlNetService Service, byte[] data, ref int Offset, ref int Lenght, out byte[] packet)
         {
-
             packet = this.packet;
+
+            if (Tcpclient == null) return false;
+            if (SessionHandle == 0) RegisterSession();
+            if (SessionHandle == 0) return false;
 
             try
             {
                 UCMM_RR_Packet m = new UCMM_RR_Packet();
                 m.Path = ClassDataPath;
                 m.Service = (byte)Service;
+                m.Data = data;
 
                 EncapsulationPacket p = new EncapsulationPacket(EncapsulationCommands.SendRRData, SessionHandle, m.toByteArray());
-                p.Encapsulateddata = data;
                 Tcpclient.Client.Send(p.toByteArray());
 
                 Lenght = Tcpclient.Client.Receive(packet);
@@ -258,42 +276,7 @@ namespace System.Net.EnIPStack
 
         public bool GetClassInstanceAttribut_Data(byte[] ClassDataPath, ControlNetService Service, ref int Offset, ref int Lenght, out byte[] packet)
         {
-
             return SetClassInstanceAttribut_Data(ClassDataPath, Service, null, ref Offset, ref Lenght, out packet);
-
-            packet = this.packet;
-
-            try
-            {
-                UCMM_RR_Packet m = new UCMM_RR_Packet();
-                m.Path = ClassDataPath;
-                m.Service = (byte)Service;
-
-                EncapsulationPacket p = new EncapsulationPacket(EncapsulationCommands.SendRRData, SessionHandle, m.toByteArray());                
-                Tcpclient.Client.Send(p.toByteArray());
-
-                Lenght = Tcpclient.Client.Receive(packet);
-                if (Lenght > 24)
-                {
-                    Offset = 0;
-                    p = new EncapsulationPacket(packet, ref Offset);
-                    if ((p.IsOK) && (p.Command == (ushort)EncapsulationCommands.SendRRData))
-                    {
-                        m = new UCMM_RR_Packet(packet, ref Offset);
-                        if (m.IsOK)
-                        {
-                            return true;
-                        }
-                    }
-                }
-                Trace.WriteLine("Service not supported : " + Service.ToString());
-                return false;
-            }
-            catch
-            {
-                Trace.TraceWarning("Error while sending request");
-                return false;
-            }
         }
 
         public List<EnIPClass> GetObjectList()
@@ -339,7 +322,8 @@ namespace System.Net.EnIPStack
 
     public class EnIPClass
     {
-        public ushort Id { get; set; }
+        public ushort Id { get; set; }        
+        public object DecodedMembers { get; set; }
         public byte[] RawData { get; set; }
 
         public EnIPRemoteDevice RemoteDevice;
@@ -372,6 +356,7 @@ namespace System.Net.EnIPStack
     public class EnIPClassInstance
     {
         public byte Id { get; set; }
+        public object DecodedMembers { get; set; }
         public byte[] RawData { get; set; }
 
         public EnIPClass Class;
@@ -420,6 +405,7 @@ namespace System.Net.EnIPStack
     public class EnIPInstanceAttribut
     {
         public byte Id { get; set; }
+        public object DecodedContent { get; set; }
         public byte[] RawData { get; set; }
 
         public EnIPClassInstance Instance;
@@ -453,7 +439,7 @@ namespace System.Net.EnIPStack
             int Offset = 0;
             int Lenght = 0;
             byte[] packet;
-            if (RemoteDevice.GetClassInstanceAttribut_Data(ClassDataPath, ControlNetService.GetAttributeSingle, ref Offset, ref Lenght, out packet) == true)
+            if (RemoteDevice.GetClassInstanceAttribut_Data(ClassDataPath, ControlNetService.GetAttributeSingle, ref Offset, ref Lenght, out packet) == true)            
             {
                 RawData = new byte[Lenght - Offset];
                 Array.Copy(packet, Offset, RawData, 0, Lenght - Offset);

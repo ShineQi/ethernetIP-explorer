@@ -43,7 +43,7 @@ namespace SampleClient
             Thread.Sleep(1000);
 
             TestReadLoop();
-            // TestWrite();
+            //TestWriteLoop();
         }
 
         //  Read the first analog value on a Wago PLC 750-8xx
@@ -57,21 +57,22 @@ namespace SampleClient
 
             if (!WagoPlc.IsConnected()) return;
 
-            // class 103, instance 1, attribut 3
+            // class 103, instance 1, attribut 1
+            // could be class 4, Instance 104 (with status) or 107 (wihout), attribut 3 for all Input data
             EnIPClass Class103 = new EnIPClass(WagoPlc, 103);
             EnIPClassInstance Instance1 = new EnIPClassInstance(Class103, 1);
-            EnIPInstanceAttribut FirstAnalogInput = new EnIPInstanceAttribut(Instance1, 3);
+            EnIPInstanceAttribut FirstAnalogInput = new EnIPInstanceAttribut(Instance1, 1);
 
             for (; ; )
             {
                 // all data will be put in the byte[] RawData member of EnIPInstanceAttribut 
                 if (FirstAnalogInput.GetInstanceAttributData())
-                    Console.WriteLine((FirstAnalogInput.RawData[0] << 8) | FirstAnalogInput.RawData[1]);
+                    Console.WriteLine((FirstAnalogInput.RawData[1] << 8) | FirstAnalogInput.RawData[0]);
                 Thread.Sleep(200);
             }
         }
 
-        //  Write %IB2552-%IB2553
+        //  Write %IW1530
         public static void TestWriteLoop()
         {
 
@@ -82,9 +83,9 @@ namespace SampleClient
 
             if (!WagoPlc.IsConnected()) return;
 
-            // class 163, instance 1, attribut 1
-            EnIPClass Class163 = new EnIPClass(WagoPlc, 103);
-            EnIPClassInstance Instance1 = new EnIPClassInstance(Class163, 1);
+            // class 166, instance 1, attribut 1
+            EnIPClass Class166 = new EnIPClass(WagoPlc, 166);
+            EnIPClassInstance Instance1 = new EnIPClassInstance(Class166, 1);
             EnIPInstanceAttribut FirstMemoryByte = new EnIPInstanceAttribut(Instance1, 1);
 
             ushort i = 0;
@@ -109,7 +110,6 @@ namespace SampleClient
 
         static void client_DeviceArrival(EnIPRemoteDevice device)
         {
-
             Console.WriteLine("Arrvial of : " + device.ep.Address.ToString() + " - " + device.ProductName);
         }
     }

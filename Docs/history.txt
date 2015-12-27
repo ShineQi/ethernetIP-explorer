@@ -2,6 +2,18 @@
                    EnIPExplorer- Ethernet/IP Explorer
 -------------------------------------------------------------------------------
 
-0.1.0 - 027/12/2015
+0.1.0 - 24/12/2015
  - First code on Sourceforge
 
+0.1.1
+ - Full tree view Device-Class-Instance-Attribut
+ - Read & display raw data from class, instance, attribut
+
+0.1.2
+ - Add Single Write attribut (undecoded byte[] raw data)
+
+Roadmap
+ - Save& load Tree structure in a spreadsheet editable format 
+ - Maybe decoding of standard classes :
+	but I don't understand how missing optional attributs values
+	could be detected, and my Wago Plc don't help me for that.

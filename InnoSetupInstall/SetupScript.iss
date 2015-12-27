@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "EnIPExplorer"
-#define MyAppVersion "0.1"
+#define MyAppVersion "0.2"
 #define MyAppPublisher "F. Chaxel"
 #define MyAppURL "http://sourceforge.net/projects/EnIPExplorer"
 #define MyAppExeName "EnIPExplorer.exe"
@@ -23,7 +23,7 @@ DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 LicenseFile=..\Docs\MIT_license.txt
 OutputDir=.
-OutputBaseFilename=SetupEnIPExplorer
+OutputBaseFilename=SetupEnIPExplorer_{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
 
