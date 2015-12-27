@@ -46,5 +46,41 @@ namespace EnIPExplorer.Properties {
                 this["TCP_WAN_TimeOut"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ConfirmDeleteDevice {
+            get {
+                return ((bool)(this["ConfirmDeleteDevice"]));
+            }
+            set {
+                this["ConfirmDeleteDevice"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ConfirmDeleteOthers {
+            get {
+                return ((bool)(this["ConfirmDeleteOthers"]));
+            }
+            set {
+                this["ConfirmDeleteOthers"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string DefaultTreeFile {
+            get {
+                return ((string)(this["DefaultTreeFile"]));
+            }
+            set {
+                this["DefaultTreeFile"] = value;
+            }
+        }
     }
 }

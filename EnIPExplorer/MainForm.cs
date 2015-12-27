@@ -33,6 +33,8 @@ using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Net.EnIPStack;
+using System.Threading;
+using System.Globalization;
 
 namespace EnIPExplorer
 {
@@ -48,6 +50,7 @@ namespace EnIPExplorer
             propertyGrid.ExpandAllGridItems();
         }
 
+        // Each time we received a reponse to udp brodcast ou unicast ListIdentity
         void On_DeviceArrival(EnIPRemoteDevice device)
         {
             if (InvokeRequired)
@@ -68,7 +71,6 @@ namespace EnIPExplorer
 
         private int Classe2Ico(CIPObjectLibrary clId)
         {
-
             switch (clId)
             {
                 case CIPObjectLibrary.Identity:
@@ -88,8 +90,35 @@ namespace EnIPExplorer
                     return 6;
                 default: return 2;
             }
-            
+        }
 
+        private TreeNode ClassToTreeNode(EnIPClass Class)
+        {
+            TreeNode tn;
+
+            if (Enum.IsDefined(typeof(CIPObjectLibrary), Class.Id))
+            {
+                CIPObjectLibrary cipobj = (CIPObjectLibrary)Class.Id;
+                int img = Classe2Ico(cipobj);
+                tn = new TreeNode(cipobj.ToString(), img, img);
+
+                if ((Class.Id == 1) || (Class.Id == 2) || (Class.Id == 0xF5) || (Class.Id == 0xF6))
+                {
+                    EnIPClassInstance instance = new EnIPClassInstance(Class, 1);
+                    TreeNode tnI = new TreeNode("Instance #1", 9, 9);
+                    tnI.Tag = instance;
+                    tn.Nodes.Add(tnI);
+
+                }
+            }
+            else
+            {
+                tn = new TreeNode("Proprietary " + Class.Id.ToString() + " (0x" + Class.Id.ToString("X2") + ")", 1, 1);
+            }
+
+            tn.Tag = Class;
+
+            return tn;
         }
 
         private void devicesTreeView_AfterSelect(object sender, TreeViewEventArgs e)
@@ -110,51 +139,31 @@ namespace EnIPExplorer
                 }
 
                 foreach (EnIPClass clId in device.SupportedClassLists)
-                {
-                    TreeNode tn;
-
-                    if (Enum.IsDefined(typeof(CIPObjectLibrary), clId.Id))
-                    {
-                        CIPObjectLibrary cipobj = (CIPObjectLibrary)clId.Id;
-                        int img = Classe2Ico(cipobj);
-                        tn = new TreeNode(cipobj.ToString(), img, img);
-
-                        if ((clId.Id == 1) || (clId.Id == 2) || (clId.Id == 0xF5) || (clId.Id == 0xF6))
-                        {
-                            EnIPClassInstance instance = new EnIPClassInstance(clId, 1);
-                            TreeNode tnI = new TreeNode("Instance #1", 9, 9);
-                            tnI.Tag = instance;
-                            tn.Nodes.Add(tnI);
-
-                        }
-                    }
-                    else
-                    {
-                        tn = new TreeNode("Proprietary " + clId.Id.ToString() + " (0x" + clId.Id.ToString("X2") + ")", 1, 1);
-                    }
-
-                    tn.Tag = clId;
-
-                    e.Node.Nodes.Add(tn);
+                {                    
+                    e.Node.Nodes.Add(ClassToTreeNode(clId));
                 }
+                e.Node.Expand();
             }
             else if (e.Node.Tag is EnIPClass)
             {
                 EnIPClass EnClass = (EnIPClass)e.Node.Tag;
                 EnClass.GetClassData();
                 propertyGrid.SelectedObject = EnClass;
+                propertyGrid.ExpandAllGridItems();
             }
             else if (e.Node.Tag is EnIPClassInstance)
             {
                 EnIPClassInstance Instance = (EnIPClassInstance)e.Node.Tag;
                 Instance.GetClassInstanceData();
                 propertyGrid.SelectedObject = Instance;
+                propertyGrid.ExpandAllGridItems();
             }
             else if (e.Node.Tag is EnIPInstanceAttribut)
             {
                 EnIPInstanceAttribut Att = (EnIPInstanceAttribut)e.Node.Tag;
                 Att.GetInstanceAttributData();
                 propertyGrid.SelectedObject = Att;
+                propertyGrid.ExpandAllGridItems();
             }
         }
 
@@ -166,7 +175,7 @@ namespace EnIPExplorer
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(this, "Ethernet/IP Explorer - EnIPExplorer\nVersion " + this.GetType().Assembly.GetName().Version + "\nBy Frederic Chaxel - Copyright 2016\n" +
+            MessageBox.Show(this, "Ethernet/IP Explorer - EnIPExplorer\nVersion Alpha " + this.GetType().Assembly.GetName().Version + "\nBy Frederic Chaxel - Copyright 2016\n" +
                 "\nReference: http://sourceforge.net/projects/EnIPExplorer" +
                 "\nReference: http://sourceforge.net/projects/yetanotherbacnetexplorer/" +
                 "\nReference: http://www.famfamfam.com/"+
@@ -181,27 +190,95 @@ namespace EnIPExplorer
 
         private void sendListIdentityDiscoverToolStripMenuItem_Click(object sender, EventArgs e)
         {
-                client.DiscoverServers();
+            if (client == null) return;
+            client.DiscoverServers();
         }
 
         private void openInterfaceToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (client == null)
             {
+                var Input =
+                    new GenericInputBox<ComboBox>("Local Interface", "IP address",
+                         (o) =>
+                         {
+                             string[] local_endpoints = GetAvailableIps();
+                             o.Items.AddRange(local_endpoints);
+                         });
+
+                DialogResult res = Input.ShowDialog();
+
+                if (res != DialogResult.OK) return;
+                String userinput = Input.genericInput.Text;
+
                 try
                 {
-                    client = new EnIPClient("");
+                    client = new EnIPClient(userinput);
                     client.DeviceArrival += new DeviceArrivalHandler(On_DeviceArrival);
 
                     client.DiscoverServers();
 
                     openInterfaceToolStripMenuItem.Enabled = false;
-                    sendListIdentityDiscoverToolStripMenuItem.Enabled = true;
                 }
                 catch
                 {
                     MessageBox.Show("Local address unavailable", "Error in Open Interface", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+            }
+        }
+
+        public static string[] GetAvailableIps()
+        {
+            List<string> ips = new List<string>();
+            System.Net.NetworkInformation.NetworkInterface[] interfaces = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces();
+            foreach (System.Net.NetworkInformation.NetworkInterface inf in interfaces)
+            {
+                if (!inf.IsReceiveOnly && inf.OperationalStatus == System.Net.NetworkInformation.OperationalStatus.Up && inf.SupportsMulticast && inf.NetworkInterfaceType != System.Net.NetworkInformation.NetworkInterfaceType.Loopback)
+                {
+                    System.Net.NetworkInformation.IPInterfaceProperties ipinfo = inf.GetIPProperties();
+                    if (ipinfo.GatewayAddresses == null || ipinfo.GatewayAddresses.Count == 0 || (ipinfo.GatewayAddresses.Count == 1 && ipinfo.GatewayAddresses[0].Address.ToString() == "0.0.0.0")) continue;
+                    foreach (System.Net.NetworkInformation.UnicastIPAddressInformation addr in ipinfo.UnicastAddresses)
+                    {
+                        if (addr.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                        {
+                            ips.Add(addr.Address.ToString());
+                        }
+                    }
+                }
+            }
+            return ips.ToArray();
+        }
+
+        private void addClassToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TreeNode tn = devicesTreeView.SelectedNode;
+
+            if (tn == null) return;
+
+            if (!(tn.Tag is EnIPRemoteDevice)) return;
+
+            int Numbase = 1;
+            foreach (TreeNode t in tn.Nodes)
+            {
+                int num = (t.Tag as EnIPClass).Id;
+                Numbase = Math.Max(num + 1, Numbase);
+            }
+
+            var Input =
+                new GenericInputBox<NumericUpDown>("Add Class", "Class Id :",
+                     (o) =>
+                     {
+                         o.Minimum = 1; o.Maximum = 65535; o.Value = Numbase;
+                     });
+
+            DialogResult res = Input.ShowDialog();
+
+            if (res == DialogResult.OK)
+            {
+                byte Id = (byte)Input.genericInput.Value;
+                EnIPClass Class = new EnIPClass(tn.Tag as EnIPRemoteDevice, Id);
+                tn.Nodes.Add(ClassToTreeNode(Class));
+                tn.Expand();
             }
         }
 
@@ -221,15 +298,23 @@ namespace EnIPExplorer
                 Numbase = Math.Max(num + 1, Numbase);
             }
 
-            GetId form = new GetId("Instance Id :", Numbase);
-            DialogResult res = form.ShowDialog();
+            var Input =
+                new GenericInputBox<NumericUpDown>("Add Instance", "Instance Id :",
+                     (o) =>
+                     {
+                         o.Minimum = 1; o.Maximum = 255; o.Value = Numbase;
+                     });
+
+            DialogResult res = Input.ShowDialog();
+
             if (res == DialogResult.OK)
             {
-                byte Id = (byte)form.Id.Value;
+                byte Id = (byte)Input.genericInput.Value;
                 EnIPClassInstance instance = new EnIPClassInstance(tn.Tag as EnIPClass, Id);
                 TreeNode tnI = new TreeNode("Instance #"+Id.ToString(), 9, 9);
                 tnI.Tag = instance;
                 tn.Nodes.Add(tnI);
+                tn.Expand();
             }
 
         }
@@ -249,15 +334,23 @@ namespace EnIPExplorer
                 Numbase = Math.Max(num + 1, Numbase);
             }
 
-            GetId form = new GetId("Attribut Id :", Numbase);
-            DialogResult res = form.ShowDialog();
+            var Input =
+                new GenericInputBox<NumericUpDown>("Add Attribut", "Attribut Id :",
+                     (o) =>
+                     {
+                         o.Minimum = 1; o.Maximum = 255; o.Value = Numbase;
+                     });
+
+            DialogResult res = Input.ShowDialog();
+
             if (res == DialogResult.OK)
             {
-                byte Id = (byte)form.Id.Value;
+                byte Id = (byte)Input.genericInput.Value;
                 EnIPInstanceAttribut att = new EnIPInstanceAttribut(tn.Tag as EnIPClassInstance, Id);
                 TreeNode tnI = new TreeNode("Attribut #"+Id.ToString(), 8, 8);
                 tnI.Tag = att;
                 tn.Nodes.Add(tnI);
+                tn.Expand();
             }
 
         }
@@ -278,11 +371,74 @@ namespace EnIPExplorer
             catch { }
         }
 
+        // change in properties Grid, a Byte in the Raw Data 
+        // send it to the device if it's an attribut value
         private void propertyGrid_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
-            Trace.WriteLine("No modification taken into account at this level");
+            if ((e.ChangedItem.Parent != null) && (e.ChangedItem.Parent.Label == "RawData") && (devicesTreeView.SelectedNode.Tag is EnIPInstanceAttribut))
+            {
+                EnIPInstanceAttribut v = (EnIPInstanceAttribut)devicesTreeView.SelectedNode.Tag;
+                if (v.SetInstanceAttributData()==true)
+                    Trace.WriteLine("Write OK");
+            }
+            else
+                Trace.WriteLine("Modifications are not taken into account at this level");
         }
 
+        // Add a new device not discovery using the broadcast technic : outside the local net
+        private void addRemoteDeviceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (client==null) return;
+
+            var Input =
+                new GenericInputBox<TextBox>("Remote device", "IP address",
+                     (o) =>
+                     {
+                     });
+
+            DialogResult res = Input.ShowDialog();
+
+            if (res != DialogResult.OK) return;
+        }
+
+        // Delete a Device, a class, an instance, an attribut
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TreeNode tn = devicesTreeView.SelectedNode;
+            if (tn == null) return;
+
+            DialogResult deleteOK = DialogResult.OK;
+
+            if (tn.Tag is EnIPRemoteDevice)
+            {
+                // confirm
+                if (Properties.Settings.Default.ConfirmDeleteDevice)
+                    deleteOK = MessageBox.Show("Delete this device", tn.Text, MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+
+                if (deleteOK == DialogResult.OK)
+                {
+                    EnIPRemoteDevice device=(tn.Tag as EnIPRemoteDevice);
+                    
+                    device.Disconnect();                    // close the tcp connection
+                    devicesTreeView.Nodes.Remove(tn);       // remove from the tree
+                    servers.Remove(device);                 // remove from the list
+                }
+            }
+            else
+            {
+                // confirm
+                if (Properties.Settings.Default.ConfirmDeleteOthers)
+                    deleteOK = MessageBox.Show("Delete", tn.Text, MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+                if (deleteOK == DialogResult.OK)
+                    devicesTreeView.Nodes.Remove(tn);   // only remove from the list
+            }
+        }
+
+        // Remove the Log content
+        private void LogText_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            LogText.Text = "";
+        }
     }
 
     public class MyTraceListener : TraceListener

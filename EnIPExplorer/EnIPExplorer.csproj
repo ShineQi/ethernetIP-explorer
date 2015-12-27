@@ -61,11 +61,8 @@
     <Compile Include="..\EnIPStack\Enums.cs">
       <Link>Enums.cs</Link>
     </Compile>
-    <Compile Include="GetId.cs">
+    <Compile Include="GenericInputBox.cs">
       <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GetId.Designer.cs">
-      <DependentUpon>GetId.cs</DependentUpon>
     </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -81,9 +78,6 @@
     <Compile Include="SettingsDialog.designer.cs">
       <DependentUpon>SettingsDialog.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="GetId.resx">
-      <DependentUpon>GetId.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -123,6 +117,8 @@
     <None Include="ico\magnifier.png" />
     <None Include="ico\bullet_purple.png" />
     <None Include="ico\pencil.png" />
+    <None Include="ico\bullet_wrench.png" />
+    <None Include="ico\computer_add.png" />
     <Content Include="Search.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
