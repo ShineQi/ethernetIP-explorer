@@ -88,6 +88,31 @@ namespace System.Net.EnIPStack
             return null;
 
         }
+
+        public static string GetPath(byte[] path)
+        {
+            StringBuilder sb=new StringBuilder();
+
+            int i = 0;
+            do
+            {
+                if (i != 0) sb.Append('.');
+                // Missing 32 bits elements
+                if ((path[i] & 3) == 1)
+                {
+
+                    sb = sb.Append((path[i + 2] << 8 | path[i + 3]).ToString());
+                    i += 4;
+                }
+                else
+                {
+                    sb = sb.Append(path[i + 1].ToString());
+                    i += 2;
+                }
+            } while (i < path.Length);
+
+            return sb.ToString();
+        }
     }
 
     // Volume 2 : Table 2-3.1 Encapsulation Packet

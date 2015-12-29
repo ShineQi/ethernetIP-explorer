@@ -1,0 +1,48 @@
+Device IP;Name;Class;ClassName;Instance;InstanceName;Attribut;AttributName
+//
+// EnIPExplorer Device Tree, can be modified with a spreadsheet
+// No empy line, comment first with a / char
+// All comments removed by EnIPExplorer save As menu.
+//
+// Device IP & Name
+172.20.54.58;WAGO 750-881 PFC ETHERNET
+// Class 1 under the Wago Plc
+;;1;Identity  #1;;;;
+// instance 1 under the class 1
+;;;;1;Instance #1;;
+// class 2
+;;2;MessageRouter #2;;;;
+// and so on !
+;;;;1;Instance #1;;
+;;4;Assembly #4;;;;
+;;;;101;Instance #101;;
+;;;;;;1;Attribut #3
+;;;;103;Instance #103;;
+;;;;;;1;Attribut #3
+;;6;ConnectionManager  #6;;;;
+;;244;Port #244;;;;
+;;245;TCPIPInterface #245;;;;
+;;;;1;Instance #1;;
+;;246;EthernetLink #246;;;;
+;;;;1;Instance #1;;
+;;100;Proprietary #100;;;;
+;;101;Proprietary #101;;;;
+;;102;Proprietary #102;;;;
+;;103;Proprietary Analog Inputs #103;;;;
+;;;;1;Instance #1;;
+;;;;;;1;First Analog Input #1 
+;;104;Proprietary #104;;;;
+;;105;Proprietary #105;;;;
+;;106;Proprietary #106;;;;
+;;107;Proprietary #107;;;;
+;;108;Proprietary #108;;;;
+;;109;Proprietary #109;;;;
+;;110;Proprietary #110;;;;
+;;111;I can put the name I want;;;;
+;;112;Proprietary #112;;;;
+// Next device
+172.20.54.59;WAGO 750-881 PFC ETHERNET
+;;1;Identity  #1;;;;
+;;103;Proprietary Analog Inputs #103;;;;
+;;;;1;Instance #1;;
+;;;;;;1;First Analog Input #1 

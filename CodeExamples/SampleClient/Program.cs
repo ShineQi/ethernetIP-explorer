@@ -57,6 +57,9 @@ namespace SampleClient
             EnIPClassInstance Instance1 = new EnIPClassInstance(Class103, 1);
             EnIPInstanceAttribut FirstAnalogInput = new EnIPInstanceAttribut(Instance1, 1);
 
+            WagoPlc.autoConnect = false;
+            WagoPlc.autoRegisterSession = true;
+
             for (; ; )
             {
                 // Connect or try re-connect, could be made with a long delay
@@ -66,7 +69,7 @@ namespace SampleClient
                     return;
 
                 // all data will be put in the byte[] RawData member of EnIPInstanceAttribut 
-                if (FirstAnalogInput.GetInstanceAttributData())
+                if (FirstAnalogInput.GetInstanceAttributData()==EnIPNetworkStatus.OnLine)
                     Console.WriteLine((FirstAnalogInput.RawData[1] << 8) | FirstAnalogInput.RawData[0]);
 
                 Thread.Sleep(200);
@@ -84,17 +87,15 @@ namespace SampleClient
             EnIPClassInstance Instance1 = new EnIPClassInstance(Class166, 1);
             EnIPInstanceAttribut FirstMemoryByte = new EnIPInstanceAttribut(Instance1, 1);
 
+            // Connect made & retry automatically
+            WagoPlc.autoConnect = true;
+            WagoPlc.autoRegisterSession = true;
+
             ushort i = 0;
             for (; ; )
-            {
-                // Connect or try re-connect, could be made with a long delay
-                if (!WagoPlc.IsConnected())
-                    WagoPlc.Connect();
-                if (!WagoPlc.IsConnected())
-                    return;
-
+            {               
                 FirstMemoryByte.RawData=BitConverter.GetBytes(i++);
-                if (FirstMemoryByte.SetInstanceAttributData())
+                if (FirstMemoryByte.SetInstanceAttributData()==EnIPNetworkStatus.OnLine)
                     Console.WriteLine("OK");
 
                 Thread.Sleep(200);

@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "EnIPExplorer"
-#define MyAppVersion "0.2"
+#define MyAppVersion "0.3"
 #define MyAppPublisher "F. Chaxel"
 #define MyAppURL "http://sourceforge.net/projects/EnIPExplorer"
 #define MyAppExeName "EnIPExplorer.exe"
@@ -60,13 +60,16 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "..\EnIPExplorer\bin\Debug\EnIPExplorer.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\EnIPExplorer\bin\Debug\README.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\EnIPExplorer\bin\Debug\SampleTree.csv"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 Name: "{group}\Doc\Website"; Filename : "{#MyAppURL}"
 Name: "{group}\Doc\Readme"; Filename: "{app}\Readme.txt"
+Name: "{group}\Doc\SampleTree.csv"; Filename: "{app}\SampleTree.csv"
 Name: "{group}\Doc\Full source code"; Filename: "http://sourceforge.net/p/enipexplorer/code/HEAD/tarball"
 
 [Run]

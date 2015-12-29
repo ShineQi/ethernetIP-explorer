@@ -35,6 +35,7 @@
             this.devicesTreeView = new System.Windows.Forms.TreeView();
             this.MenuPopup = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.popupDeleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.popupRenameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.popupAddCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.popupAddIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.popupAddAToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -55,6 +56,7 @@
             this.sendListIdentityDiscoverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.renameCurrentNodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addClassToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addClassInstanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addInstanceAttributToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -124,17 +126,19 @@
             this.devicesTreeView.SelectedImageIndex = 0;
             this.devicesTreeView.Size = new System.Drawing.Size(298, 478);
             this.devicesTreeView.TabIndex = 1;
+            this.devicesTreeView.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.devicesTreeView_AfterExpand);
             this.devicesTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.devicesTreeView_AfterSelect);
             // 
             // MenuPopup
             // 
             this.MenuPopup.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.popupDeleteToolStripMenuItem,
+            this.popupRenameToolStripMenuItem,
             this.popupAddCToolStripMenuItem,
             this.popupAddIToolStripMenuItem,
             this.popupAddAToolStripMenuItem});
             this.MenuPopup.Name = "MenuPopup";
-            this.MenuPopup.Size = new System.Drawing.Size(144, 92);
+            this.MenuPopup.Size = new System.Drawing.Size(144, 114);
             // 
             // popupDeleteToolStripMenuItem
             // 
@@ -143,6 +147,14 @@
             this.popupDeleteToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
             this.popupDeleteToolStripMenuItem.Text = "Delete";
             this.popupDeleteToolStripMenuItem.Click += new System.EventHandler(this.popupDeleteToolStripMenuItem_Click);
+            // 
+            // popupRenameToolStripMenuItem
+            // 
+            this.popupRenameToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.text_replace;
+            this.popupRenameToolStripMenuItem.Name = "popupRenameToolStripMenuItem";
+            this.popupRenameToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.popupRenameToolStripMenuItem.Text = "Rename";
+            this.popupRenameToolStripMenuItem.Click += new System.EventHandler(this.popupRenameToolStripMenuItem_Click);
             // 
             // popupAddCToolStripMenuItem
             // 
@@ -173,15 +185,16 @@
             this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
             this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
             this.imageList1.Images.SetKeyName(0, "Plc.png");
-            this.imageList1.Images.SetKeyName(1, "bullet_wrench.png");
-            this.imageList1.Images.SetKeyName(2, "layout.png");
-            this.imageList1.Images.SetKeyName(3, "information.png");
-            this.imageList1.Images.SetKeyName(4, "arrow_out.png");
-            this.imageList1.Images.SetKeyName(5, "computer.png");
-            this.imageList1.Images.SetKeyName(6, "text_list_bullets.png");
-            this.imageList1.Images.SetKeyName(7, "disconnect.png");
-            this.imageList1.Images.SetKeyName(8, "bullet_purple.png");
+            this.imageList1.Images.SetKeyName(1, "PlcOffline.png");
+            this.imageList1.Images.SetKeyName(2, "bullet_wrench.png");
+            this.imageList1.Images.SetKeyName(3, "layout.png");
+            this.imageList1.Images.SetKeyName(4, "information.png");
+            this.imageList1.Images.SetKeyName(5, "arrow_out.png");
+            this.imageList1.Images.SetKeyName(6, "computer.png");
+            this.imageList1.Images.SetKeyName(7, "text_list_bullets.png");
+            this.imageList1.Images.SetKeyName(8, "disconnect.png");
             this.imageList1.Images.SetKeyName(9, "pencil.png");
+            this.imageList1.Images.SetKeyName(10, "bullet_purple.png");
             // 
             // DeviceLabel
             // 
@@ -202,6 +215,7 @@
             this.propertyGrid.PropertySort = System.Windows.Forms.PropertySort.NoSort;
             this.propertyGrid.Size = new System.Drawing.Size(317, 478);
             this.propertyGrid.TabIndex = 1;
+            this.propertyGrid.ToolbarVisible = false;
             this.propertyGrid.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid_PropertyValueChanged);
             // 
             // PropertiesLabel
@@ -260,17 +274,19 @@
             // 
             // loadConfigurationToolStripMenuItem
             // 
-            this.loadConfigurationToolStripMenuItem.Enabled = false;
+            this.loadConfigurationToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.database_edit;
             this.loadConfigurationToolStripMenuItem.Name = "loadConfigurationToolStripMenuItem";
             this.loadConfigurationToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this.loadConfigurationToolStripMenuItem.Text = "Load Tree Configuration";
+            this.loadConfigurationToolStripMenuItem.Click += new System.EventHandler(this.loadConfigurationToolStripMenuItem_Click);
             // 
             // saveConfigurationAsToolStripMenuItem
             // 
-            this.saveConfigurationAsToolStripMenuItem.Enabled = false;
+            this.saveConfigurationAsToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.database_go1;
             this.saveConfigurationAsToolStripMenuItem.Name = "saveConfigurationAsToolStripMenuItem";
             this.saveConfigurationAsToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this.saveConfigurationAsToolStripMenuItem.Text = "Save Configuration As";
+            this.saveConfigurationAsToolStripMenuItem.Click += new System.EventHandler(this.saveConfigurationAsToolStripMenuItem_Click);
             // 
             // quitToolStripMenuItem
             // 
@@ -288,6 +304,7 @@
             this.sendListIdentityDiscoverToolStripMenuItem,
             this.toolStripSeparator1,
             this.deleteToolStripMenuItem,
+            this.renameCurrentNodeToolStripMenuItem,
             this.addClassToolStripMenuItem,
             this.addClassInstanceToolStripMenuItem,
             this.addInstanceAttributToolStripMenuItem});
@@ -306,7 +323,6 @@
             // 
             // addRemoteDeviceToolStripMenuItem
             // 
-            this.addRemoteDeviceToolStripMenuItem.Enabled = false;
             this.addRemoteDeviceToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.computer_add;
             this.addRemoteDeviceToolStripMenuItem.Name = "addRemoteDeviceToolStripMenuItem";
             this.addRemoteDeviceToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
@@ -332,8 +348,16 @@
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             this.deleteToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
             this.deleteToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
-            this.deleteToolStripMenuItem.Text = "Delete Node";
+            this.deleteToolStripMenuItem.Text = "Delete current Node";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
+            // 
+            // renameCurrentNodeToolStripMenuItem
+            // 
+            this.renameCurrentNodeToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.text_replace;
+            this.renameCurrentNodeToolStripMenuItem.Name = "renameCurrentNodeToolStripMenuItem";
+            this.renameCurrentNodeToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.renameCurrentNodeToolStripMenuItem.Text = "Rename current Node";
+            this.renameCurrentNodeToolStripMenuItem.Click += new System.EventHandler(this.renameCurrentNodeToolStripMenuItem_Click);
             // 
             // addClassToolStripMenuItem
             // 
@@ -469,6 +493,8 @@
         private System.Windows.Forms.ToolStripMenuItem popupAddCToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem popupAddIToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem popupAddAToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem renameCurrentNodeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem popupRenameToolStripMenuItem;
     }
 }
 

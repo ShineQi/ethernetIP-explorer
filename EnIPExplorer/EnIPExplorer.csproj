@@ -94,6 +94,10 @@
     <EmbeddedResource Include="SettingsDialog.resx">
       <DependentUpon>SettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="..\Docs\SampleTree.csv">
+      <Link>SampleTree.csv</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -119,6 +123,9 @@
     <None Include="ico\pencil.png" />
     <None Include="ico\bullet_wrench.png" />
     <None Include="ico\computer_add.png" />
+    <None Include="ico\database_edit.png" />
+    <None Include="ico\database_go1.png" />
+    <None Include="ico\text_replace.png" />
     <Content Include="Search.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

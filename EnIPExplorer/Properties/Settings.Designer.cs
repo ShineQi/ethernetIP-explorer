@@ -94,5 +94,41 @@ namespace EnIPExplorer.Properties {
                 this["GUI_FormSize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string DefaultRemoteDevice {
+            get {
+                return ((string)(this["DefaultRemoteDevice"]));
+            }
+            set {
+                this["DefaultRemoteDevice"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(";")]
+        public char CSVSeparator {
+            get {
+                return ((char)(this["CSVSeparator"]));
+            }
+            set {
+                this["CSVSeparator"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Normal")]
+        public global::System.Windows.Forms.FormWindowState GUI_State {
+            get {
+                return ((global::System.Windows.Forms.FormWindowState)(this["GUI_State"]));
+            }
+            set {
+                this["GUI_State"] = value;
+            }
+        }
     }
 }

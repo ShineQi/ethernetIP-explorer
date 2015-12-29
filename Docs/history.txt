@@ -12,8 +12,12 @@
 0.1.2
  - Add Single Write attribut (undecoded byte[] raw data)
 
+0.1.3
+ - Save&load Tree structure in a spreadsheet editable format
+ - Clean device Online/Offline display
+
 Roadmap
- - Save& load Tree structure in a spreadsheet editable format 
  - Maybe decoding of standard classes :
 	but I don't understand how missing optional attributs values
 	could be detected, and my Wago Plc don't help me for that.
+ - Rawdata user selectable format ? byte, short, uhsort ... 
