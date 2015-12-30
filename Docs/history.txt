@@ -17,7 +17,5 @@
  - Clean device Online/Offline display
 
 Roadmap
- - Maybe decoding of standard classes :
-	but I don't understand how missing optional attributs values
-	could be detected, and my Wago Plc don't help me for that.
+ - Maybe decoding of standard classes
  - Rawdata user selectable format ? byte, short, uhsort ... 

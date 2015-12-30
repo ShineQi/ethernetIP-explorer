@@ -33,7 +33,7 @@ namespace System.Net.EnIPStack
     // Volume 2 : Table 2-3.2 Encapsulation Commands
     public enum EncapsulationCommands : ushort
     {
-        NOP = 0x0000,
+        Nop = 0x0000,   // Application keep alive
         ListServices = 0x0004,
         ListIdentity = 0x0063,
         ListInterfaces = 0x0064,
@@ -161,5 +161,55 @@ namespace System.Net.EnIPStack
         MajorRecoverableFault = 4,
         MajorUnRecoverableFault = 5,
         Default = 255
+    }
+
+    // Volume 1 : Table B-1.1 CIP General Status Codes
+    public enum CIPGeneralSatusCode
+    {
+        Success = 0,
+        Connection_failure = 1,
+        Resource_unavailable = 2,
+        Invalid_parameter_value = 3,
+        Path_segment_error = 4,
+        Path_destination_unknown = 5,
+        Partial_transfer = 6,
+        Connection_lost = 7,
+        Service_not_supported = 8,
+        Invalid_attribute_value = 9,
+        Attribute_list_error = 10,
+        Already_in_requested_mode_state = 11,
+        Object_state_conflict = 12,
+        Object_already_exists = 13,
+        Attribute_not_settable = 14,
+        Privilege_violation = 15,
+        Device_state_conflict = 16,
+        Reply_data_too_large = 17,
+        Fragmentation_of_a_primitive_value = 18,
+        Not_enough_data = 19,
+        Attribute_not_supported = 20,
+        Too_much_data = 21,
+        Object_does_not_exist = 22,
+        Service_fragmentation_sequence_not_in_progress = 23,
+        No_stored_attribute_data = 24,
+        Store_operation_failure = 25,
+        Routing_failure_request_packet_too_large = 26,
+        Routing_failure_response_packet_too_large = 27,
+        Missing_attribute_list_entry_data = 28,
+        Invalid_attribute_value_list = 29,
+        Embedded_service_error = 30,
+        Vendor_specific_error = 31,
+        Invalid_parameter = 32,
+        Write_once_value_or_medium_already_written = 33,
+        Invalid_reply_received = 34,
+        Buffer_overflow = 35,
+        Invalid_message_format = 36,
+        Key_failure_in_path = 37,
+        Path_size_invalid = 38,
+        Unexpected_attribute_in_list = 39,
+        Invalid_Member_ID = 40,
+        Member_not_settable = 41,
+        Group_2_only_server_general_failure = 42,
+        Unknown_Modbus_error = 43,
+        Attribute_not_gettable = 44
     }
 }

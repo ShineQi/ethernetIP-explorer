@@ -12,15 +12,16 @@ Device IP;Name;Class;ClassName;Instance;InstanceName;Attribut;AttributName
 ;;;;1;Instance #1;;
 // class 2
 ;;2;MessageRouter #2;;;;
-// and so on !
 ;;;;1;Instance #1;;
+;;;;;;1;ObjectList #1
 ;;4;Assembly #4;;;;
-;;;;101;Instance #101;;
-;;;;;;1;Attribut #3
-;;;;103;Instance #103;;
-;;;;;;1;Attribut #3
+;;;;101;Instance #101 - Output;;
+;;;;;;3;Attribut #3
+;;;;107;Instance #107 - Input;;
+;;;;;;3;Attribut #3
 ;;6;ConnectionManager  #6;;;;
 ;;244;Port #244;;;;
+;;;;1;Instance #1;;
 ;;245;TCPIPInterface #245;;;;
 ;;;;1;Instance #1;;
 ;;246;EthernetLink #246;;;;

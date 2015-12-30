@@ -115,6 +115,11 @@ namespace SampleClient
         static void client_DeviceArrival(EnIPRemoteDevice device)
         {
             Console.WriteLine("Arrvial of : " + device.IPString() + " - " + device.ProductName);
+            // Query the object list : Assembly object, instance 1, atribut 1
+            Console.WriteLine("Classes inside :");
+            device.GetObjectList();
+            foreach (EnIPClass cl in device.SupportedClassLists)
+                Console.WriteLine("\t"+((CIPObjectLibrary)cl.Id).ToString());
         }
     }
 }

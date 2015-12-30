@@ -131,7 +131,7 @@ namespace EnIPExplorer
                 tn = new TreeNode(cipobj.ToString()+" #"+ Class.Id.ToString(), img, img);
 
                 // Special classes with the known instance(s)
-                if ((Class.Id == 1) || (Class.Id == 2) || (Class.Id == 0xF5) || (Class.Id == 0xF6))
+                if ((Class.Id == 1) || (Class.Id == 2) || (Class.Id == 0xF4) || (Class.Id == 0xF5) || (Class.Id == 0xF6))
                 {
                     EnIPClassInstance instance = new EnIPClassInstance(Class, 1);
                     TreeNode tnI = new TreeNode("Instance #1", 9, 9);
@@ -294,7 +294,7 @@ namespace EnIPExplorer
         // Menu Item
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(this, "Ethernet/IP Explorer - EnIPExplorer\nVersion Alpha " + this.GetType().Assembly.GetName().Version + "\nBy Frederic Chaxel - Copyright 2016\n" +
+            MessageBox.Show(this, "Ethernet/IP Explorer - EnIPExplorer\nVersion Beta " + this.GetType().Assembly.GetName().Version + "\nBy Frederic Chaxel - Copyright 2016\n" +
                 "\nReference: http://sourceforge.net/projects/EnIPExplorer" +
                 "\nReference: http://sourceforge.net/projects/yetanotherbacnetexplorer/" +
                 "\nReference: http://www.famfamfam.com/"+

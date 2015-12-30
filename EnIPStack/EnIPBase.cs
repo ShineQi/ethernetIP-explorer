@@ -35,7 +35,7 @@ namespace System.Net.EnIPStack
 {
     // Volume 1 : C-1.4.2 Logical Segment
     // Remember for 16 bits address : (0x21 or 0x25 or 0x31) - 0x00 - 0xPF - 0xpf
-    // also a pad 0x00 must be set  for 32 bits address
+    // also a pad 0x00 must be set for 32 bits address
     public static class Path
     {
         private static void Fit(byte[] path, ref int offset, ushort value, byte code)
@@ -55,7 +55,7 @@ namespace System.Net.EnIPStack
             }
         }
 
-        public static byte[] GetPath(ushort Class, ushort? Instance=null, ushort? Attribut=null)
+        public static byte[] GetPath(ushort Class, ushort Instance, ushort? Attribut=null)
         {
 
             byte[] path = new byte[12];
@@ -63,9 +63,9 @@ namespace System.Net.EnIPStack
             int size=0;
             Fit(path,ref size,Class,0x20);
 
-            // It seems that this Instance value is required : 0 is used to access class data
-            if (Instance != null)
-                Fit(path, ref size, Instance.Value, 0x24);
+            // It seems that this Instance value is always required : 0 is used to access class data
+            // Volume 1 : Figure 1-2.5 Instance #0 Example
+            Fit(path, ref size, Instance, 0x24);
    
             if (Attribut != null)
                 Fit(path, ref size, Attribut.Value, 0x30);

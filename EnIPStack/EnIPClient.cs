@@ -46,6 +46,7 @@ namespace System.Net.EnIPStack
 
         public event DeviceArrivalHandler DeviceArrival;
 
+        // Local endpoint is important for broadcast messages
         public EnIPClient(String End_point, int TcpTimeout=100)
         {
             this.TcpTimeout = TcpTimeout;
@@ -115,6 +116,7 @@ namespace System.Net.EnIPStack
 
         private TcpClient Tcpclient;
         private int Timeout=100;
+        private object LockTransaction = new object();
 
         // A global packet for response frames
         byte[] packet = new byte[1500];
@@ -169,8 +171,10 @@ namespace System.Net.EnIPStack
 
             Offset += 1;
         }
-        // The udp endpoint is given here, it's also the tcp one
+        // The remote udp endpoint is given here, it's also the tcp one
         // this constuctor is used with the ListIdentity response buffer
+        // No local endpoint given here, the TCP/IP stack should do the job
+        // if more than one interface is present
         public EnIPRemoteDevice(IPEndPoint ep, int TcpTimeout, byte[] DataArray, ref int Offset)
         {
             this.ep = ep;
@@ -220,7 +224,7 @@ namespace System.Net.EnIPStack
 
         public bool Connect()
         {
-            lock (ConnectedEvAndLock) // to avoid to connection request
+            lock (LockTransaction) // to avoid to connection request
             {
                 if (IsConnected()) return true;
 
@@ -233,15 +237,17 @@ namespace System.Net.EnIPStack
                     SocketAsyncEventArgs AsynchEvent = new SocketAsyncEventArgs();
                     AsynchEvent.RemoteEndPoint = ep;
                     AsynchEvent.Completed += new EventHandler<SocketAsyncEventArgs>(On_ConnectedACK);
+                    
+                    // Go
                     ConnectedEvAndLock.Reset();
                     Tcpclient.Client.ConnectAsync(AsynchEvent);
                     bool ret = ConnectedEvAndLock.WaitOne(Timeout * 2);  // Wait transaction 2 * Timeout
 
+                    // In fact if the connection ACK-SYN is late, it will be OK after
                     if (!ret)
                         Trace.WriteLine("Connection fail to " + ep.ToString());
 
-                    return ret;
-                    //return true;
+                    return ret;                   
                 }
                 catch
                 {
@@ -254,17 +260,19 @@ namespace System.Net.EnIPStack
 
         public void Disconnect()
         {
-            try
-            {
-                if (Tcpclient != null)
-                    Tcpclient.Close();
-            }
-            catch { }
+            lock (LockTransaction)
+                try
+                {
+                    if (Tcpclient != null)
+                        Tcpclient.Close();
+                }
+                catch { }
 
             Tcpclient = null;
         }
 
-        // Unicast TCP ListIdentity for remote device
+        // Unicast TCP ListIdentity for remote device, not UDP it's my choice because in such way 
+        // firewall could be configured only for one port (TCP is mandatory for the others exchanges)
         public bool DiscoverServer()
         {
             if (autoConnect) Connect();
@@ -275,11 +283,15 @@ namespace System.Net.EnIPStack
                 {
                     EncapsulationPacket p = new EncapsulationPacket(EncapsulationCommands.ListIdentity);
                     p.Command = (ushort)EncapsulationCommands.ListIdentity;
-                    Tcpclient.Client.Send(p.toByteArray());
-                    Trace.WriteLine("Send ListIdentity to " + ep.Address.ToString());
 
-                    int Length = Tcpclient.Client.Receive(packet);
-                    if (Length < 26) return false;
+                    int Length;
+                    lock (LockTransaction)
+                    {
+                        Tcpclient.Client.Send(p.toByteArray());
+                        Trace.WriteLine("Send ListIdentity to " + ep.Address.ToString());
+                        Length = Tcpclient.Client.Receive(packet);
+                    }
+                    if (Length < 26) return false; // never appears in a normal situation
 
                     int Offset = 0;
                     EncapsulationPacket Encapacket = new EncapsulationPacket(packet, ref Offset);
@@ -291,6 +303,8 @@ namespace System.Net.EnIPStack
                             DeviceArrival(this);
                         return true;
                     }
+                    else
+                        Trace.WriteLine("Unicast TCP ListIdentity fail");
                 }
             }
             catch 
@@ -312,9 +326,13 @@ namespace System.Net.EnIPStack
                 EncapsulationPacket p = new EncapsulationPacket(EncapsulationCommands.RegisterSession, 0, b);
 
                 byte[] buffer = p.toByteArray();
-                Tcpclient.Client.Send(buffer);
 
-                int ret = Tcpclient.Client.Receive(buffer); // re-use of buffer, large enought
+                int ret;
+                lock (LockTransaction)
+                {
+                    Tcpclient.Client.Send(buffer);
+                    ret = Tcpclient.Client.Receive(buffer); // re-use of buffer, large enought
+                }
                 if (ret == 28)
                 {
                     int Offset = 0;
@@ -340,9 +358,12 @@ namespace System.Net.EnIPStack
                 m.Data = data;
 
                 EncapsulationPacket p = new EncapsulationPacket(EncapsulationCommands.SendRRData, SessionHandle, m.toByteArray());
-                Tcpclient.Client.Send(p.toByteArray());
 
-                Lenght = Tcpclient.Client.Receive(packet);
+                lock (LockTransaction)
+                {
+                    Tcpclient.Client.Send(p.toByteArray());
+                    Lenght = Tcpclient.Client.Receive(packet);
+                }
                 if (Lenght > 24)
                 {
                     Offset = 0;
@@ -356,7 +377,7 @@ namespace System.Net.EnIPStack
                         }
                     }
                 }
-                Trace.WriteLine("Service not supported : " + Service.ToString() + " on " + Path.GetPath(DataPath));
+                Trace.WriteLine("Service not supported : " + Service.ToString() + " on " + Path.GetPath(DataPath) + ", endpoint " + ep.ToString());
                 if (Service == ControlNetService.SetAttributeSingle)
                     return EnIPNetworkStatus.OnLineWriteRejected;
                 else
@@ -364,7 +385,7 @@ namespace System.Net.EnIPStack
             }
             catch
             {
-                Trace.TraceWarning("Error while sending request");
+                Trace.TraceWarning("Error while sending reques to endpoint "+ep.ToString());
                 return EnIPNetworkStatus.OffLine;;
             }
         }
@@ -406,13 +427,16 @@ namespace System.Net.EnIPStack
             {
                 EncapsulationPacket p = new EncapsulationPacket(EncapsulationCommands.RegisterSession, SessionHandle);
                 byte[] buffer = p.toByteArray();
-                Tcpclient.Client.Send(buffer);
+
+                lock (LockTransaction)
+                    Tcpclient.Client.Send(buffer);
+
                 SessionHandle = 0;
             }
         }
     }
 
-    // Device data dictionnary top hierachy 
+    // Device data dictionnary top hierarchy 
     abstract public class EnIPCIPObject
     {
         public ushort Id { get; set; }
@@ -447,7 +471,6 @@ namespace System.Net.EnIPStack
 
         public EnIPNetworkStatus GetClassData()
         {
-            //if (RawData != null) return true;
             byte[] ClassDataPath = Path.GetPath(Id, 0, null);
 
             int Offset = 0;
@@ -461,6 +484,27 @@ namespace System.Net.EnIPStack
                 Array.Copy(packet, Offset, RawData, 0, Lenght - Offset);
             }
             return Status;
+        }
+
+        // Never tested, certainly not like this
+        public EnIPClassInstance CreateInstance(byte instanceId, byte[] InitialRawData)
+        {
+            byte[] ClassDataPath = Path.GetPath(Id, instanceId, null);
+
+            int Offset = 0;
+            int Lenght = 0;
+            byte[] packet;
+
+            Status = RemoteDevice.SetClassInstanceAttribut_Data(ClassDataPath, ControlNetService.Create, InitialRawData, ref Offset, ref Lenght, out packet);
+
+            if (Status == EnIPNetworkStatus.OnLine)
+            {
+                EnIPClassInstance cl = new EnIPClassInstance(this, instanceId);
+                cl.RawData = InitialRawData;
+                return cl;
+            }
+
+            return null;
         }
     }
 
@@ -479,13 +523,13 @@ namespace System.Net.EnIPStack
 
         public EnIPNetworkStatus GetClassInstanceAttributList()
         {
-            byte[] ClassDataPath = Path.GetPath(Class.Id, Id, null);
+            byte[] DataPath = Path.GetPath(Class.Id, Id, null);
 
             int Offset = 0;
             int Lenght = 0;
             byte[] packet;
 
-            Status = RemoteDevice.GetClassInstanceAttribut_Data(ClassDataPath, ControlNetService.GetAttributeList, ref Offset, ref Lenght, out packet);
+            Status = RemoteDevice.GetClassInstanceAttribut_Data(DataPath, ControlNetService.GetAttributeList, ref Offset, ref Lenght, out packet);
 
             return Status;
         }
@@ -503,13 +547,13 @@ namespace System.Net.EnIPStack
         public EnIPNetworkStatus GetClassInstanceData()
         {
 
-            byte[] ClassDataPath = Path.GetPath(Class.Id, Id, null);
+            byte[] DataPath = Path.GetPath(Class.Id, Id, null);
 
             int Offset = 0;
             int Lenght = 0;
             byte[] packet;
 
-            Status = RemoteDevice.GetClassInstanceAttribut_Data(ClassDataPath, ControlNetService.GetAttributesAll, ref Offset, ref Lenght, out packet);
+            Status = RemoteDevice.GetClassInstanceAttribut_Data(DataPath, ControlNetService.GetAttributesAll, ref Offset, ref Lenght, out packet);
             if (Status == EnIPNetworkStatus.OnLine)
             {
                 RawData = new byte[Lenght - Offset];
@@ -539,13 +583,13 @@ namespace System.Net.EnIPStack
 
         public EnIPNetworkStatus SetInstanceAttributData()
         {
-            byte[] ClassDataPath = Path.GetPath(Instance.Class.Id, Instance.Id, Id);
+            byte[] DataPath = Path.GetPath(Instance.Class.Id, Instance.Id, Id);
 
             int Offset = 0;
             int Lenght = 0;
             byte[] packet;
 
-            Status = RemoteDevice.SetClassInstanceAttribut_Data(ClassDataPath, ControlNetService.SetAttributeSingle, RawData, ref Offset, ref Lenght, out packet);
+            Status = RemoteDevice.SetClassInstanceAttribut_Data(DataPath, ControlNetService.SetAttributeSingle, RawData, ref Offset, ref Lenght, out packet);
 
             return Status; 
         }
@@ -557,13 +601,13 @@ namespace System.Net.EnIPStack
 
         public EnIPNetworkStatus GetInstanceAttributData()
         {
-            byte[] ClassDataPath = Path.GetPath(Instance.Class.Id, Instance.Id, Id);
+            byte[] DataPath = Path.GetPath(Instance.Class.Id, Instance.Id, Id);
 
             int Offset = 0;
             int Lenght = 0;
             byte[] packet;
 
-            Status = RemoteDevice.GetClassInstanceAttribut_Data(ClassDataPath, ControlNetService.GetAttributeSingle, ref Offset, ref Lenght, out packet);
+            Status = RemoteDevice.GetClassInstanceAttribut_Data(DataPath, ControlNetService.GetAttributeSingle, ref Offset, ref Lenght, out packet);
             if (Status == EnIPNetworkStatus.OnLine)           
             {
                 RawData = new byte[Lenght - Offset];

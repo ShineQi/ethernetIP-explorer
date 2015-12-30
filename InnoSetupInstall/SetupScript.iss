@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "EnIPExplorer"
-#define MyAppVersion "0.3"
+#define MyAppVersion "0.4"
 #define MyAppPublisher "F. Chaxel"
 #define MyAppURL "http://sourceforge.net/projects/EnIPExplorer"
 #define MyAppExeName "EnIPExplorer.exe"
@@ -61,6 +61,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "..\EnIPExplorer\bin\Debug\EnIPExplorer.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\EnIPExplorer\bin\Debug\README.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\EnIPExplorer\bin\Debug\SampleTree.csv"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Docs\MIT_license.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Docs\history.txt"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

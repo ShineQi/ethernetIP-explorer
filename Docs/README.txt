@@ -14,9 +14,7 @@
 
 	1.2 CREDITS
 		The project was created by F. Chaxel, in 2016. 
-
 		Graphics are the usual FamFamFam: http://www.famfamfam.com/
-
 		It is inspired by the best Bacnet Explorer, Yabe :
 		http://sourceforge.net/projects/yetanotherbacnetexplorer/
 		and also Profinet Explorer
@@ -39,8 +37,8 @@
 		  service is not supported by the devices.
 	2.2 Read Class data
 		- When a device (Plc or other) is selected, the class list is requested
-		  through the network and displayed (Read attribut ObjectList n°1 of the 
-		  unique instance n°1 of the Message Router class n°2).
+		  through the network and displayed (Read attribut n°1 -ObjectList- of 
+		  the instance n°1 of the class n°2 -Message Router- ).
 		- If a class is selected, a network request is sent and the class data
 		  is read and displayed in the properties panel.
 		- With the shortcut key CTRL-C one can add classes in the list to try
@@ -105,6 +103,5 @@
 	https://sourceforge.net/projects/EnIPExplorer/
 
 9.  DEV. ROADMAP 
-	Maybe decoding of standard classes :
-		but I don't understand how missing optional attributs values
-		could be detected, and my Wago Plc don't help me for that.
+	Maybe decoding of standard classes.
+	Maybe a rawdata user selectable format : byte, short, uhsort ...
