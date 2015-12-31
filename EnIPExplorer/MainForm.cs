@@ -56,6 +56,8 @@ namespace EnIPExplorer
 
             if (Properties.Settings.Default.DefaultTreeFile == "")
                 Properties.Settings.Default.DefaultTreeFile = Application.StartupPath+"\\SampleTree.csv";
+
+            devicesTreeView.ShowNodeToolTips = Properties.Settings.Default.ShowNodeToolTip;
         }
 
         // Each time we received a response to udp broadcast or udp/tcp unicast ListIdentity
@@ -133,15 +135,17 @@ namespace EnIPExplorer
                 // Special classes with the known instance(s)
                 if ((Class.Id == 1) || (Class.Id == 2) || (Class.Id == 0xF4) || (Class.Id == 0xF5) || (Class.Id == 0xF6))
                 {
-                    EnIPClassInstance instance = new EnIPClassInstance(Class, 1);
+                    EnIPInstance instance = new EnIPInstance(Class, 1);
                     TreeNode tnI = new TreeNode("Instance #1", 9, 9);
                     tnI.Tag = instance;
+                    tnI.ToolTipText = "Node " + Class.Id.ToString()+".1";
                     tn.Nodes.Add(tnI);
                 }
             }
             else
                 tn = new TreeNode("Proprietary #" + Class.Id.ToString(), 2, 2);
 
+            tn.ToolTipText = "Node "+Class.Id.ToString();
             tn.Tag = Class;
             return tn;
         }
@@ -237,7 +241,7 @@ namespace EnIPExplorer
             {
                 // Read it from the remote devie
                 EnIPClass EnClass = (EnIPClass)e.Node.Tag;
-                ReadRet=EnClass.GetClassData();
+                ReadRet = EnClass.ReadDataFromNetwork();
                 // In the Grid
                 propertyGrid.SelectedObject = EnClass;
                 propertyGrid.ExpandAllGridItems();
@@ -249,11 +253,11 @@ namespace EnIPExplorer
 
             }
             // It's an Instance
-            else if (e.Node.Tag is EnIPClassInstance)
+            else if (e.Node.Tag is EnIPInstance)
             {
                 // Read it from the remote devie
-                EnIPClassInstance Instance = (EnIPClassInstance)e.Node.Tag;
-                ReadRet=Instance.GetClassInstanceData();
+                EnIPInstance Instance = (EnIPInstance)e.Node.Tag;
+                ReadRet = Instance.ReadDataFromNetwork();
                 // In the Grid
                 propertyGrid.SelectedObject = Instance;
                 propertyGrid.ExpandAllGridItems();
@@ -264,11 +268,11 @@ namespace EnIPExplorer
                 popupDeleteToolStripMenuItem.Text = deleteToolStripMenuItem.Text = "Delete current Instance";
             }
             // It's an Attribut
-            else if (e.Node.Tag is EnIPInstanceAttribut)
+            else if (e.Node.Tag is EnIPAttribut)
             {
                 // Read it from the remote devie
-                EnIPInstanceAttribut Att = (EnIPInstanceAttribut)e.Node.Tag;
-                ReadRet=Att.GetInstanceAttributData();
+                EnIPAttribut Att = (EnIPAttribut)e.Node.Tag;
+                ReadRet = Att.ReadDataFromNetwork();
                 // In the Grid
                 propertyGrid.SelectedObject = Att;
                 propertyGrid.ExpandAllGridItems();
@@ -431,7 +435,7 @@ namespace EnIPExplorer
             int Numbase = 1;
             foreach (TreeNode t in tn.Nodes)
             {
-                int num = (t.Tag as EnIPClassInstance).Id;
+                int num = (t.Tag as EnIPInstance).Id;
                 Numbase = Math.Max(num + 1, Numbase);
             }
 
@@ -447,9 +451,12 @@ namespace EnIPExplorer
             if (res == DialogResult.OK)
             {
                 byte Id = (byte)Input.genericInput.Value;
-                EnIPClassInstance instance = new EnIPClassInstance(tn.Tag as EnIPClass, Id);
+                EnIPClass cl=(EnIPClass)tn.Tag;
+                EnIPInstance instance = new EnIPInstance(cl, Id);
                 TreeNode tnI = new TreeNode("Instance #"+Id.ToString(), 9, 9);
                 tnI.Tag = instance;
+                tnI.ToolTipText = "Node " +cl.Id.ToString()+"."+ Id.ToString();
+
                 tn.Nodes.Add(tnI);
                 tn.Expand();
             }
@@ -465,14 +472,14 @@ namespace EnIPExplorer
             for (; ; )
             {
                 if (tn == null) return;
-                if (tn.Tag is EnIPClassInstance) break;
+                if (tn.Tag is EnIPInstance) break;
                 tn = tn.Parent;
             }
 
             int Numbase = 1;
             foreach (TreeNode t in tn.Nodes)
             {
-                int num = (t.Tag as EnIPInstanceAttribut).Id;
+                int num = (t.Tag as EnIPAttribut).Id;
                 Numbase = Math.Max(num + 1, Numbase);
             }
 
@@ -488,13 +495,14 @@ namespace EnIPExplorer
             if (res == DialogResult.OK)
             {
                 byte Id = (byte)Input.genericInput.Value;
-                EnIPInstanceAttribut att = new EnIPInstanceAttribut(tn.Tag as EnIPClassInstance, Id);
+                EnIPInstance ist = (EnIPInstance)tn.Tag;
+                EnIPAttribut att = new EnIPAttribut(ist, Id);
                 TreeNode tnI = new TreeNode("Attribut #"+Id.ToString(), 10, 10);
                 tnI.Tag = att;
+                tnI.ToolTipText = "Node "+ (tn.Parent.Tag as EnIPClass).Id+"." + ist.Id.ToString() + "." + Id.ToString();
                 tn.Nodes.Add(tnI);
                 tn.Expand();
             }
-
         }
 
         // Menu Item
@@ -503,6 +511,7 @@ namespace EnIPExplorer
             SettingsDialog dlg = new SettingsDialog();
             dlg.SelectedObject = Properties.Settings.Default;
             dlg.ShowDialog(this);
+            devicesTreeView.ShowNodeToolTips = Properties.Settings.Default.ShowNodeToolTip;
         }
 
         // Save the current Settings
@@ -521,10 +530,10 @@ namespace EnIPExplorer
         // send it to the device if it's an attribut value
         private void propertyGrid_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
-            if ((e.ChangedItem.Parent != null) && (e.ChangedItem.Parent.Label == "RawData") && (devicesTreeView.SelectedNode.Tag is EnIPInstanceAttribut))
+            if ((e.ChangedItem.Parent != null) && (e.ChangedItem.Parent.Label == "RawData") && (devicesTreeView.SelectedNode.Tag is EnIPAttribut))
             {
-                EnIPInstanceAttribut v = (EnIPInstanceAttribut)devicesTreeView.SelectedNode.Tag;
-                if (v.SetInstanceAttributData()==EnIPNetworkStatus.OnLine)
+                EnIPAttribut v = (EnIPAttribut)devicesTreeView.SelectedNode.Tag;
+                if (v.WriteDataToNetwork()==EnIPNetworkStatus.OnLine)
                     Trace.WriteLine("Write OK");
             }
             else
@@ -565,7 +574,7 @@ namespace EnIPExplorer
             try
             {
                 EnIPRemoteDevice remotedevice = new EnIPRemoteDevice(new System.Net.IPEndPoint(IPAddress.Parse(Input.genericInput.Text), 0xAF12), Properties.Settings.Default.TCP_WAN_TimeOut);
-
+                remotedevice.ProductName = "EnIPExplorer temporary ProductName";
                 AddRemoteDevice(remotedevice);
 
                 remotedevice.DeviceArrival += new DeviceArrivalHandler(On_DeviceArrival);
@@ -629,6 +638,16 @@ namespace EnIPExplorer
 
             if (res == DialogResult.OK)
                 tn.Text = Input.genericInput.Text;
+        }
+
+        // Menu Item
+        private void readAgainToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (propertyGrid.SelectedObject is EnIPCIPObject)
+            {
+                (propertyGrid.SelectedObject as EnIPCIPObject).ReadDataFromNetwork();
+                propertyGrid.Refresh();
+            }
         }
 
         // Recursive usage
@@ -701,8 +720,8 @@ namespace EnIPExplorer
         // Usage by Load file menu
         private void AddNodesFromFile(StreamReader sr, ref int line)
         {
-            TreeNode ParentDevice = null, ParentClass = null, ParentInstance = null;
-
+            TreeNode ParentDeviceTreeNode = null, ParentClassTreeNode = null, ParentInstanceTreeNode = null;
+            EnIPRemoteDevice remotedevice = null; EnIPClass Class = null; EnIPInstance Instance = null;
             while (!sr.EndOfStream)
             {
                 try
@@ -721,26 +740,29 @@ namespace EnIPExplorer
                         switch (Length)
                         {
                             case 2: // A device, assume LAN timeout and not WAN
-                                EnIPRemoteDevice remotedevice = new EnIPRemoteDevice(new System.Net.IPEndPoint(IPAddress.Parse(Strs[0]), 0xAF12), Properties.Settings.Default.TCP_LAN_Timeout);
+                                remotedevice = new EnIPRemoteDevice(new System.Net.IPEndPoint(IPAddress.Parse(Strs[0]), 0xAF12), Properties.Settings.Default.TCP_LAN_Timeout);
                                 remotedevice.ProductName = Strs[1];
-                                ParentDevice = AddRemoteDevice(remotedevice);
+                                ParentDeviceTreeNode = AddRemoteDevice(remotedevice);
                                 break;
                             case 4: // A class
-                                EnIPClass Class = new EnIPClass(ParentDevice.Tag as EnIPRemoteDevice, Convert.ToUInt16(Strs[2]));
+                                Class = new EnIPClass(remotedevice, Convert.ToUInt16(Strs[2]));
                                 int ico;
                                 if (Enum.IsDefined(typeof(CIPObjectLibrary), Class.Id))
                                     ico = Classe2Ico((CIPObjectLibrary)Class.Id);
                                 else
                                     ico = 2;
-                                ParentClass = AddeNode(ParentDevice, Class, Strs[3], ico);
+                                ParentClassTreeNode = AddeNode(ParentDeviceTreeNode, Class, Strs[3], ico);
+                                ParentClassTreeNode.ToolTipText = "Node " + Class.Id.ToString();
                                 break;
                             case 6: // An instance
-                                EnIPClassInstance Instance = new EnIPClassInstance(ParentClass.Tag as EnIPClass, Convert.ToByte(Strs[4]));
-                                ParentInstance = AddeNode(ParentClass, Instance, Strs[5], 9);
+                                Instance = new EnIPInstance(Class, Convert.ToByte(Strs[4]));
+                                ParentInstanceTreeNode = AddeNode(ParentClassTreeNode, Instance, Strs[5], 9);
+                                ParentInstanceTreeNode.ToolTipText = ParentClassTreeNode.ToolTipText + "." + Instance.Id.ToString();
                                 break;
                             case 8: // An attribut
-                                EnIPInstanceAttribut Attribut = new EnIPInstanceAttribut(ParentInstance.Tag as EnIPClassInstance, Convert.ToByte(Strs[6]));
-                                AddeNode(ParentInstance, Attribut, Strs[7], 10);
+                                EnIPAttribut Attribut = new EnIPAttribut(Instance, Convert.ToByte(Strs[6]));
+                                TreeNode tnAtt=AddeNode(ParentInstanceTreeNode, Attribut, Strs[7], 10);
+                                tnAtt.ToolTipText = ParentInstanceTreeNode.ToolTipText + "." + Attribut.Id.ToString();
                                 break;
                             default:
                                 throw new Exception("Not the good number of colums");
@@ -809,6 +831,7 @@ namespace EnIPExplorer
             renameCurrentNodeToolStripMenuItem_Click(null, null);
         }
         #endregion
+
 
     }
 

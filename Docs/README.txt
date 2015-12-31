@@ -26,11 +26,11 @@
 		- Start EnIPExplorer
 		- Select "Open Interface" under "Functions".
 		- Press the "Add" button.
-		  The program will now open an Udp connection and send
-		  out a "ListIdentity" broadcast. If Ethernet/IP devices exist on the 
+		  The program will now open an Udp connection and send out a
+		  broadcast "ListIdentity". If Ethernet/IP devices exist on the local 
 		  network they will show up in the tree.
-		- If you have more than 1 ethernet card, you can also select a local 
-		  endpoint ip (before you click the "Add"). Either select one from 
+		- If you have more than 1 ethernet card, you can also select the local 
+		  ip interface (before you click the "Add"). Either select one from 
 		  the list or write one by hand, if the interface is not displayed. 
 		  The program will fetch all "Classes" from the devices and
 		  display them in the tree. Nothing is displayed if the needed network 
@@ -44,35 +44,38 @@
 		- With the shortcut key CTRL-C one can add classes in the list to try
 		  to read values (this will not add the class in the remote device,
 		  it's just give you the possibility to read). 
+		- F3 key will refresh the values.
 	2.3 Read Class instances data
 		- For common classes (Identity, MessageRouter, ...) one class instance
 		  is already visible and could be read out. Select it and the values are 
 		  displays in the properties panel.	
 		- With the shortcut key CTRL-I one can add instances in the list to try
-		  to read values (this will not add the instance in the remote device,
-		  it's just give you the possibility to read). 		
+		  to read values (this will not add the instance in the remote device). 	
+		- F3 key will refresh the values.	
 	2.4 Attribut data (Read & Write)
 		- With the shortcut key CTRL-A, same behaviour as §2.2 and $2.3
 		- RawByte data could be modified at this level, and are sent to the 
 		  remote device (change a value then hit Enter key).
-	2.5 Save/Open File
+		- F3 key will refresh the values.
+	2.5 Save/Open Files
 		- The full Tree (from Devices to Attributs) could be save/load from
 		  a file. This file could be edit/modify using an spreadsheet (Excel or
 		  OpenOffice/LibreOffice for instance). The format isn't too complex
 		  to be infers. It must be strictly respected.
 		- The content Online & Offline (file) are merged together if some 
-		  difference appears.
+		  difference appears. The names coming from the file are the winners.
+		- Several files could be open successively, the content are added.
 		- Save is not automatic, but must be done by hand.
 
 3.  SETTINGS OPTIONS
 	3.1 TCP_LAN_Timeout & TCP_WAN_Timeout
-		  - in ms : used for connection & read & write operations. LAN is for
+		  - In ms : used for connection & read & write operations. LAN is for
 		  autodiscovered devices, WAN for whoses added by the Menu Add manually.
-		  - During the connection, the timeout is two time this value.
+		  - For the connection, the timeout is two time this value.
 	3.2 DefaultRemoteDevice
-		  - used to fill the Textbox with this default value
-	3.2 CSVSeparator
-		  - Value for treeview CSV file (spreadsheet compatible format).
+		  - Used to fill the Textbox with this default value.
+	3.3 CSVSeparator
+		  - Value for treeview CSV file (spreadsheet compatible format) see §2.5.
 
 4.  TESTS
 	The EnIPExplorer has been tested with really a too few number of others tools :

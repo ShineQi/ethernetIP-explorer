@@ -35,7 +35,7 @@ namespace System.Net.EnIPStack
 {
     // Volume 1 : C-1.4.2 Logical Segment
     // Remember for 16 bits address : (0x21 or 0x25 or 0x31) - 0x00 - 0xPF - 0xpf
-    // also a pad 0x00 must be set for 32 bits address
+    // also a pad 0x00 must be set for 32 bits address. No supported here.
     public static class Path
     {
         private static void Fit(byte[] path, ref int offset, ushort value, byte code)
@@ -55,6 +55,8 @@ namespace System.Net.EnIPStack
             }
         }
 
+        // Instance seems to be only byte
+        // FIXME
         public static byte[] GetPath(ushort Class, ushort Instance, ushort? Attribut=null)
         {
 
@@ -116,21 +118,21 @@ namespace System.Net.EnIPStack
     }
 
     // Volume 2 : Table 2-3.1 Encapsulation Packet
-    // no explicit information to distinguish between a request and a reply
+    // No explicit information to distinguish between a request and a reply
     public class EncapsulationPacket
     {
         public UInt16 Command;
         public UInt16 Length;
         public UInt32 Sessionhandle;
         //  Volume 2 : Table 2-3.3 Error Codes - 0x0000 Success, others value error
-        public UInt32 Status;
+        public EncapsulationStatus Status = EncapsulationStatus.Invalid_Session_Handle;
         // byte copy of the request into the response
         public byte[] SenderContext = new byte[8];
         public UInt32 Options;
         // Not used in the EncapsulationPacket receive objects
         public byte[] Encapsulateddata=null;
 
-        public bool IsOK { get { return Status == 0; } }
+        public bool IsOK { get { return Status == EncapsulationStatus.Success; } }
 
         public EncapsulationPacket(EncapsulationCommands Command, uint Sessionhandle=0, byte[] Encapsulateddata=null) 
         {
@@ -139,25 +141,28 @@ namespace System.Net.EnIPStack
             this.Encapsulateddata = Encapsulateddata;
             if (Encapsulateddata != null)
                 Length = (UInt16)Encapsulateddata.Length;
+            else
+                Length = 0;
         }
     
         // From network
-        public EncapsulationPacket(byte[] Packet, ref int Offset)
+        public EncapsulationPacket(byte[] Packet, ref int Offset, int Length)
         {
             Command = BitConverter.ToUInt16(Packet, Offset);
             Offset += 2;
-            Length = BitConverter.ToUInt16(Packet, Offset);
+            this.Length = BitConverter.ToUInt16(Packet, Offset);
 
-            if (Packet.Length < 24 + Length)
+            if (Length < 24 + this.Length)
             {
                 Trace.TraceWarning("Bad encapsulation packet size");
-                throw new Exception("Bad packet size");
+                Status = EncapsulationStatus.Invalid_Length;
+                return;
             }
 
             Offset += 2;
             Sessionhandle = BitConverter.ToUInt32(Packet, Offset);
             Offset += 4;
-            Status = BitConverter.ToUInt32(Packet, Offset);
+            Status = (EncapsulationStatus)BitConverter.ToUInt32(Packet, Offset);
             Offset += 4;
             Array.Copy(Packet, Offset, SenderContext, 0, 8);
             Offset += 8;
@@ -165,14 +170,14 @@ namespace System.Net.EnIPStack
             Offset += 4;  // value 24
         }
 
-        public byte[] toByteArray()
+        public byte[] toByteArray(EncapsulationStatus Status = EncapsulationStatus.Success)
         {
             byte[] ret = new byte[24 + Length];
             
             Buffer.BlockCopy(BitConverter.GetBytes(Command), 0, ret, 0, 2);
             Buffer.BlockCopy(BitConverter.GetBytes(Length), 0, ret, 2, 2);
             Buffer.BlockCopy(BitConverter.GetBytes(Sessionhandle), 0, ret, 4, 4);
-            Buffer.BlockCopy(BitConverter.GetBytes(Status), 0, ret, 8, 4);
+            Buffer.BlockCopy(BitConverter.GetBytes((uint)Status), 0, ret, 8, 4);
             Array.Copy(SenderContext, 0, ret, 12, 8);
             Buffer.BlockCopy(BitConverter.GetBytes(Options), 0, ret, 20, 4);
             if (Encapsulateddata!=null)
@@ -187,7 +192,7 @@ namespace System.Net.EnIPStack
         public byte Service;
 
         // Only for response packet
-        public byte GeneralStatus;
+        public CIPGeneralSatusCode GeneralStatus;
         public byte AdditionalStatus_Size;
         public ushort[] AdditionalStatus;
 
@@ -195,13 +200,18 @@ namespace System.Net.EnIPStack
         public byte[] Path;
         public byte[] Data;
 
-        public bool IsOK { get { return GeneralStatus == 0; } }
+        public bool IsOK { get { return GeneralStatus == CIPGeneralSatusCode.Success; } }
 
-        public UCMM_RR_Packet() { } 
+        public UCMM_RR_Packet() { }
 
-        public UCMM_RR_Packet(byte[] DataArray, ref int Offset)
+        // up to now it's only a response paquet decoding
+        public UCMM_RR_Packet(byte[] DataArray, ref int Offset, int Lenght)
         {
-            // Skip 16 bytes
+            if ((Offset + 20) > Lenght)
+                GeneralStatus = CIPGeneralSatusCode.Not_enough_data;
+
+            // Skip 16 bytes of the Command specific data
+            // Volume 2 : Table 3-2.1 UCMM Request & Table 3-2.2 UCMM Reply
             Offset += 16;
 
             Service = DataArray[Offset];
@@ -210,11 +220,14 @@ namespace System.Net.EnIPStack
             //Skip reserved byte
             Offset += 1;
 
-            GeneralStatus = DataArray[Offset]; // only 0 is OK
+            GeneralStatus = (CIPGeneralSatusCode)DataArray[Offset]; // only 0 is OK
             Offset += 1;
 
             AdditionalStatus_Size = DataArray[Offset];
-            Offset++;
+            Offset += 1;
+
+            if ((Offset + AdditionalStatus_Size *2) > Lenght)
+                GeneralStatus = CIPGeneralSatusCode.Not_enough_data;
 
             if (AdditionalStatus_Size > 0)
             {
@@ -227,14 +240,16 @@ namespace System.Net.EnIPStack
             }
         }
 
+        // up to now it's only a request paquet
         public byte[] toByteArray()
         {
             if ((Path == null) || ((Path.Length%2)!=0))
             {
                 Trace.TraceError("Request_Path is not OK");
-                throw new Exception("Request_Path is not OK");
+                return null;
             }
 
+            // Volume 2 : Table 3-2.1 UCMM Request
             byte[] retVal = new byte[10 + 6 + 2 + Path.Length + (Data == null ? 0 : Data.Length)];
 
             retVal[6] = 2;

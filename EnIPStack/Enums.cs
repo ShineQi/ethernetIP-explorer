@@ -23,11 +23,6 @@
 * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 *
 *********************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace System.Net.EnIPStack
 {
     // Volume 2 : Table 2-3.2 Encapsulation Commands
@@ -43,6 +38,22 @@ namespace System.Net.EnIPStack
         SendUnitData = 0x0070,
         IndicateStatus = 0x0072,
         Cancel = 0x0073
+    }
+
+    // Volume 2 : Table 2-3.3 Error Codes
+    // Another time these documents are a bag of shit
+    // this table shows 16 bits status
+    public enum EncapsulationStatus : uint
+    {
+        Success = 0x00000000,
+        Unsupported_Command = 0x00000001,
+        Insufficient_Memory = 0x00000002,
+        Incorrect_Data = 0x00000003,
+        Invalid_Session_Handle = 0x000000064,
+        Invalid_Length = 0x000000065,
+        // Exceptionnel
+        // There is no protocol version id in the header !!!
+        Unsupported_Protocol_Revision= 0x000000069
     }
 
     // Volume 1 : Table 5-1.1 Object Specifications
@@ -112,20 +123,8 @@ namespace System.Net.EnIPStack
         CompoNetRepeater = 0xF8
     }
 
-    public enum CommonPacketTypeId : ushort
-    {
-        Null = 0x0000,
-        ListIdentityResponse = 0x000C,
-        ConnectionBased = 0x00A1,
-        ConnectedTransportPacket = 0x00B1,
-        UnconnectedMessage = 0x00B2,
-        SocketAddrInfo_O2T = 0x8000,
-        SocketAddrInfo_T2O = 0x8001,
-        SequencedAddressItem = 0x8002
-    }
-
     // Volume 1 : Table A-3.1 CIP Service Codes and Names
-    public enum ControlNetService
+    public enum CIPServiceCodes
     {
         GetAttributesAll = 0x01,
         SetAttributeAll = 0x02,
@@ -164,7 +163,7 @@ namespace System.Net.EnIPStack
     }
 
     // Volume 1 : Table B-1.1 CIP General Status Codes
-    public enum CIPGeneralSatusCode
+    public enum CIPGeneralSatusCode : byte
     {
         Success = 0,
         Connection_failure = 1,

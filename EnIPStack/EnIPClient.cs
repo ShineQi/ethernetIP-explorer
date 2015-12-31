@@ -107,19 +107,20 @@ namespace System.Net.EnIPStack
         public IdentityObjectState State { get; set; }
 
         private IPEndPoint ep;
+        // Not a property to avoid browsable in propertyGrid, also [Browsable(false)] could be used
         public string IPString() { return ep.Address.ToString(); }
 
         public bool autoConnect = true;
         public bool autoRegisterSession = true;
 
-        private UInt32 SessionHandle; // When Register Session is set
+        private UInt32 SessionHandle=0; // When Register Session is set
 
-        private TcpClient Tcpclient;
-        private int Timeout=100;
+        private EnIPTCPClientTransport Tcpclient;
+
         private object LockTransaction = new object();
 
         // A global packet for response frames
-        byte[] packet = new byte[1500];
+        private byte[] packet = new byte[1500];
 
         public List<EnIPClass> SupportedClassLists = new List<EnIPClass>();
 
@@ -172,20 +173,20 @@ namespace System.Net.EnIPStack
             Offset += 1;
         }
         // The remote udp endpoint is given here, it's also the tcp one
-        // this constuctor is used with the ListIdentity response buffer
+        // This constuctor is used with the ListIdentity response buffer
         // No local endpoint given here, the TCP/IP stack should do the job
         // if more than one interface is present
         public EnIPRemoteDevice(IPEndPoint ep, int TcpTimeout, byte[] DataArray, ref int Offset)
         {
             this.ep = ep;
-            Timeout = TcpTimeout;
+            Tcpclient = new EnIPTCPClientTransport(TcpTimeout);
             FromListIdentityResponse(DataArray, ref Offset);
         }
 
         public EnIPRemoteDevice(IPEndPoint ep, int TcpTimeout=100)
         {
             this.ep = ep;
-            Timeout = TcpTimeout;
+            Tcpclient = new EnIPTCPClientTransport(TcpTimeout);
             ProductName = "";
         }
 
@@ -204,6 +205,9 @@ namespace System.Net.EnIPStack
             State = newset.State;
         }
 
+        // Certainly here if SocketAddress is fullfil it could be the
+        // value to test
+        // FIXME if you know.
         public bool Equals(EnIPRemoteDevice other)
         {
             return ep.Equals(other.ep);
@@ -211,90 +215,51 @@ namespace System.Net.EnIPStack
 
         public bool IsConnected()
         {
-            if (Tcpclient == null) return false;
-            return Tcpclient.Connected;
-        }
-
-        ManualResetEvent ConnectedEvAndLock = new ManualResetEvent(false);
-        // Asynchronous connection is the best way to manage the timeout
-        void On_ConnectedACK(object sender, SocketAsyncEventArgs e)
-        {
-            ConnectedEvAndLock.Set();
+            return Tcpclient.IsConnected();
         }
 
         public bool Connect()
         {
-            lock (LockTransaction) // to avoid to connection request
-            {
-                if (IsConnected()) return true;
+            if (Tcpclient.IsConnected() == true) return true;
 
-                SessionHandle = 0;
-                try
-                {
-                    Tcpclient = new TcpClient();
-                    Tcpclient.ReceiveTimeout = this.Timeout;
+            SessionHandle = 0;
 
-                    SocketAsyncEventArgs AsynchEvent = new SocketAsyncEventArgs();
-                    AsynchEvent.RemoteEndPoint = ep;
-                    AsynchEvent.Completed += new EventHandler<SocketAsyncEventArgs>(On_ConnectedACK);
-                    
-                    // Go
-                    ConnectedEvAndLock.Reset();
-                    Tcpclient.Client.ConnectAsync(AsynchEvent);
-                    bool ret = ConnectedEvAndLock.WaitOne(Timeout * 2);  // Wait transaction 2 * Timeout
-
-                    // In fact if the connection ACK-SYN is late, it will be OK after
-                    if (!ret)
-                        Trace.WriteLine("Connection fail to " + ep.ToString());
-
-                    return ret;                   
-                }
-                catch
-                {
-                    Tcpclient = null;
-                    Trace.WriteLine("Connection fail to " + ep.ToString());
-                    return false;
-                }
-            }
+            lock (LockTransaction)
+                return Tcpclient.Connect(ep);
         }
 
         public void Disconnect()
         {
-            lock (LockTransaction)
-                try
-                {
-                    if (Tcpclient != null)
-                        Tcpclient.Close();
-                }
-                catch { }
+            SessionHandle = 0;
 
-            Tcpclient = null;
+            lock (LockTransaction)
+                Tcpclient.Disconnect();
         }
 
         // Unicast TCP ListIdentity for remote device, not UDP it's my choice because in such way 
-        // firewall could be configured only for one port (TCP is mandatory for the others exchanges)
+        // firewall could be configured only for TCP port (TCP is required for the others exchanges)
         public bool DiscoverServer()
         {
             if (autoConnect) Connect();
 
             try
             {
-                if (IsConnected())
+                if (Tcpclient.IsConnected())
                 {
                     EncapsulationPacket p = new EncapsulationPacket(EncapsulationCommands.ListIdentity);
                     p.Command = (ushort)EncapsulationCommands.ListIdentity;
 
                     int Length;
+                    int Offset = 0;
+                    EncapsulationPacket Encapacket;
+
                     lock (LockTransaction)
-                    {
-                        Tcpclient.Client.Send(p.toByteArray());
-                        Trace.WriteLine("Send ListIdentity to " + ep.Address.ToString());
-                        Length = Tcpclient.Client.Receive(packet);
-                    }
+                        Length = Tcpclient.SendReceive(p, out Encapacket, out Offset, ref packet);
+
+                     Trace.WriteLine("Send ListIdentity to " + ep.Address.ToString());
+
                     if (Length < 26) return false; // never appears in a normal situation
 
-                    int Offset = 0;
-                    EncapsulationPacket Encapacket = new EncapsulationPacket(packet, ref Offset);
                     if ((Encapacket.Command == (ushort)EncapsulationCommands.ListIdentity) && (Encapacket.Length != 0) && Encapacket.IsOK)
                     {
                         Offset += 2;
@@ -320,30 +285,25 @@ namespace System.Net.EnIPStack
         {
             if (autoConnect) Connect();
 
-            if ((IsConnected() == true) && (SessionHandle == 0))
+            if ((Tcpclient.IsConnected() == true) && (SessionHandle == 0))
             {
                 byte[] b = new byte[] { 1, 0, 0, 0 };
                 EncapsulationPacket p = new EncapsulationPacket(EncapsulationCommands.RegisterSession, 0, b);
 
-                byte[] buffer = p.toByteArray();
-
                 int ret;
+                EncapsulationPacket rep;
+                int Offset = 0;
+
                 lock (LockTransaction)
-                {
-                    Tcpclient.Client.Send(buffer);
-                    ret = Tcpclient.Client.Receive(buffer); // re-use of buffer, large enought
-                }
+                    ret = Tcpclient.SendReceive(p, out rep, out Offset, ref packet);
+
                 if (ret == 28)
-                {
-                    int Offset = 0;
-                    EncapsulationPacket rep = new EncapsulationPacket(buffer, ref Offset);
                     if (rep.IsOK)
                         SessionHandle = rep.Sessionhandle;
-                }
             }
         }
 
-        public EnIPNetworkStatus SetClassInstanceAttribut_Data(byte[] DataPath, ControlNetService Service, byte[] data, ref int Offset, ref int Lenght, out byte[] packet)
+        public EnIPNetworkStatus SetClassInstanceAttribut_Data(byte[] DataPath, CIPServiceCodes Service, byte[] data, ref int Offset, ref int Lenght, out byte[] packet)
         {
             packet = this.packet;
 
@@ -358,27 +318,35 @@ namespace System.Net.EnIPStack
                 m.Data = data;
 
                 EncapsulationPacket p = new EncapsulationPacket(EncapsulationCommands.SendRRData, SessionHandle, m.toByteArray());
+                
+                EncapsulationPacket rep;
+                Offset = 0;
 
                 lock (LockTransaction)
-                {
-                    Tcpclient.Client.Send(p.toByteArray());
-                    Lenght = Tcpclient.Client.Receive(packet);
-                }
+                    Lenght = Tcpclient.SendReceive(p, out rep, out Offset, ref packet);
+
+                String ErrorMsg="TCP Error";
+
                 if (Lenght > 24)
                 {
-                    Offset = 0;
-                    p = new EncapsulationPacket(packet, ref Offset);
-                    if ((p.IsOK) && (p.Command == (ushort)EncapsulationCommands.SendRRData))
+                    if ((rep.IsOK) && (rep.Command == (ushort)EncapsulationCommands.SendRRData))
                     {
-                        m = new UCMM_RR_Packet(packet, ref Offset);
+                        m = new UCMM_RR_Packet(packet, ref Offset, Lenght);
                         if (m.IsOK)
                         {
+                            // all is OK, and Offset is ready set at the beginning of data[]
                             return EnIPNetworkStatus.OnLine;
                         }
+                        else
+                            ErrorMsg = m.GeneralStatus.ToString();
                     }
+                    else
+                        ErrorMsg = rep.Status.ToString();
                 }
-                Trace.WriteLine("Service not supported : " + Service.ToString() + " on " + Path.GetPath(DataPath) + ", endpoint " + ep.ToString());
-                if (Service == ControlNetService.SetAttributeSingle)
+
+                Trace.WriteLine(Service.ToString() + " : " + ErrorMsg + " - Node " + Path.GetPath(DataPath) + " - Endpoint " + ep.ToString());
+
+                if (Service == CIPServiceCodes.SetAttributeSingle)
                     return EnIPNetworkStatus.OnLineWriteRejected;
                 else
                     return EnIPNetworkStatus.OnLineReadRejected;
@@ -390,7 +358,7 @@ namespace System.Net.EnIPStack
             }
         }
 
-        public EnIPNetworkStatus GetClassInstanceAttribut_Data(byte[] ClassDataPath, ControlNetService Service, ref int Offset, ref int Lenght, out byte[] packet)
+        public EnIPNetworkStatus GetClassInstanceAttribut_Data(byte[] ClassDataPath, CIPServiceCodes Service, ref int Offset, ref int Lenght, out byte[] packet)
         {
             return SetClassInstanceAttribut_Data(ClassDataPath, Service, null, ref Offset, ref Lenght, out packet);
         }
@@ -408,7 +376,7 @@ namespace System.Net.EnIPStack
             int Lenght = 0;
             int Offset = 0;
 
-            if (GetClassInstanceAttribut_Data(MessageRouterObjectList, ControlNetService.GetAttributeSingle, ref Offset, ref Lenght, out packet) == EnIPNetworkStatus.OnLine)
+            if (GetClassInstanceAttribut_Data(MessageRouterObjectList, CIPServiceCodes.GetAttributeSingle, ref Offset, ref Lenght, out packet) == EnIPNetworkStatus.OnLine)
             {
                 ushort NbClasses = BitConverter.ToUInt16(packet, Offset);
                 Offset += 2;
@@ -423,13 +391,12 @@ namespace System.Net.EnIPStack
 
         public void UnRegisterSession()
         {
-            if ((IsConnected() == true) && (SessionHandle != 0))
+            if (SessionHandle != 0)
             {
                 EncapsulationPacket p = new EncapsulationPacket(EncapsulationCommands.RegisterSession, SessionHandle);
-                byte[] buffer = p.toByteArray();
 
                 lock (LockTransaction)
-                    Tcpclient.Client.Send(buffer);
+                    Tcpclient.Send(p);
 
                 SessionHandle = 0;
             }
@@ -437,8 +404,9 @@ namespace System.Net.EnIPStack
     }
 
     // Device data dictionnary top hierarchy 
-    abstract public class EnIPCIPObject
+    public abstract class EnIPCIPObject
     {
+        // set is present to shows not greyed in the property grid
         public ushort Id { get; set; }
         public EnIPNetworkStatus Status { get; set; }
         public object DecodedMembers { get; set; }
@@ -446,11 +414,38 @@ namespace System.Net.EnIPStack
 
         public abstract EnIPNetworkStatus ReadDataFromNetwork();
         public abstract EnIPNetworkStatus WriteDataToNetwork();
+
+        public EnIPRemoteDevice RemoteDevice;
+
+        protected EnIPNetworkStatus ReadDataFromNetwork(byte[] Path, CIPServiceCodes Service)
+        {
+            int Offset = 0;
+            int Lenght = 0;
+            byte[] packet;
+            Status = RemoteDevice.GetClassInstanceAttribut_Data(Path, Service, ref Offset, ref Lenght, out packet);
+
+            if (Status == EnIPNetworkStatus.OnLine)
+            {
+                RawData = new byte[Lenght - Offset];
+                Array.Copy(packet, Offset, RawData, 0, Lenght - Offset);
+            }
+            return Status;
+        }
+
+        protected EnIPNetworkStatus WriteDataToNetwork(byte[] Path, CIPServiceCodes Service)
+        {
+            int Offset = 0;
+            int Lenght = 0;
+            byte[] packet;
+
+            Status = RemoteDevice.SetClassInstanceAttribut_Data(Path, Service, RawData, ref Offset, ref Lenght, out packet);
+
+            return Status;
+        }
     }
     
     public class EnIPClass : EnIPCIPObject
     {
-        public EnIPRemoteDevice RemoteDevice;
 
         public EnIPClass(EnIPRemoteDevice RemoteDevice, ushort Id)
         {
@@ -466,59 +461,32 @@ namespace System.Net.EnIPStack
 
         public override EnIPNetworkStatus ReadDataFromNetwork()
         {
-            return GetClassData();
-        }
-
-        public EnIPNetworkStatus GetClassData()
-        {
             byte[] ClassDataPath = Path.GetPath(Id, 0, null);
-
-            int Offset = 0;
-            int Lenght = 0;
-            byte[] packet;
-            Status=RemoteDevice.GetClassInstanceAttribut_Data(ClassDataPath, ControlNetService.GetAttributesAll, ref Offset, ref Lenght, out packet);
-            
-            if (Status== EnIPNetworkStatus.OnLine)
-            {
-                RawData = new byte[Lenght - Offset];
-                Array.Copy(packet, Offset, RawData, 0, Lenght - Offset);
-            }
-            return Status;
-        }
-
-        // Never tested, certainly not like this
-        public EnIPClassInstance CreateInstance(byte instanceId, byte[] InitialRawData)
-        {
-            byte[] ClassDataPath = Path.GetPath(Id, instanceId, null);
-
-            int Offset = 0;
-            int Lenght = 0;
-            byte[] packet;
-
-            Status = RemoteDevice.SetClassInstanceAttribut_Data(ClassDataPath, ControlNetService.Create, InitialRawData, ref Offset, ref Lenght, out packet);
-
-            if (Status == EnIPNetworkStatus.OnLine)
-            {
-                EnIPClassInstance cl = new EnIPClassInstance(this, instanceId);
-                cl.RawData = InitialRawData;
-                return cl;
-            }
-
-            return null;
+            return ReadDataFromNetwork(ClassDataPath, CIPServiceCodes.GetAttributesAll);
         }
     }
 
-    public class EnIPClassInstance : EnIPCIPObject
+    public class EnIPInstance : EnIPCIPObject
     {
         public EnIPClass Class;
-        public EnIPRemoteDevice RemoteDevice;
 
-        public EnIPClassInstance(EnIPClass Class, byte Id)
+        public EnIPInstance(EnIPClass Class, byte Id)
         {
             this.Id = Id;
             this.Class = Class;
             this.RemoteDevice = Class.RemoteDevice;
             Status = EnIPNetworkStatus.OffLine;
+        }
+
+        public override EnIPNetworkStatus WriteDataToNetwork()
+        {
+            return EnIPNetworkStatus.OnLineWriteRejected;
+        }
+
+        public override EnIPNetworkStatus ReadDataFromNetwork()
+        {
+            byte[] DataPath = Path.GetPath(Class.Id, Id, null);
+            return ReadDataFromNetwork(DataPath, CIPServiceCodes.GetAttributesAll);
         }
 
         public EnIPNetworkStatus GetClassInstanceAttributList()
@@ -529,46 +497,34 @@ namespace System.Net.EnIPStack
             int Lenght = 0;
             byte[] packet;
 
-            Status = RemoteDevice.GetClassInstanceAttribut_Data(DataPath, ControlNetService.GetAttributeList, ref Offset, ref Lenght, out packet);
+            Status = RemoteDevice.GetClassInstanceAttribut_Data(DataPath, CIPServiceCodes.GetAttributeList, ref Offset, ref Lenght, out packet);
 
             return Status;
         }
 
-        public override EnIPNetworkStatus WriteDataToNetwork()
+        // Never tested, certainly not like this
+        public bool CreateRemoteInstance()
         {
-            return EnIPNetworkStatus.OnLineWriteRejected;
-        }
-
-        public override EnIPNetworkStatus ReadDataFromNetwork()
-        {
-            return GetClassInstanceData();
-        }
-
-        public EnIPNetworkStatus GetClassInstanceData()
-        {
-
-            byte[] DataPath = Path.GetPath(Class.Id, Id, null);
+            byte[] ClassDataPath = Path.GetPath(Class.Id, Id, null);
 
             int Offset = 0;
             int Lenght = 0;
             byte[] packet;
 
-            Status = RemoteDevice.GetClassInstanceAttribut_Data(DataPath, ControlNetService.GetAttributesAll, ref Offset, ref Lenght, out packet);
+            Status = RemoteDevice.SetClassInstanceAttribut_Data(ClassDataPath, CIPServiceCodes.Create, RawData, ref Offset, ref Lenght, out packet);
+
             if (Status == EnIPNetworkStatus.OnLine)
-            {
-                RawData = new byte[Lenght - Offset];
-                Array.Copy(packet, Offset, RawData, 0, Lenght - Offset);
-            }
-            return Status;
+                return true;
+            else
+                return false;
         }
     }
 
-    public class EnIPInstanceAttribut : EnIPCIPObject
+    public class EnIPAttribut : EnIPCIPObject
     {
-        public EnIPClassInstance Instance;
-        EnIPRemoteDevice RemoteDevice;
+        public EnIPInstance Instance;
 
-        public EnIPInstanceAttribut(EnIPClassInstance Instance, byte Id)
+        public EnIPAttribut(EnIPInstance Instance, byte Id)
         {
             this.Id = Id;
             this.Instance = Instance;
@@ -578,42 +534,14 @@ namespace System.Net.EnIPStack
 
         public override EnIPNetworkStatus WriteDataToNetwork()
         {
-            return SetInstanceAttributData();
-        }
-
-        public EnIPNetworkStatus SetInstanceAttributData()
-        {
             byte[] DataPath = Path.GetPath(Instance.Class.Id, Instance.Id, Id);
-
-            int Offset = 0;
-            int Lenght = 0;
-            byte[] packet;
-
-            Status = RemoteDevice.SetClassInstanceAttribut_Data(DataPath, ControlNetService.SetAttributeSingle, RawData, ref Offset, ref Lenght, out packet);
-
-            return Status; 
+            return WriteDataToNetwork(DataPath, CIPServiceCodes.SetAttributeSingle);
         }
 
         public override EnIPNetworkStatus ReadDataFromNetwork()
         {
-            return GetInstanceAttributData();
-        }
-
-        public EnIPNetworkStatus GetInstanceAttributData()
-        {
             byte[] DataPath = Path.GetPath(Instance.Class.Id, Instance.Id, Id);
-
-            int Offset = 0;
-            int Lenght = 0;
-            byte[] packet;
-
-            Status = RemoteDevice.GetClassInstanceAttribut_Data(DataPath, ControlNetService.GetAttributeSingle, ref Offset, ref Lenght, out packet);
-            if (Status == EnIPNetworkStatus.OnLine)           
-            {
-                RawData = new byte[Lenght - Offset];
-                Array.Copy(packet, Offset, RawData, 0, Lenght - Offset);
-            }
-            return Status;
+            return ReadDataFromNetwork(DataPath, CIPServiceCodes.GetAttributeSingle);
         }
     }
 }

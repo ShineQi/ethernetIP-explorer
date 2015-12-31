@@ -126,6 +126,7 @@
     <None Include="ico\database_edit.png" />
     <None Include="ico\database_go1.png" />
     <None Include="ico\text_replace.png" />
+    <None Include="ico\arrow_refresh.png" />
     <Content Include="Search.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

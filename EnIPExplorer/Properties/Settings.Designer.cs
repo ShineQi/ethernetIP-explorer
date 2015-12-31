@@ -130,5 +130,17 @@ namespace EnIPExplorer.Properties {
                 this["GUI_State"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowNodeToolTip {
+            get {
+                return ((bool)(this["ShowNodeToolTip"]));
+            }
+            set {
+                this["ShowNodeToolTip"] = value;
+            }
+        }
     }
 }

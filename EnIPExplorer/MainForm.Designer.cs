@@ -55,6 +55,8 @@
             this.addRemoteDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendListIdentityDiscoverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.readAgainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.renameCurrentNodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addClassToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -124,6 +126,7 @@
             this.devicesTreeView.Location = new System.Drawing.Point(0, 13);
             this.devicesTreeView.Name = "devicesTreeView";
             this.devicesTreeView.SelectedImageIndex = 0;
+            this.devicesTreeView.ShowNodeToolTips = true;
             this.devicesTreeView.Size = new System.Drawing.Size(298, 478);
             this.devicesTreeView.TabIndex = 1;
             this.devicesTreeView.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.devicesTreeView_AfterExpand);
@@ -303,6 +306,8 @@
             this.addRemoteDeviceToolStripMenuItem,
             this.sendListIdentityDiscoverToolStripMenuItem,
             this.toolStripSeparator1,
+            this.readAgainToolStripMenuItem,
+            this.toolStripSeparator2,
             this.deleteToolStripMenuItem,
             this.renameCurrentNodeToolStripMenuItem,
             this.addClassToolStripMenuItem,
@@ -317,7 +322,7 @@
             // 
             this.openInterfaceToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.add;
             this.openInterfaceToolStripMenuItem.Name = "openInterfaceToolStripMenuItem";
-            this.openInterfaceToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.openInterfaceToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.openInterfaceToolStripMenuItem.Text = "Open Interface";
             this.openInterfaceToolStripMenuItem.Click += new System.EventHandler(this.openInterfaceToolStripMenuItem_Click);
             // 
@@ -325,7 +330,7 @@
             // 
             this.addRemoteDeviceToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.computer_add;
             this.addRemoteDeviceToolStripMenuItem.Name = "addRemoteDeviceToolStripMenuItem";
-            this.addRemoteDeviceToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.addRemoteDeviceToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.addRemoteDeviceToolStripMenuItem.Text = "Add Remote device manually";
             this.addRemoteDeviceToolStripMenuItem.Click += new System.EventHandler(this.addRemoteDeviceToolStripMenuItem_Click);
             // 
@@ -333,21 +338,35 @@
             // 
             this.sendListIdentityDiscoverToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.magnifier;
             this.sendListIdentityDiscoverToolStripMenuItem.Name = "sendListIdentityDiscoverToolStripMenuItem";
-            this.sendListIdentityDiscoverToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.sendListIdentityDiscoverToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.sendListIdentityDiscoverToolStripMenuItem.Text = "Send ListIdentity (Discover)";
             this.sendListIdentityDiscoverToolStripMenuItem.Click += new System.EventHandler(this.sendListIdentityDiscoverToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(226, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(228, 6);
+            // 
+            // readAgainToolStripMenuItem
+            // 
+            this.readAgainToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.arrow_refresh;
+            this.readAgainToolStripMenuItem.Name = "readAgainToolStripMenuItem";
+            this.readAgainToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F3;
+            this.readAgainToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.readAgainToolStripMenuItem.Text = "Refresh Properties";
+            this.readAgainToolStripMenuItem.Click += new System.EventHandler(this.readAgainToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(228, 6);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.cross;
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             this.deleteToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.deleteToolStripMenuItem.Text = "Delete current Node";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
@@ -355,7 +374,8 @@
             // 
             this.renameCurrentNodeToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.text_replace;
             this.renameCurrentNodeToolStripMenuItem.Name = "renameCurrentNodeToolStripMenuItem";
-            this.renameCurrentNodeToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.renameCurrentNodeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
+            this.renameCurrentNodeToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.renameCurrentNodeToolStripMenuItem.Text = "Rename current Node";
             this.renameCurrentNodeToolStripMenuItem.Click += new System.EventHandler(this.renameCurrentNodeToolStripMenuItem_Click);
             // 
@@ -364,7 +384,7 @@
             this.addClassToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.bullet_wrench;
             this.addClassToolStripMenuItem.Name = "addClassToolStripMenuItem";
             this.addClassToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.addClassToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.addClassToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.addClassToolStripMenuItem.Text = "Add Class";
             this.addClassToolStripMenuItem.Click += new System.EventHandler(this.addClassToolStripMenuItem_Click);
             // 
@@ -373,7 +393,7 @@
             this.addClassInstanceToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.pencil;
             this.addClassInstanceToolStripMenuItem.Name = "addClassInstanceToolStripMenuItem";
             this.addClassInstanceToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I)));
-            this.addClassInstanceToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.addClassInstanceToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.addClassInstanceToolStripMenuItem.Text = "Add Instance";
             this.addClassInstanceToolStripMenuItem.Click += new System.EventHandler(this.addClassInstanceToolStripMenuItem_Click);
             // 
@@ -382,7 +402,7 @@
             this.addInstanceAttributToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.bullet_purple;
             this.addInstanceAttributToolStripMenuItem.Name = "addInstanceAttributToolStripMenuItem";
             this.addInstanceAttributToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-            this.addInstanceAttributToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.addInstanceAttributToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.addInstanceAttributToolStripMenuItem.Text = "Add Attribut";
             this.addInstanceAttributToolStripMenuItem.Click += new System.EventHandler(this.addInstanceAttributToolStripMenuItem_Click);
             // 
@@ -495,6 +515,8 @@
         private System.Windows.Forms.ToolStripMenuItem popupAddAToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem renameCurrentNodeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem popupRenameToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem readAgainToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
     }
 }
 

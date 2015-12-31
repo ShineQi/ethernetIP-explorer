@@ -54,8 +54,8 @@ namespace SampleClient
             // class 103, instance 1, attribut 1
             // could be class 4, Instance 104 (with status) or 107 (wihout), attribut 3 for all Input data
             EnIPClass Class103 = new EnIPClass(WagoPlc, 103);
-            EnIPClassInstance Instance1 = new EnIPClassInstance(Class103, 1);
-            EnIPInstanceAttribut FirstAnalogInput = new EnIPInstanceAttribut(Instance1, 1);
+            EnIPInstance Instance1 = new EnIPInstance(Class103, 1);
+            EnIPAttribut FirstAnalogInput = new EnIPAttribut(Instance1, 1);
 
             WagoPlc.autoConnect = false;
             WagoPlc.autoRegisterSession = true;
@@ -69,7 +69,7 @@ namespace SampleClient
                     return;
 
                 // all data will be put in the byte[] RawData member of EnIPInstanceAttribut 
-                if (FirstAnalogInput.GetInstanceAttributData()==EnIPNetworkStatus.OnLine)
+                if (FirstAnalogInput.ReadDataFromNetwork()==EnIPNetworkStatus.OnLine)
                     Console.WriteLine((FirstAnalogInput.RawData[1] << 8) | FirstAnalogInput.RawData[0]);
 
                 Thread.Sleep(200);
@@ -84,8 +84,8 @@ namespace SampleClient
 
             // class 166, instance 1, attribut 1
             EnIPClass Class166 = new EnIPClass(WagoPlc, 166);
-            EnIPClassInstance Instance1 = new EnIPClassInstance(Class166, 1);
-            EnIPInstanceAttribut FirstMemoryByte = new EnIPInstanceAttribut(Instance1, 1);
+            EnIPInstance Instance1 = new EnIPInstance(Class166, 1);
+            EnIPAttribut FirstMemoryByte = new EnIPAttribut(Instance1, 1);
 
             // Connect made & retry automatically
             WagoPlc.autoConnect = true;
@@ -95,7 +95,7 @@ namespace SampleClient
             for (; ; )
             {               
                 FirstMemoryByte.RawData=BitConverter.GetBytes(i++);
-                if (FirstMemoryByte.SetInstanceAttributData()==EnIPNetworkStatus.OnLine)
+                if (FirstMemoryByte.WriteDataToNetwork()==EnIPNetworkStatus.OnLine)
                     Console.WriteLine("OK");
 
                 Thread.Sleep(200);
