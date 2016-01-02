@@ -34,7 +34,7 @@ using System.Threading;
 
 namespace System.Net.EnIPStack
 {
-    public delegate void MessageReceivedHandler(object sender, byte[] packet, EncapsulationPacket EncapPacket, int offset, int msg_length, IPEndPoint remote_address);
+    public delegate void MessageReceivedHandler(object sender, byte[] packet, Encapsulation_Packet EncapPacket, int offset, int msg_length, IPEndPoint remote_address);
 
     // Could be used for client & server implementation
     public class EnIPUDPTransport
@@ -109,7 +109,7 @@ namespace System.Net.EnIPStack
                 try
                 {
                     int Offset = 0;
-                    EncapsulationPacket Encapacket = new EncapsulationPacket(local_buffer, ref Offset, rx);
+                    Encapsulation_Packet Encapacket = new Encapsulation_Packet(local_buffer, ref Offset, rx);
                     //verify message
                     if (MessageReceived != null)
                         MessageReceived(this, local_buffer, Encapacket, Offset, local_buffer.Length, ep);                   
@@ -135,7 +135,7 @@ namespace System.Net.EnIPStack
             }
         }
 
-        public void Send(EncapsulationPacket Packet, IPEndPoint ep)
+        public void Send(Encapsulation_Packet Packet, IPEndPoint ep)
         {
             byte[] b=Packet.toByteArray();
             m_exclusive_conn.Send(b, b.Length, ep);
@@ -250,7 +250,7 @@ namespace System.Net.EnIPStack
             Tcpclient = null;
         }
 
-        public int SendReceive(EncapsulationPacket SendPkt, out EncapsulationPacket ReceivePkt, out int Offset, ref byte[] packet)
+        public int SendReceive(Encapsulation_Packet SendPkt, out Encapsulation_Packet ReceivePkt, out int Offset, ref byte[] packet)
         {
             ReceivePkt = null;
             Offset=0;
@@ -260,14 +260,14 @@ namespace System.Net.EnIPStack
             {
                 // We are not working on a continous flow but with query/response datagram
                 // So if something is here it's a previous lost (timeout) response packet
-                // Flush it.
+                // Flush all content.
                  while (Tcpclient.Available!=0) 
                      Tcpclient.Client.Receive(packet);
 
                 Tcpclient.Client.Send(SendPkt.toByteArray());
                 Lenght = Tcpclient.Client.Receive(packet);
                 if (Lenght > 24)
-                    ReceivePkt = new EncapsulationPacket(packet, ref Offset, Lenght);
+                    ReceivePkt = new Encapsulation_Packet(packet, ref Offset, Lenght);
                 if (Lenght ==0)
                     Trace.WriteLine("Reception timeout with " + Tcpclient.Client.RemoteEndPoint.ToString());
             }
@@ -280,7 +280,7 @@ namespace System.Net.EnIPStack
             return Lenght;
         }
 
-        public void Send(EncapsulationPacket SendPkt)
+        public void Send(Encapsulation_Packet SendPkt)
         {
             try
             {
@@ -361,7 +361,7 @@ namespace System.Net.EnIPStack
                     try
                     {
                         int Offset = 0;
-                        EncapsulationPacket Encapacket = new EncapsulationPacket(Rcp, ref Offset, Lenght);
+                        Encapsulation_Packet Encapacket = new Encapsulation_Packet(Rcp, ref Offset, Lenght);
                         if (MessageReceived != null)
                             MessageReceived(this, Rcp, Encapacket, Offset, Lenght, (IPEndPoint)tcpClient.Client.RemoteEndPoint);
                     }

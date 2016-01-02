@@ -180,6 +180,7 @@ namespace EnIPExplorer
             Cursor Memcurs = this.Cursor;
 
             this.Cursor = Cursors.WaitCursor;
+            popupForwardToolStripMenuItem.Visible = false;
 
             // It's a Device : top level
             if (e.Node.Tag is EnIPRemoteDevice)
@@ -191,6 +192,7 @@ namespace EnIPExplorer
                 popupAddCToolStripMenuItem.Visible = true;
                 popupAddIToolStripMenuItem.Visible = false;
                 popupAddAToolStripMenuItem.Visible = false;
+
                 popupDeleteToolStripMenuItem.Text = deleteToolStripMenuItem.Text = "Delete current Device";
 
                 if (device.SupportedClassLists.Count == 0) // certainly never discovers
@@ -280,6 +282,7 @@ namespace EnIPExplorer
                 popupAddCToolStripMenuItem.Visible = true;
                 popupAddIToolStripMenuItem.Visible = true;
                 popupAddAToolStripMenuItem.Visible = true;
+                popupForwardToolStripMenuItem.Visible = true;
                 popupDeleteToolStripMenuItem.Text = deleteToolStripMenuItem.Text = "Delete current Attribut";
             }
 
@@ -443,7 +446,7 @@ namespace EnIPExplorer
                 new GenericInputBox<NumericUpDown>("Add Instance", "Instance Id :",
                      (o) =>
                      {
-                         o.Minimum = 1; o.Maximum = 255; o.Value = Numbase;
+                         o.Minimum = 1; o.Maximum = 65535; o.Value = Numbase;
                      });
 
             DialogResult res = Input.ShowDialog();
@@ -487,7 +490,7 @@ namespace EnIPExplorer
                 new GenericInputBox<NumericUpDown>("Add Attribut", "Attribut Id :",
                      (o) =>
                      {
-                         o.Minimum = 1; o.Maximum = 255; o.Value = Numbase;
+                         o.Minimum = 1; o.Maximum = 65535; o.Value = Numbase;
                      });
 
             DialogResult res = Input.ShowDialog();
@@ -648,6 +651,23 @@ namespace EnIPExplorer
                 (propertyGrid.SelectedObject as EnIPCIPObject).ReadDataFromNetwork();
                 propertyGrid.Refresh();
             }
+        }
+
+        // Menu Item
+        private void ForwardOpenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!(propertyGrid.SelectedObject is EnIPAttribut)) return;
+
+            bool p2p = true;
+
+            if ((sender == multicastToolStripMenuItem) || (sender == popupMulticastToolStripMenuItem))
+                p2p = false;
+
+            EnIPAttribut att = (EnIPAttribut)propertyGrid.SelectedObject;
+
+            Trace.WriteLine("Sending ForwardOpen T->O, good luck with Wireshark");
+            att.ForwardOpen(p2p, Properties.Settings.Default.ForwardOpenPeriod_ms, Properties.Settings.Default.ForwardOpenDuration_s);
+
         }
 
         // Recursive usage
@@ -831,7 +851,6 @@ namespace EnIPExplorer
             renameCurrentNodeToolStripMenuItem_Click(null, null);
         }
         #endregion
-
 
     }
 

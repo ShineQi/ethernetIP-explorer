@@ -142,5 +142,29 @@ namespace EnIPExplorer.Properties {
                 this["ShowNodeToolTip"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("200")]
+        public uint ForwardOpenPeriod_ms {
+            get {
+                return ((uint)(this["ForwardOpenPeriod_ms"]));
+            }
+            set {
+                this["ForwardOpenPeriod_ms"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public byte ForwardOpenDuration_s {
+            get {
+                return ((byte)(this["ForwardOpenDuration_s"]));
+            }
+            set {
+                this["ForwardOpenDuration_s"] = value;
+            }
+        }
     }
 }

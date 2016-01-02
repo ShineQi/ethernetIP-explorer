@@ -124,6 +124,7 @@ namespace System.Net.EnIPStack
     }
 
     // Volume 1 : Table A-3.1 CIP Service Codes and Names
+    // High bit 0 for query, 1 for response
     public enum CIPServiceCodes
     {
         GetAttributesAll = 0x01,
@@ -147,7 +148,12 @@ namespace System.Net.EnIPStack
         SetMember = 0x19,
         InsertMember = 0x1A,
         RemoveMember = 0x1B,
-        GroupSync = 0x1C
+        GroupSync = 0x1C,
+        ForwardClose = 0x4E,
+        UnconnectedSend = 0x52,
+        ForwardOpen = 0x54,     // Todo Volume 1 : Table 3-5.16
+        LargeForwardOpen = 0x5B
+
     }
 
     // Volume 1 : Table 5-2.2 Identity Object Instance Attributes 
@@ -210,5 +216,19 @@ namespace System.Net.EnIPStack
         Group_2_only_server_general_failure = 42,
         Unknown_Modbus_error = 43,
         Attribute_not_gettable = 44
+    }
+
+    // Volume 2 : Table 2-6.3 Item ID Numbers
+    public enum CommonPacketItemIdNumbers : ushort
+    {
+        NULL = 0x0000,
+        ListIdentityResponse = 0x000C,
+        ConnectionBased = 0x00A1,
+        ConnectedTransportPacket = 0x00B1,
+        UnconnectedMessage = 0x00B2,
+        ListServicesResponse = 0x0100,
+        SocketaddrInfo_O2T = 0x8000,
+        SocketaddrInfo_T2O = 0x8001,
+        SequencedAddressItem = 0x8002
     }
 }

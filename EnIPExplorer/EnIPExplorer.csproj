@@ -61,9 +61,7 @@
     <Compile Include="..\EnIPStack\Enums.cs">
       <Link>Enums.cs</Link>
     </Compile>
-    <Compile Include="GenericInputBox.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="GenericInputBox.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -127,6 +125,7 @@
     <None Include="ico\database_go1.png" />
     <None Include="ico\text_replace.png" />
     <None Include="ico\arrow_refresh.png" />
+    <None Include="ico\door_out.png" />
     <Content Include="Search.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

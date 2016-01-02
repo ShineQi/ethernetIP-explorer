@@ -27,8 +27,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Net;
-using System.Net.Sockets;
 using System.Diagnostics;
 
 namespace System.Net.EnIPStack
@@ -36,7 +34,7 @@ namespace System.Net.EnIPStack
     // Volume 1 : C-1.4.2 Logical Segment
     // Remember for 16 bits address : (0x21 or 0x25 or 0x31) - 0x00 - 0xPF - 0xpf
     // also a pad 0x00 must be set for 32 bits address. No supported here.
-    public static class Path
+    public static class EnIPPath
     {
         private static void Fit(byte[] path, ref int offset, ushort value, byte code)
         {
@@ -88,7 +86,52 @@ namespace System.Net.EnIPStack
             if (s.Length == 2)
                 return GetPath(Convert.ToUInt16(s[0]), Convert.ToUInt16(s[1]), null);
             return null;
+        }
 
+        // Base on Volume 1 : Figure C-1.3 Port Segment Encoding
+        // & Table C-1.2 Port Segment Examples
+        // & Volume 2 : 3-3.7 Connection Path
+        // IPendPoint in the format x.x.x.x:x, port is optional
+        private static byte[] GetExtendedPath(String IPendPoint, byte[] LogicalSeg)
+        {
+            byte[] PortSegment = Encoding.ASCII.GetBytes(IPendPoint);
+
+            int IPlenght = PortSegment.Length;
+            if ((IPlenght % 2) != 0) IPlenght++;
+
+            byte[] FullPath = new byte[LogicalSeg.Length + IPlenght + 2];
+
+            // to be FIXED : Port number !
+            FullPath[0] = 0x15;
+            FullPath[1] = (byte)IPendPoint.Length;
+            Array.Copy(PortSegment, 0, FullPath, 2, PortSegment.Length);
+            Array.Copy(LogicalSeg, 0, FullPath, 2 + IPlenght, LogicalSeg.Length);
+
+            return FullPath;
+        }
+
+        // Add a Data Member to the Path
+        public static byte[] AddDataSegment(byte[] ExtendedPath, byte[] Data)
+        {
+            byte[] FullPath = new byte[Data.Length + ExtendedPath.Length + 2];
+            Array.Copy(ExtendedPath, FullPath, ExtendedPath.Length);
+            FullPath[ExtendedPath.Length] = 0x80;
+            FullPath[ExtendedPath.Length + 1] = (byte)(Data.Length / 2 + (Data.Length % 2));
+            Array.Copy(Data, 0, FullPath, ExtendedPath.Length + 2, Data.Length);
+
+            return FullPath;
+        }
+        public static byte[] GetExtendedPath(String IPendPoint, String LogicalSegment)
+        {
+            byte[] LogicalSeg = GetPath(LogicalSegment);
+            byte[] ExtendedPath = GetExtendedPath(IPendPoint, LogicalSeg);
+            return ExtendedPath;
+        }
+        public static byte[] GetExtendedPath(String IPAdress, ushort Class, ushort Instance, ushort? Attribut = null)
+        {
+            byte[] LogicalSeg = GetPath(Class, Instance, Attribut);
+            byte[] ExtendedPath = GetExtendedPath(IPAdress, LogicalSeg);
+            return ExtendedPath;
         }
 
         public static string GetPath(byte[] path)
@@ -119,9 +162,9 @@ namespace System.Net.EnIPStack
 
     // Volume 2 : Table 2-3.1 Encapsulation Packet
     // No explicit information to distinguish between a request and a reply
-    public class EncapsulationPacket
+    public class Encapsulation_Packet
     {
-        public UInt16 Command;
+        public EncapsulationCommands Command;
         public UInt16 Length;
         public UInt32 Sessionhandle;
         //  Volume 2 : Table 2-3.3 Error Codes - 0x0000 Success, others value error
@@ -134,9 +177,9 @@ namespace System.Net.EnIPStack
 
         public bool IsOK { get { return Status == EncapsulationStatus.Success; } }
 
-        public EncapsulationPacket(EncapsulationCommands Command, uint Sessionhandle=0, byte[] Encapsulateddata=null) 
+        public Encapsulation_Packet(EncapsulationCommands Command, uint Sessionhandle=0, byte[] Encapsulateddata=null) 
         {
-            this.Command = (UInt16)Command;
+            this.Command = Command;
             this.Sessionhandle = Sessionhandle;
             this.Encapsulateddata = Encapsulateddata;
             if (Encapsulateddata != null)
@@ -146,9 +189,9 @@ namespace System.Net.EnIPStack
         }
     
         // From network
-        public EncapsulationPacket(byte[] Packet, ref int Offset, int Length)
+        public Encapsulation_Packet(byte[] Packet, ref int Offset, int Length)
         {
-            Command = BitConverter.ToUInt16(Packet, Offset);
+            Command = (EncapsulationCommands)BitConverter.ToUInt16(Packet, Offset);
             Offset += 2;
             this.Length = BitConverter.ToUInt16(Packet, Offset);
 
@@ -174,10 +217,10 @@ namespace System.Net.EnIPStack
         {
             byte[] ret = new byte[24 + Length];
             
-            Buffer.BlockCopy(BitConverter.GetBytes(Command), 0, ret, 0, 2);
-            Buffer.BlockCopy(BitConverter.GetBytes(Length), 0, ret, 2, 2);
-            Buffer.BlockCopy(BitConverter.GetBytes(Sessionhandle), 0, ret, 4, 4);
-            Buffer.BlockCopy(BitConverter.GetBytes((uint)Status), 0, ret, 8, 4);
+            Array.Copy(BitConverter.GetBytes((ushort)Command), 0, ret, 0, 2);
+            Array.Copy(BitConverter.GetBytes(Length), 0, ret, 2, 2);
+            Array.Copy(BitConverter.GetBytes(Sessionhandle), 0, ret, 4, 4);
+            Array.Copy(BitConverter.GetBytes((uint)Status), 0, ret, 8, 4);
             Array.Copy(SenderContext, 0, ret, 12, 8);
             Buffer.BlockCopy(BitConverter.GetBytes(Options), 0, ret, 20, 4);
             if (Encapsulateddata!=null)
@@ -189,6 +232,12 @@ namespace System.Net.EnIPStack
     // Volume 1 : paragraph 2-4 Message Router Request/Response Formats
     public class UCMM_RR_Packet
     {
+        // Partial Header
+        public ushort ItemCount = 2;
+        public CommonPacketItemIdNumbers IdemId = CommonPacketItemIdNumbers.UnconnectedMessage;
+        public ushort DataLength;
+
+        // High bit 0 for query, 1 for response
         public byte Service;
 
         // Only for response packet
@@ -200,9 +249,34 @@ namespace System.Net.EnIPStack
         public byte[] Path;
         public byte[] Data;
 
+
+
         public bool IsOK { get { return GeneralStatus == CIPGeneralSatusCode.Success; } }
 
-        public UCMM_RR_Packet() { }
+        public UCMM_RR_Packet(CIPServiceCodes Service, bool IsRequest, byte[] Path, byte[] Data) 
+        {            
+            this.Service = (byte)Service;
+            if (!IsRequest)
+                this.Service = (byte)(this.Service | 0x80);
+
+            this.Path = Path;
+            this.Data = Data;
+        }
+
+        public bool IsService(CIPServiceCodes Service)
+        {
+            byte s=(byte)(this.Service & 0x7F);
+
+            if (s == (byte)Service) return true;
+
+            if ((this.Service > 0x80 )&& (s==(byte)CIPServiceCodes.UnconnectedSend))
+                return true;
+            
+            return false;
+        }
+
+        public bool IsResponse  { get { return Service > 0x80; } }
+        public bool IsQuery { get { return Service < 0x80; } }
 
         // up to now it's only a response paquet decoding
         public UCMM_RR_Packet(byte[] DataArray, ref int Offset, int Lenght)
@@ -249,12 +323,15 @@ namespace System.Net.EnIPStack
                 return null;
             }
 
-            // Volume 2 : Table 3-2.1 UCMM Request
-            byte[] retVal = new byte[10 + 6 + 2 + Path.Length + (Data == null ? 0 : Data.Length)];
+            DataLength = (ushort)(2 + Path.Length + (Data == null ? 0 : Data.Length));
 
-            retVal[6] = 2;
-            retVal[12] = 0xB2;
-            retVal[14] = (byte)(2 + Path.Length+(Data==null ? 0 : Data.Length));
+            // Volume 2 : Table 3-2.1 UCMM Request
+            byte[] retVal = new byte[10 + 6 + DataLength];
+            Array.Copy(BitConverter.GetBytes(ItemCount), 0, retVal, 6, 2);
+
+            Array.Copy(BitConverter.GetBytes((ushort)this.IdemId), 0, retVal, 12, 2);
+
+            Array.Copy(BitConverter.GetBytes(DataLength), 0, retVal, 14, 2);
 
             retVal[16] = Service;
             retVal[17] = (byte)(Path.Length >> 1);
@@ -268,33 +345,157 @@ namespace System.Net.EnIPStack
         }        
     }
 
-    public class SocketAddress
+    // Volume 1 : Table 3-5.16 Forward_Open
+    // class for both request and response
+    public class ForwardOpen_Packet
     {
+        // TimeOut (duration) in ms = 2^Priority_TimeTick * Timeout_Ticks
+        // So with Priority_TimeTick=10, Timeout_Ticks is ~ the number of seconds
+        public byte Priority_TimeTick=10;
+        public byte Timeout_Ticks=10;
+
+        private static uint _ConnectionId;
+        public uint O2T_ConnectionId;
+        public uint T2O_ConnectionId;
+
+        public ushort ConnectionSerialNumber= (ushort)new Random().Next(65535);
+        public ushort OriginatorVendorId = 0x4B1D;
+        public uint OriginatorSerialNumber = 0x8BADF00D;
+
+        // 0 => *4
+        public byte ConnectionTimeoutMultiplier;
+        public byte[] Reserved = new byte[3];
+        // It's O2T_API for reply, in microseconde
+        public uint O2T_RPI=0;
+        public ushort O2T_ConnectionParameters;
+        // It's T2A_API for reply
+        public uint T2O_RPI = 0;
+        public ushort T2O_ConnectionParameters;
+        // volume 1 : Figure 3-4.2 Transport Class Trigger Attribute
+        public byte TransportTrigger;
+        public byte Connection_Path_Size;
+        public byte[] Connection_Path;
+
+        // Only use for request
+        public ForwardOpen_Packet(byte[] Connection_Path, bool p2p, ushort datasize) 
+        {
+            this.Connection_Path = Connection_Path;
+
+            _ConnectionId++;
+            _ConnectionId = (uint)((_ConnectionId & 0xFFFF) + (new Random().Next(65535) << 16));
+
+            // User should put zero for one :
+            O2T_ConnectionId=T2O_ConnectionId = _ConnectionId;
+
+            // Volume 1:  chapter 3-5.5.1.1
+            /* Sample for wireshark
+            T->O Network Connection Parameters: 0x463b
+            0... .... .... .... = Owner: Exclusive (0)
+            .10. .... .... .... = Connection Type: Point to Point (2)
+            .... 01.. .... .... = Priority: High Priority (1)
+            .... ..1. .... .... = Connection Size Type: Variable (1)
+            .... ...0 0011 1011 = Connection Size: 59
+            */
+            ushort ConnectionParameters;
+            if (p2p) ConnectionParameters = 0x4600; else ConnectionParameters = 0x2600;
+            ConnectionParameters += (ushort)(datasize + 2);
+
+            // User should put zero for one :
+            O2T_ConnectionParameters = T2O_ConnectionParameters = ConnectionParameters; // 0x2 multicats, 0x4 p2p
+            TransportTrigger = 0x01; // client class 1
+
+        }
+
+        // by now only use for request
+        public byte[] toByteArray()
+        {
+            int PathSize = Connection_Path.Length / 2 + (Connection_Path.Length % 2);
+            Connection_Path_Size = (byte)PathSize;
+
+            byte[] fwopen=new byte[36+PathSize*2];
+
+            fwopen[0] = Priority_TimeTick;
+            fwopen[1] = Timeout_Ticks;
+            Array.Copy(BitConverter.GetBytes(O2T_ConnectionId), 0, fwopen, 2, 4);
+            Array.Copy(BitConverter.GetBytes(T2O_ConnectionId), 0, fwopen, 6, 4);
+            Array.Copy(BitConverter.GetBytes(ConnectionSerialNumber), 0, fwopen, 10, 2);
+            Array.Copy(BitConverter.GetBytes(OriginatorVendorId), 0, fwopen, 12, 2);
+            Array.Copy(BitConverter.GetBytes(OriginatorSerialNumber), 0, fwopen, 14, 4);
+            fwopen[18] = ConnectionTimeoutMultiplier;
+            Array.Copy(Reserved, 0, fwopen, 19, 3);
+            Array.Copy(BitConverter.GetBytes(O2T_RPI), 0, fwopen, 22, 4);
+            Array.Copy(BitConverter.GetBytes(O2T_ConnectionParameters), 0, fwopen, 26, 2);
+            Array.Copy(BitConverter.GetBytes(T2O_RPI), 0, fwopen, 28, 4);
+            Array.Copy(BitConverter.GetBytes(T2O_ConnectionParameters), 0, fwopen, 32, 2);
+            fwopen[34] = TransportTrigger;
+            fwopen[35] = Connection_Path_Size;
+            Array.Copy(Connection_Path, 0, fwopen, 36, Connection_Path.Length);
+
+            return fwopen;
+        }
+    }
+
+    // Volume 2 : 2-6.3.3 Sockaddr Info Item
+    public class EnIPSocketAddress
+    {
+        // use for socket Address Item in CIP
+        // if 0x8000 ou 0x8001
+        public ushort TypeID = 0;
+        //public ushort Lenght;
+
         public short sin_family;
         public ushort sin_port;
         public uint sin_addr;
 
         // Too small for IPV6 !
-        public byte[] sin_zero = new byte[8];
-
-        public byte[] toByteArray()
+        // public byte[] sin_zero = new byte[8];
+        
+        public EnIPSocketAddress(IPEndPoint ep)
         {
-            byte[] retVal = new byte[16];
-
-            Buffer.BlockCopy(BitConverter.GetBytes(sin_family), 0, retVal, 0, 2);
-            Buffer.BlockCopy(BitConverter.GetBytes(sin_port), 0, retVal, 2, 2);
-            Buffer.BlockCopy(BitConverter.GetBytes(sin_addr), 0, retVal, 4, 4);
-
-            return retVal;
+            sin_family = (short)ep.AddressFamily;
+            sin_port = (ushort)ep.Port;
+            sin_addr = BitConverter.ToUInt32(ep.Address.GetAddressBytes(),0);
+        }
+        public EnIPSocketAddress(byte[] DataArray, ref int Offset)
+        {
+            sin_family = (short)((DataArray[0 + Offset] << 8) + DataArray[1 + Offset]);
+            sin_port = (ushort)((DataArray[2 + Offset] << 8) + DataArray[3 + Offset]);
+            sin_addr = (uint)((DataArray[7 + Offset] << 24) + (DataArray[6 + Offset] << 16) 
+                            + (DataArray[5 + Offset] << 8) + DataArray[4 + Offset]);
+            Offset += 16;
         }
 
-        public SocketAddress(byte[] DataArray, ref int Offset)
+        public IPEndPoint toIPEndpoint()
         {
-            sin_family = BitConverter.ToInt16(DataArray, Offset);
-            sin_port = BitConverter.ToUInt16(DataArray, Offset + 2);
-            sin_addr = BitConverter.ToUInt32(DataArray, Offset + 4);
+            IPEndPoint ep = new IPEndPoint(new IPAddress(sin_addr), sin_port);
+            return ep;
+        }
+        // give 2 formats depending of the TypeID field
+        public byte[] toByteArray()
+        {
+            byte[] retVal;
+            int shift = 0;
+            if (TypeID == 0)
+                retVal = new byte[16];
+            else
+            {
+                retVal = new byte[16 + 4];
+                shift = 4;
+                Array.Copy(BitConverter.GetBytes(TypeID), 0, retVal, 0, 2);
+                Array.Copy(BitConverter.GetBytes((ushort)16), 0, retVal, 2, 2);
+            }
 
-            Offset += 16;
+            retVal[0 + shift] = (byte)(sin_family >> 8);
+            retVal[1 + shift] = (byte)(sin_family & 0xFF);
+            retVal[2 + shift] = (byte)(sin_port >> 8);
+            retVal[3 + shift] = (byte)(sin_port & 0xFF);
+
+            retVal[4 + shift] = (byte)(sin_addr & 0xFF);
+            retVal[5 + shift] = (byte)((sin_addr & 0xFF00) >> 8);
+            retVal[6 + shift] = (byte)((sin_addr & 0xFF0000) >> 16);
+            retVal[7 + shift] = (byte)((sin_addr & 0xFF000000) >> 24);
+
+            return retVal;
         }
     }
 }

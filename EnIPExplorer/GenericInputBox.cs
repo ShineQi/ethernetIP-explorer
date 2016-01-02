@@ -45,6 +45,7 @@ namespace System.Windows.Forms
 {
     public delegate void PostInitializeComponent<T>(T generic);
 
+    [System.ComponentModel.DesignerCategory("")] // Avoid failure opening with the GUI Designer
     public partial class GenericInputBox<T> : Form where T : Control, new()
     {
         public GenericInputBox(String BoxTitle, String Lbl, PostInitializeComponent<T> FillInput)
@@ -53,7 +54,8 @@ namespace System.Windows.Forms
             InitializeComponent();
             genericLbl.Text = Lbl;
             this.Text = BoxTitle;
-            FillInput(genericInput);
+            if (FillInput!=null)
+                FillInput(genericInput); // 'Callback' for optional genericInput content initialization
         }
 
         private void bt_Click(object sender, EventArgs e)
@@ -61,17 +63,6 @@ namespace System.Windows.Forms
             if (sender==btOK)
                 this.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.Close();
-        }
-            
-        private System.ComponentModel.IContainer components = null;
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
         }
 
         public T genericInput;

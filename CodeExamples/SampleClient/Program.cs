@@ -36,7 +36,7 @@ namespace SampleClient
     class Program
     {
         static void Main(string[] args)
-        {
+        {       
             TestDiscover();
             // Wait a little before next operation
             Thread.Sleep(1000);
