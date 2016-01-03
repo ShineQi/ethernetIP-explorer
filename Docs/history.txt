@@ -16,6 +16,14 @@
  - Save&load Tree structure in a spreadsheet editable format
  - Clean device Online/Offline display
 
+0.1.4
+ - ForwardOpen T->O
+
+0.1.5
+ - Class1 sample client
+ - Clean multicast & P2P ForwardOpen
+
 Roadmap
+ - Forward Open O->T
  - Maybe decoding of standard classes
  - Rawdata user selectable format ? byte, short, uhsort ... 

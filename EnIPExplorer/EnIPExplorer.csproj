@@ -126,6 +126,7 @@
     <None Include="ico\text_replace.png" />
     <None Include="ico\arrow_refresh.png" />
     <None Include="ico\door_out.png" />
+    <None Include="ico\door_in.png" />
     <Content Include="Search.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

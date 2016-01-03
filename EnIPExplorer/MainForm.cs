@@ -181,6 +181,7 @@ namespace EnIPExplorer
 
             this.Cursor = Cursors.WaitCursor;
             popupForwardToolStripMenuItem.Visible = false;
+            popuForward2ToolStripMenuItem.Visible = false;
 
             // It's a Device : top level
             if (e.Node.Tag is EnIPRemoteDevice)
@@ -283,6 +284,7 @@ namespace EnIPExplorer
                 popupAddIToolStripMenuItem.Visible = true;
                 popupAddAToolStripMenuItem.Visible = true;
                 popupForwardToolStripMenuItem.Visible = true;
+                popuForward2ToolStripMenuItem.Visible = true;
                 popupDeleteToolStripMenuItem.Text = deleteToolStripMenuItem.Text = "Delete current Attribut";
             }
 
@@ -665,8 +667,11 @@ namespace EnIPExplorer
 
             EnIPAttribut att = (EnIPAttribut)propertyGrid.SelectedObject;
 
-            Trace.WriteLine("Sending ForwardOpen T->O, good luck with Wireshark");
-            att.ForwardOpen(p2p, Properties.Settings.Default.ForwardOpenPeriod_ms, Properties.Settings.Default.ForwardOpenDuration_s);
+            int Duration = Properties.Settings.Default.ForwardOpenDuration_s;
+            if (Duration <= 0) Duration = 1;
+            if (Duration > 60) Duration = 60;
+            if (att.ForwardOpen(p2p, true, false, Properties.Settings.Default.ForwardOpenPeriod_ms, Duration)==EnIPNetworkStatus.OnLine)
+                Trace.WriteLine("ForwardOpen T->O OK, good luck with Wireshark or Class1 client sample source code");
 
         }
 

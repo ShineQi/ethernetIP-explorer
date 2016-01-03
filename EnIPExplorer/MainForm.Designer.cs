@@ -42,6 +42,7 @@
             this.popupForwardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.popupMulticastToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.popupP2PToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.popuForward2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.DeviceLabel = new System.Windows.Forms.Label();
             this.propertyGrid = new System.Windows.Forms.PropertyGrid();
@@ -62,6 +63,7 @@
             this.sendForwardOpenTOToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.multicastToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.point2PointToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sendForwardOpenTOToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.renameCurrentNodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -146,15 +148,16 @@
             this.popupAddCToolStripMenuItem,
             this.popupAddIToolStripMenuItem,
             this.popupAddAToolStripMenuItem,
-            this.popupForwardToolStripMenuItem});
+            this.popupForwardToolStripMenuItem,
+            this.popuForward2ToolStripMenuItem});
             this.MenuPopup.Name = "MenuPopup";
-            this.MenuPopup.Size = new System.Drawing.Size(223, 158);
+            this.MenuPopup.Size = new System.Drawing.Size(241, 158);
             // 
             // popupDeleteToolStripMenuItem
             // 
             this.popupDeleteToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.cross;
             this.popupDeleteToolStripMenuItem.Name = "popupDeleteToolStripMenuItem";
-            this.popupDeleteToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.popupDeleteToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.popupDeleteToolStripMenuItem.Text = "Delete";
             this.popupDeleteToolStripMenuItem.Click += new System.EventHandler(this.popupDeleteToolStripMenuItem_Click);
             // 
@@ -162,7 +165,7 @@
             // 
             this.popupRenameToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.text_replace;
             this.popupRenameToolStripMenuItem.Name = "popupRenameToolStripMenuItem";
-            this.popupRenameToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.popupRenameToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.popupRenameToolStripMenuItem.Text = "Rename";
             this.popupRenameToolStripMenuItem.Click += new System.EventHandler(this.popupRenameToolStripMenuItem_Click);
             // 
@@ -170,7 +173,7 @@
             // 
             this.popupAddCToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.bullet_wrench;
             this.popupAddCToolStripMenuItem.Name = "popupAddCToolStripMenuItem";
-            this.popupAddCToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.popupAddCToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.popupAddCToolStripMenuItem.Text = "Add Class";
             this.popupAddCToolStripMenuItem.Click += new System.EventHandler(this.popupAddCToolStripMenuItem_Click);
             // 
@@ -178,7 +181,7 @@
             // 
             this.popupAddIToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.pencil;
             this.popupAddIToolStripMenuItem.Name = "popupAddIToolStripMenuItem";
-            this.popupAddIToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.popupAddIToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.popupAddIToolStripMenuItem.Text = "Add Instance";
             this.popupAddIToolStripMenuItem.Click += new System.EventHandler(this.popupAddIToolStripMenuItem_Click);
             // 
@@ -186,7 +189,7 @@
             // 
             this.popupAddAToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.bullet_purple;
             this.popupAddAToolStripMenuItem.Name = "popupAddAToolStripMenuItem";
-            this.popupAddAToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.popupAddAToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.popupAddAToolStripMenuItem.Text = "Add Attribut";
             this.popupAddAToolStripMenuItem.Click += new System.EventHandler(this.popupAddAToolStripMenuItem_Click);
             // 
@@ -197,22 +200,29 @@
             this.popupP2PToolStripMenuItem});
             this.popupForwardToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.door_out;
             this.popupForwardToolStripMenuItem.Name = "popupForwardToolStripMenuItem";
-            this.popupForwardToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
+            this.popupForwardToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.popupForwardToolStripMenuItem.Text = "Advise : ForwardOpen T->O";
             // 
             // popupMulticastToolStripMenuItem
             // 
             this.popupMulticastToolStripMenuItem.Name = "popupMulticastToolStripMenuItem";
-            this.popupMulticastToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.popupMulticastToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.popupMulticastToolStripMenuItem.Text = "Multicast";
             this.popupMulticastToolStripMenuItem.Click += new System.EventHandler(this.ForwardOpenToolStripMenuItem_Click);
             // 
             // popupP2PToolStripMenuItem
             // 
             this.popupP2PToolStripMenuItem.Name = "popupP2PToolStripMenuItem";
-            this.popupP2PToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.popupP2PToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.popupP2PToolStripMenuItem.Text = "Point 2 Point";
             this.popupP2PToolStripMenuItem.Click += new System.EventHandler(this.ForwardOpenToolStripMenuItem_Click);
+            // 
+            // popuForward2ToolStripMenuItem
+            // 
+            this.popuForward2ToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.door_in;
+            this.popuForward2ToolStripMenuItem.Name = "popuForward2ToolStripMenuItem";
+            this.popuForward2ToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.popuForward2ToolStripMenuItem.Text = "Configure : ForwardOpen O->T";
             // 
             // imageList1
             // 
@@ -339,6 +349,7 @@
             this.toolStripSeparator1,
             this.readAgainToolStripMenuItem,
             this.sendForwardOpenTOToolStripMenuItem,
+            this.sendForwardOpenTOToolStripMenuItem1,
             this.toolStripSeparator2,
             this.deleteToolStripMenuItem,
             this.renameCurrentNodeToolStripMenuItem,
@@ -354,7 +365,7 @@
             // 
             this.openInterfaceToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.add;
             this.openInterfaceToolStripMenuItem.Name = "openInterfaceToolStripMenuItem";
-            this.openInterfaceToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.openInterfaceToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.openInterfaceToolStripMenuItem.Text = "Open Interface";
             this.openInterfaceToolStripMenuItem.Click += new System.EventHandler(this.openInterfaceToolStripMenuItem_Click);
             // 
@@ -362,7 +373,7 @@
             // 
             this.addRemoteDeviceToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.computer_add;
             this.addRemoteDeviceToolStripMenuItem.Name = "addRemoteDeviceToolStripMenuItem";
-            this.addRemoteDeviceToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.addRemoteDeviceToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.addRemoteDeviceToolStripMenuItem.Text = "Add Remote device manually";
             this.addRemoteDeviceToolStripMenuItem.Click += new System.EventHandler(this.addRemoteDeviceToolStripMenuItem_Click);
             // 
@@ -370,21 +381,21 @@
             // 
             this.sendListIdentityDiscoverToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.magnifier;
             this.sendListIdentityDiscoverToolStripMenuItem.Name = "sendListIdentityDiscoverToolStripMenuItem";
-            this.sendListIdentityDiscoverToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.sendListIdentityDiscoverToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.sendListIdentityDiscoverToolStripMenuItem.Text = "Send ListIdentity (Discover)";
             this.sendListIdentityDiscoverToolStripMenuItem.Click += new System.EventHandler(this.sendListIdentityDiscoverToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(228, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(237, 6);
             // 
             // readAgainToolStripMenuItem
             // 
             this.readAgainToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.arrow_refresh;
             this.readAgainToolStripMenuItem.Name = "readAgainToolStripMenuItem";
             this.readAgainToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F3;
-            this.readAgainToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.readAgainToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.readAgainToolStripMenuItem.Text = "Refresh Properties";
             this.readAgainToolStripMenuItem.Click += new System.EventHandler(this.readAgainToolStripMenuItem_Click);
             // 
@@ -395,7 +406,7 @@
             this.point2PointToolStripMenuItem});
             this.sendForwardOpenTOToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.door_out;
             this.sendForwardOpenTOToolStripMenuItem.Name = "sendForwardOpenTOToolStripMenuItem";
-            this.sendForwardOpenTOToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.sendForwardOpenTOToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.sendForwardOpenTOToolStripMenuItem.Text = "Advise : ForwardOpen T->O";
             // 
             // multicastToolStripMenuItem
@@ -412,17 +423,24 @@
             this.point2PointToolStripMenuItem.Text = "Point 2 Point";
             this.point2PointToolStripMenuItem.Click += new System.EventHandler(this.ForwardOpenToolStripMenuItem_Click);
             // 
+            // sendForwardOpenTOToolStripMenuItem1
+            // 
+            this.sendForwardOpenTOToolStripMenuItem1.Image = global::EnIPExplorer.Properties.Resources.door_in;
+            this.sendForwardOpenTOToolStripMenuItem1.Name = "sendForwardOpenTOToolStripMenuItem1";
+            this.sendForwardOpenTOToolStripMenuItem1.Size = new System.Drawing.Size(240, 22);
+            this.sendForwardOpenTOToolStripMenuItem1.Text = "Configure : ForwardOpen O->T";
+            // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(228, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(237, 6);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.cross;
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             this.deleteToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.deleteToolStripMenuItem.Text = "Delete current Node";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
@@ -431,7 +449,7 @@
             this.renameCurrentNodeToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.text_replace;
             this.renameCurrentNodeToolStripMenuItem.Name = "renameCurrentNodeToolStripMenuItem";
             this.renameCurrentNodeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
-            this.renameCurrentNodeToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.renameCurrentNodeToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.renameCurrentNodeToolStripMenuItem.Text = "Rename current Node";
             this.renameCurrentNodeToolStripMenuItem.Click += new System.EventHandler(this.renameCurrentNodeToolStripMenuItem_Click);
             // 
@@ -440,7 +458,7 @@
             this.addClassToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.bullet_wrench;
             this.addClassToolStripMenuItem.Name = "addClassToolStripMenuItem";
             this.addClassToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.addClassToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.addClassToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.addClassToolStripMenuItem.Text = "Add Class";
             this.addClassToolStripMenuItem.Click += new System.EventHandler(this.addClassToolStripMenuItem_Click);
             // 
@@ -449,7 +467,7 @@
             this.addClassInstanceToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.pencil;
             this.addClassInstanceToolStripMenuItem.Name = "addClassInstanceToolStripMenuItem";
             this.addClassInstanceToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I)));
-            this.addClassInstanceToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.addClassInstanceToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.addClassInstanceToolStripMenuItem.Text = "Add Instance";
             this.addClassInstanceToolStripMenuItem.Click += new System.EventHandler(this.addClassInstanceToolStripMenuItem_Click);
             // 
@@ -458,7 +476,7 @@
             this.addInstanceAttributToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.bullet_purple;
             this.addInstanceAttributToolStripMenuItem.Name = "addInstanceAttributToolStripMenuItem";
             this.addInstanceAttributToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-            this.addInstanceAttributToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.addInstanceAttributToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.addInstanceAttributToolStripMenuItem.Text = "Add Attribut";
             this.addInstanceAttributToolStripMenuItem.Click += new System.EventHandler(this.addInstanceAttributToolStripMenuItem_Click);
             // 
@@ -579,6 +597,8 @@
         private System.Windows.Forms.ToolStripMenuItem popupForwardToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem popupMulticastToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem popupP2PToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem sendForwardOpenTOToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem popuForward2ToolStripMenuItem;
     }
 }
 

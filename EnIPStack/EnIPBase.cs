@@ -191,7 +191,15 @@ namespace System.Net.EnIPStack
         // From network
         public Encapsulation_Packet(byte[] Packet, ref int Offset, int Length)
         {
-            Command = (EncapsulationCommands)BitConverter.ToUInt16(Packet, Offset);
+            ushort Cmd=BitConverter.ToUInt16(Packet, Offset);
+
+            if (!(Enum.IsDefined(typeof(EncapsulationCommands), Cmd)))
+            {
+                Status = EncapsulationStatus.Unsupported_Command;
+                return;
+            }
+
+            Command = (EncapsulationCommands)Cmd;
             Offset += 2;
             this.Length = BitConverter.ToUInt16(Packet, Offset);
 
@@ -248,8 +256,6 @@ namespace System.Net.EnIPStack
         // Only for request packet
         public byte[] Path;
         public byte[] Data;
-
-
 
         public bool IsOK { get { return GeneralStatus == CIPGeneralSatusCode.Success; } }
 
@@ -347,10 +353,15 @@ namespace System.Net.EnIPStack
 
     // Volume 1 : Table 3-5.16 Forward_Open
     // class for both request and response
+    // A lot of ushort in the bullshit specification, but byte in fact
+    // .. Codesys 3.5 EIP scanner, help a lot
     public class ForwardOpen_Packet
     {
         // TimeOut (duration) in ms = 2^Priority_TimeTick * Timeout_Ticks
         // So with Priority_TimeTick=10, Timeout_Ticks is ~ the number of seconds
+        // FIXME:
+        // I don't understand the usage, with Wago Plc it's not a timeout for the
+        // continuous udp flow.
         public byte Priority_TimeTick=10;
         public byte Timeout_Ticks=10;
 
@@ -358,34 +369,43 @@ namespace System.Net.EnIPStack
         public uint O2T_ConnectionId;
         public uint T2O_ConnectionId;
 
-        public ushort ConnectionSerialNumber= (ushort)new Random().Next(65535);
-        public ushort OriginatorVendorId = 0x4B1D;
-        public uint OriginatorSerialNumber = 0x8BADF00D;
+        // Assume only one client in this application
+        public static ushort ConnectionSerialNumber= (ushort)new Random().Next(65535);
+        public static ushort OriginatorVendorId = 0xFADA;
+        public static uint OriginatorSerialNumber = 0x8BADF00D;
 
         // 0 => *4
         public byte ConnectionTimeoutMultiplier;
         public byte[] Reserved = new byte[3];
         // It's O2T_API for reply, in microseconde
-        public uint O2T_RPI=0;
+        public uint O2T_RPI=200000;
         public ushort O2T_ConnectionParameters;
         // It's T2A_API for reply
-        public uint T2O_RPI = 0;
+        public uint T2O_RPI = 200000;
         public ushort T2O_ConnectionParameters;
         // volume 1 : Figure 3-4.2 Transport Class Trigger Attribute
         public byte TransportTrigger;
         public byte Connection_Path_Size;
         public byte[] Connection_Path;
 
-        // Only use for request
-        public ForwardOpen_Packet(byte[] Connection_Path, bool p2p, ushort datasize) 
+        // Only use for request up to now
+        // Seems that O2T & T2O are exclusive
+        public ForwardOpen_Packet(byte[] Connection_Path, bool p2p, bool T2O, bool O2T, ushort datasize, uint? ConnectionId=null) 
         {
             this.Connection_Path = Connection_Path;
 
-            _ConnectionId++;
-            _ConnectionId = (uint)((_ConnectionId & 0xFFFF) + (new Random().Next(65535) << 16));
+            if (ConnectionId == null)
+            {
+                _ConnectionId++;
+                _ConnectionId = (uint)((_ConnectionId & 0xFFFF) + (new Random().Next(65535) << 16));
+            }
+            else
+                _ConnectionId = ConnectionId.Value;
 
-            // User should put zero for one :
-            O2T_ConnectionId=T2O_ConnectionId = _ConnectionId;
+            if (O2T)
+                O2T_ConnectionId = _ConnectionId;
+            if (T2O)
+                T2O_ConnectionId = _ConnectionId;
 
             // Volume 1:  chapter 3-5.5.1.1
             /* Sample for wireshark
@@ -398,12 +418,24 @@ namespace System.Net.EnIPStack
             */
             ushort ConnectionParameters;
             if (p2p) ConnectionParameters = 0x4600; else ConnectionParameters = 0x2600;
+            // Don't relly understand +2 at this place
+            // I've show it with Codesys 3.5 EIP scanner
             ConnectionParameters += (ushort)(datasize + 2);
 
-            // User should put zero for one :
-            O2T_ConnectionParameters = T2O_ConnectionParameters = ConnectionParameters; // 0x2 multicats, 0x4 p2p
-            TransportTrigger = 0x01; // client class 1
+            if (O2T)
+                O2T_ConnectionParameters = ConnectionParameters;
+            if (T2O)
+                T2O_ConnectionParameters = ConnectionParameters;
 
+            if (T2O)
+                TransportTrigger = 0x01; // Client class 1, cyclic
+            if (O2T)
+                TransportTrigger = 0x81; // Server class 1
+        }
+
+        public void SetTriggerType(TransportClassTriggerAttribute type)
+        {
+            TransportTrigger = (byte)((TransportTrigger & 0x8F) | (byte)type);
         }
 
         // by now only use for request
@@ -433,6 +465,75 @@ namespace System.Net.EnIPStack
 
             return fwopen;
         }
+    }
+
+    public class ForwardClose_Packet
+    {
+        ForwardOpen_Packet OrignalPkt;
+        public ForwardClose_Packet(ForwardOpen_Packet FwOpen)
+        {
+            OrignalPkt = FwOpen;
+        }
+        // by now only use for request
+        public byte[] toByteArray()
+        {
+            byte[] fwclose = new byte[12 + OrignalPkt.Connection_Path_Size * 2];
+            fwclose[0] = OrignalPkt.Priority_TimeTick;
+            fwclose[1] = OrignalPkt.Timeout_Ticks;
+            Array.Copy(BitConverter.GetBytes(ForwardOpen_Packet.ConnectionSerialNumber), 0, fwclose, 2, 2);
+            Array.Copy(BitConverter.GetBytes(ForwardOpen_Packet.OriginatorVendorId), 0, fwclose, 4, 2);
+            Array.Copy(BitConverter.GetBytes(ForwardOpen_Packet.OriginatorSerialNumber), 0, fwclose, 6, 4);
+            fwclose[10] = OrignalPkt.Connection_Path_Size;
+            fwclose[11] = 0;
+            Array.Copy(OrignalPkt.Connection_Path, 0, fwclose, 12, OrignalPkt.Connection_Path.Length);
+            return fwclose;
+        }
+    }
+
+    // This is here a SequencedAddress + a connected Data Item
+    // Receive via Udp after a ForwardOpen
+    public class SequencedAddressItem
+    {
+        // SequencedAddress
+        public ushort TypeId;
+        public ushort Lenght=8;
+        public uint ConnectionId;
+        public uint SequenceNumber;
+        // Connected Data Item
+        public ushort TypeId2;
+        public ushort Lenght2 = 8;
+        public ushort SequenceCount; // ??
+
+        public SequencedAddressItem(byte[] DataArray, ref int Offset, int Lenght)
+        {
+            // Itemcount=2
+            Offset += 2;
+            TypeId=BitConverter.ToUInt16(DataArray, Offset);
+            if (TypeId != 0x8002) return;
+            Offset += 4;
+            ConnectionId = BitConverter.ToUInt32(DataArray, Offset);
+            Offset += 4;
+            SequenceNumber = BitConverter.ToUInt32(DataArray, Offset);
+            Offset += 4;
+
+            TypeId2 = BitConverter.ToUInt16(DataArray, Offset);
+            if (TypeId2 != 0x00b1) return;
+            Offset += 2;
+            Lenght2 = BitConverter.ToUInt16(DataArray, Offset);            
+            Offset += 2;
+
+            if ((Lenght2 + Offset) != Lenght)
+            {
+                Lenght2 = 0;
+                return;
+            }
+
+            SequenceCount = BitConverter.ToUInt16(DataArray, Offset);
+            Offset += 2;
+            // Offset is now at the beginning of the raw data
+        }
+
+        public bool IsOK { get { return ((TypeId == 0x8002) && (TypeId2 == 0x00b1) && (Lenght2!=0)); } }
     }
 
     // Volume 2 : 2-6.3.3 Sockaddr Info Item

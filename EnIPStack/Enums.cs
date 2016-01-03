@@ -231,4 +231,12 @@ namespace System.Net.EnIPStack
         SocketaddrInfo_T2O = 0x8001,
         SequencedAddressItem = 0x8002
     }
+
+    // Volume 1 : Figure 3-4.2 Transport Class Trigger Attribute
+    public enum TransportClassTriggerAttribute : byte
+    {
+        Cyclic = 0x00,
+        ChangeOfState = 0x10,
+        ApplicationObject = 0x20
+    }
 }

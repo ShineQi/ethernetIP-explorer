@@ -59,10 +59,13 @@
 		- F3 key will refresh the values.
 	2.5 Advise : ForwardOpen T->O
 		- On attributs one could place a ForwardOpen T->O (Device to EnIPExplorer).
-		  If accepted, the Class 1 device (Plc or other) will send cyclically back 
+		  If accepted, the Class 1 device (Plc or other) will send back 
 		  the data by using Udp in point to point or multicast mode.
-		  Nothing is done with the data, Wireshark could be used to see them.
-	2.6 Save/Open Files
+		  Nothing is done with the data, Wireshark could be used to see them, or
+		  using the Class1 client sample.
+	2.6 Configure: ForwardOpen O->T
+		- Some job to do.
+	2.7 Save/Open Files
 		- The full Tree (from Devices to Attributs) could be save/load from
 		  a file. This file could be edit/modify using an spreadsheet (Excel or
 		  OpenOffice/LibreOffice for instance). The format isn't too complex
@@ -81,8 +84,10 @@
 		  - Used to fill the Textbox with this default value.
 	3.3 CSVSeparator
 		  - Value for treeview CSV file (spreadsheet compatible format) see §2.5.
-	3.4 ForwardOpen__
-		  - Control parameters : requested cycle time (in ms) & duration (in sec.)
+	3.4 ForwardOpen
+		  - Control parameters : requested cycle time (in ms) & duration (in sec.).
+		    If the cycle is 0 ms, then a ChangeOfstate request is used.
+			Duration is auto-adjusted in the range 1..60.
 
 4.  TESTS
 	The EnIPExplorer has been tested with really a too few number of others tools :

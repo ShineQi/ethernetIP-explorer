@@ -34,48 +34,39 @@ using System.Threading;
 
 namespace System.Net.EnIPStack
 {
-    public delegate void MessageReceivedHandler(object sender, byte[] packet, Encapsulation_Packet EncapPacket, int offset, int msg_length, IPEndPoint remote_address);
+    public delegate void EncapMessageReceivedHandler(object sender, byte[] packet, Encapsulation_Packet EncapPacket, int offset, int msg_length, IPEndPoint remote_address);
+    public delegate void ItemMessageReceivedHandler(object sender, byte[] packet, SequencedAddressItem ItemPacket, int offset, int msg_length, IPEndPoint remote_address);
 
     // Could be used for client & server implementation
+    // for port 0xAF12 as well as 0x8AE (server mode)
     public class EnIPUDPTransport
     {
-        public event MessageReceivedHandler MessageReceived;
+        public event EncapMessageReceivedHandler EncapMessageReceived;
+        public event ItemMessageReceivedHandler ItemMessageReceived;
 
         private UdpClient m_exclusive_conn;
-        String m_local_IP;
-        private bool m_is_server;
 
-        public EnIPUDPTransport(String Local_IP, bool IsServer)
+        public EnIPUDPTransport(String Local_IP, int Port)
         {
-            m_local_IP = Local_IP;
-            m_is_server = IsServer;
-        }
+            System.Net.EndPoint ep = new IPEndPoint(System.Net.IPAddress.Any, Port);
+            if (!string.IsNullOrEmpty(Local_IP)) ep = new IPEndPoint(IPAddress.Parse(Local_IP), Port);
 
-        private void Open()
-        {
-            if (m_is_server)
-            {
-                System.Net.EndPoint ep = new IPEndPoint(System.Net.IPAddress.Any, 0xAF12);
-                if (!string.IsNullOrEmpty(m_local_IP)) ep = new IPEndPoint(IPAddress.Parse(m_local_IP), 0xAF12);
-                m_exclusive_conn = new UdpClient();
-                m_exclusive_conn.ExclusiveAddressUse = true;
-                m_exclusive_conn.Client.Bind((IPEndPoint)ep);
-                m_exclusive_conn.EnableBroadcast = true;
-            }
-            else
-            {
-                System.Net.EndPoint ep = new IPEndPoint(System.Net.IPAddress.Any, 0);
-                if (!string.IsNullOrEmpty(m_local_IP)) ep = new IPEndPoint(IPAddress.Parse(m_local_IP), 0);
-                m_exclusive_conn = new UdpClient((IPEndPoint)ep);
-                m_exclusive_conn.EnableBroadcast = true;
-            }
+            m_exclusive_conn = new UdpClient(AddressFamily.InterNetwork);
+            m_exclusive_conn.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            m_exclusive_conn.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ExclusiveAddressUse, false);
+            m_exclusive_conn.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
+            m_exclusive_conn.Client.Bind(ep);
 
-        }
-
-        public void Start()
-        {
-            Open();
             m_exclusive_conn.BeginReceive(OnReceiveData, m_exclusive_conn);
+        }
+
+        public void JoinMulticastGroup(String IPMulti)
+        {
+            try
+            {
+                m_exclusive_conn.JoinMulticastGroup(IPAddress.Parse(IPMulti));
+            }
+            catch {}
         }
 
         private void OnReceiveData(IAsyncResult asyncResult)
@@ -98,21 +89,30 @@ namespace System.Net.EnIPStack
                     conn.BeginReceive(OnReceiveData, conn);
                     return;
                 }
-
-                if (rx <24)    // Too small
+                
+                if (rx <14)    // Sure it's too small
                 {
                     //restart data receive
                     conn.BeginReceive(OnReceiveData, conn);
                     return;
                 }
-
+                
                 try
                 {
                     int Offset = 0;
                     Encapsulation_Packet Encapacket = new Encapsulation_Packet(local_buffer, ref Offset, rx);
                     //verify message
-                    if (MessageReceived != null)
-                        MessageReceived(this, local_buffer, Encapacket, Offset, local_buffer.Length, ep);                   
+                    if (Encapacket.IsOK)
+                    {
+                        if (EncapMessageReceived != null)
+                            EncapMessageReceived(this, local_buffer, Encapacket, Offset, rx, ep);
+                    }
+                    else
+                    {
+                        SequencedAddressItem Itempacket = new SequencedAddressItem(local_buffer, ref Offset, rx);
+                        if (Itempacket.IsOK&&(ItemMessageReceived != null))
+                            ItemMessageReceived(this, local_buffer, Itempacket, Offset, rx, ep);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -296,7 +296,7 @@ namespace System.Net.EnIPStack
 
     public class EnIPTCPServerTransport
     {
-        public event MessageReceivedHandler MessageReceived;
+        public event EncapMessageReceivedHandler MessageReceived;
         private TcpListener tcpListener;
 
         private List<TcpClient> ClientsList = new List<TcpClient>();

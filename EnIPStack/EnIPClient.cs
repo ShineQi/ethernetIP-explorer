@@ -41,18 +41,19 @@ namespace System.Net.EnIPStack
 
     public class EnIPClient
     {
-        EnIPUDPTransport udp;
+        public EnIPUDPTransport udp;
         int TcpTimeout;
 
         public event DeviceArrivalHandler DeviceArrival;
 
         // Local endpoint is important for broadcast messages
+        // When more than one interface are present, broadcast
+        // requests are sent on the first one, not all !
         public EnIPClient(String End_point, int TcpTimeout=100)
         {
             this.TcpTimeout = TcpTimeout;
-            udp = new EnIPUDPTransport(End_point, false);
-            udp.Start();
-            udp.MessageReceived += new MessageReceivedHandler(on_MessageReceived);
+            udp = new EnIPUDPTransport(End_point, 0);
+            udp.EncapMessageReceived += new EncapMessageReceivedHandler(on_MessageReceived);
         }
 
         void on_MessageReceived(object sender, byte[] packet, Encapsulation_Packet EncapPacket, int offset, int msg_length, System.Net.IPEndPoint remote_address)
@@ -523,9 +524,17 @@ namespace System.Net.EnIPStack
         }
     }
 
+    public delegate void T2OEventHandler(EnIPAttribut sender);
+
     public class EnIPAttribut : EnIPCIPObject
     {
         public EnIPInstance Instance;
+        // Forward Open
+        public uint T2O_ConnectionId, O2T_ConnectionId;
+        // It got the required data to close the previous ForwardOpen
+        ForwardClose_Packet closePkt;
+
+        public event T2OEventHandler T2OEvent;
 
         public EnIPAttribut(EnIPInstance Instance, ushort Id)
         {
@@ -546,28 +555,75 @@ namespace System.Net.EnIPStack
             byte[] DataPath = EnIPPath.GetPath(Instance.Class.Id, Instance.Id, Id);
             return ReadDataFromNetwork(DataPath, CIPServiceCodes.GetAttributeSingle);
         }
+        // Coming from an udp class1 device, with a previous ForwardOpen action
+        public void On_ItemMessageReceived(object sender, byte[] packet, SequencedAddressItem ItemPacket, int offset, int msg_length, IPEndPoint remote_address)
+        {           
+            if (ItemPacket.ConnectionId != T2O_ConnectionId) return;
+            RawData = new byte[msg_length - offset];
+            Array.Copy(packet, offset, RawData, 0, RawData.Length);
 
-        public EnIPNetworkStatus ForwardOpen(bool p2p, uint CycleTime, byte DurationSecond)
+            if (T2OEvent != null)
+                T2OEvent(this);
+        }
+
+        public EnIPNetworkStatus ForwardOpen(bool p2p, bool T2O, bool O2T, uint CycleTime, int DurationSecond)
         {
-
             if (RawData==null) return EnIPNetworkStatus.OnLineForwardOpenReject;
 
-            if (CycleTime == 0) CycleTime = 1;
-
             byte[] DataPath = EnIPPath.GetPath(Instance.Class.Id, Instance.Id, Id);
-            ForwardOpen_Packet FwPkt = new ForwardOpen_Packet(DataPath, p2p, (ushort)RawData.Length);
-            FwPkt.T2O_RPI = CycleTime * 1000;
-            FwPkt.O2T_ConnectionId = 0;
-            FwPkt.O2T_ConnectionParameters = 0;
-            FwPkt.Timeout_Ticks = (byte)Math.Max((byte)1,DurationSecond);
+            ForwardOpen_Packet FwPkt = new ForwardOpen_Packet(DataPath, p2p, T2O, O2T, (ushort)RawData.Length);
+            if (T2O)
+            {
+                T2O_ConnectionId = FwPkt.T2O_ConnectionId;
+                // Change ForwardOpen_Packet default value
+                FwPkt.T2O_RPI = CycleTime * 1000;
+                FwPkt.O2T_RPI = 0;
+            }
+            if (O2T)
+            {
+                O2T_ConnectionId = FwPkt.O2T_ConnectionId;
+                // Change ForwardOpen_Packet default value
+                FwPkt.T2O_RPI = 0;
+                FwPkt.O2T_RPI = CycleTime * 1000;
+            }
+
+            if (CycleTime == 0) FwPkt.SetTriggerType(TransportClassTriggerAttribute.ChangeOfState);
 
             int Offset = 0;
             int Lenght = 0;
             byte[] packet;
 
             Status = RemoteDevice.SendUCMM_RR_Packet(EnIPPath.GetPath(6, 1), CIPServiceCodes.ForwardOpen, FwPkt.toByteArray(), ref Offset, ref Lenght, out packet);
+            // Offset is ready set at the beginning of data : ie ForwardOpen_Packet response
+            
+            closePkt = new ForwardClose_Packet(FwPkt);
 
-            return EnIPNetworkStatus.OnLine;
+            // Send a close later
+            if ((Status == EnIPNetworkStatus.OnLine)&&(DurationSecond>=0))
+            {
+                byte[] closePktnew = closePkt.toByteArray();
+
+                ThreadPool.QueueUserWorkItem(
+                    (o) =>
+                    {
+                        Thread.Sleep(DurationSecond * 1000);
+
+                        int Offset2 = 0;
+                        int Lenght2 = 0;
+
+                        RemoteDevice.SendUCMM_RR_Packet(EnIPPath.GetPath(6, 1), CIPServiceCodes.ForwardClose, closePktnew, ref Offset2, ref Lenght2, out packet);
+                    }
+                );
+            }
+            return Status;
+        }
+
+        public EnIPNetworkStatus ForwardClose()
+        {
+            int Offset = 0;
+            int Lenght = 0;
+            byte[] packet;
+            return RemoteDevice.SendUCMM_RR_Packet(EnIPPath.GetPath(6, 1), CIPServiceCodes.ForwardClose, closePkt.toByteArray(), ref Offset, ref Lenght, out packet);
         }
     }
 }
