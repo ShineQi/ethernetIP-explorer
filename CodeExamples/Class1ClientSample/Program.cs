@@ -34,10 +34,10 @@ using System.Threading;
 namespace Class1ClientSample
 {
     // An active UDP connection is required here.
-    // Take care to Windows Firewall settings, port 2222 should be open.
+    // Take care to Windows Firewall settings, port 2222 should be available.
 
     // ForwardOpen and Class1 reception could be made in separate applications
-    // but in such a case ConnectionId should exchanged for T2O_ConnectionId
+    // but in such a case ConnectionId should be exchanged for T2O_ConnectionId
     // member in the corresponding EnIPAttribut
     class Program
     {
@@ -57,22 +57,26 @@ namespace Class1ClientSample
             
             // Read require, it provides the data size in the RawData field
             // If not, one have to make a new on it with the good size before
-            // calling ForwardOpen
+            // calling ForwardOpen : Inputs.RawData=new byte[xx]
             Inputs.ReadDataFromNetwork();
 
             // Open an Udp endpoint, server mode is mandatory : default port 0x8AE
-            EnIPUDPTransport ForwardListener = new EnIPUDPTransport("", 0x8AE);
+            // Local IP should be given if more than 1 ethernet/wifi interface is present
+            IPEndPoint LocalEp = new IPEndPoint(IPAddress.Parse(""), 0x8AE);
+            // It's not a problem to do this with more than one remote device,
+            // the underlying udp socket is static
+            WagoPlc.Class1Activate(LocalEp);
             // Not required in P2P mode
-            ForwardListener.JoinMulticastGroup("239.192.72.32");
+            WagoPlc.Class1AddMulticast("239.192.72.32");
 
-            // Register UDP callback handler for all Attribut : here just one
-            ForwardListener.ItemMessageReceived += new ItemMessageReceivedHandler(Inputs.On_ItemMessageReceived);
+            // Attach concerned attribut to the UDP callback handler : here just one
+            Inputs.Class1Enrolment();
             
             // Register me to get notified
             Inputs.T2OEvent += new T2OEventHandler(Inputs_T2OEvent);   
     
             // ForwardOpen in Multicast, T2O, cycle 200 ms, duration infinite (-1)
-            Inputs.ForwardOpen(true, true, false, 1000, -1);
+            Inputs.ForwardOpen(false, true, false, 200, -1);
 
             Console.WriteLine("Running, hit a key to stop");
 

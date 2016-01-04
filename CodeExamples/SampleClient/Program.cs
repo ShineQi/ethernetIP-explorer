@@ -122,6 +122,9 @@ namespace SampleClient
             device.GetObjectList();
             foreach (EnIPClass cl in device.SupportedClassLists)
                 Console.WriteLine("\t"+((CIPObjectLibrary)cl.Id).ToString());
+
+            // Close pending connection
+            device.Dispose();
         }
     }
 }

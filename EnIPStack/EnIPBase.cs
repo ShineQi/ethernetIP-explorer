@@ -205,7 +205,6 @@ namespace System.Net.EnIPStack
 
             if (Length < 24 + this.Length)
             {
-                Trace.TraceWarning("Bad encapsulation packet size");
                 Status = EncapsulationStatus.Invalid_Length;
                 return;
             }
@@ -242,7 +241,7 @@ namespace System.Net.EnIPStack
     {
         // Partial Header
         public ushort ItemCount = 2;
-        public CommonPacketItemIdNumbers IdemId = CommonPacketItemIdNumbers.UnconnectedMessage;
+        public CommonPacketItemIdNumbers IdemId = CommonPacketItemIdNumbers.UnConnectedDataItem;
         public ushort DataLength;
 
         // High bit 0 for query, 1 for response
@@ -392,12 +391,14 @@ namespace System.Net.EnIPStack
         // Seems that O2T & T2O are exclusive
         public ForwardOpen_Packet(byte[] Connection_Path, bool p2p, bool T2O, bool O2T, ushort datasize, uint? ConnectionId=null) 
         {
+
             this.Connection_Path = Connection_Path;
 
             if (ConnectionId == null)
             {
+                // volume 2 : 3-3.7.1.3 Pseudo-Random Connection ID Per Connection
                 _ConnectionId++;
-                _ConnectionId = (uint)((_ConnectionId & 0xFFFF) + (new Random().Next(65535) << 16));
+                _ConnectionId = _ConnectionId | (uint)(new Random().Next(65535) << 16);
             }
             else
                 _ConnectionId = ConnectionId.Value;
@@ -418,9 +419,11 @@ namespace System.Net.EnIPStack
             */
             ushort ConnectionParameters;
             if (p2p) ConnectionParameters = 0x4600; else ConnectionParameters = 0x2600;
+            // ConnectionParameters = (ushort)(ConnectionParameters | 0x8000);
+
             // Don't relly understand +2 at this place
             // I've show it with Codesys 3.5 EIP scanner
-            ConnectionParameters += (ushort)(datasize + 2);
+            ConnectionParameters += (ushort)(datasize + 2); // voir avec +2+4 ici
 
             if (O2T)
                 O2T_ConnectionParameters = ConnectionParameters;
@@ -492,6 +495,7 @@ namespace System.Net.EnIPStack
 
     // This is here a SequencedAddress + a connected Data Item
     // Receive via Udp after a ForwardOpen
+    // Volume 2 : 2-6 Common Packet Format
     public class SequencedAddressItem
     {
         // SequencedAddress
@@ -499,17 +503,17 @@ namespace System.Net.EnIPStack
         public ushort Lenght=8;
         public uint ConnectionId;
         public uint SequenceNumber;
-        // Connected Data Item
+        // Connected or Unconnected Data Item
         public ushort TypeId2;
         public ushort Lenght2 = 8;
         public ushort SequenceCount; // ??
 
         public SequencedAddressItem(byte[] DataArray, ref int Offset, int Lenght)
         {
-            // Itemcount=2
+            // Itemcount=2, by now, could change maybe in this code !
             Offset += 2;
             TypeId=BitConverter.ToUInt16(DataArray, Offset);
-            if (TypeId != 0x8002) return;
+            if (TypeId != (ushort)CommonPacketItemIdNumbers.SequencedAddressItem) return;
             Offset += 4;
             ConnectionId = BitConverter.ToUInt32(DataArray, Offset);
             Offset += 4;
@@ -517,14 +521,16 @@ namespace System.Net.EnIPStack
             Offset += 4;
 
             TypeId2 = BitConverter.ToUInt16(DataArray, Offset);
-            if (TypeId2 != 0x00b1) return;
+            if ((TypeId2 != (ushort)CommonPacketItemIdNumbers.ConnectedDataItem) &&
+                (TypeId2 != (ushort)CommonPacketItemIdNumbers.UnConnectedDataItem)) return;
+
             Offset += 2;
             Lenght2 = BitConverter.ToUInt16(DataArray, Offset);            
             Offset += 2;
 
             if ((Lenght2 + Offset) != Lenght)
             {
-                Lenght2 = 0;
+                TypeId = 0; // invalidate the frame
                 return;
             }
 
@@ -533,16 +539,12 @@ namespace System.Net.EnIPStack
             // Offset is now at the beginning of the raw data
         }
 
-        public bool IsOK { get { return ((TypeId == 0x8002) && (TypeId2 == 0x00b1) && (Lenght2!=0)); } }
+        public bool IsOK { get { return ((TypeId == 0x8002) && (TypeId2 == 0x00b1)); } }
     }
 
     // Volume 2 : 2-6.3.3 Sockaddr Info Item
     public class EnIPSocketAddress
     {
-        // use for socket Address Item in CIP
-        // if 0x8000 ou 0x8001
-        public ushort TypeID = 0;
-        //public ushort Lenght;
 
         public short sin_family;
         public ushort sin_port;
@@ -571,30 +573,23 @@ namespace System.Net.EnIPStack
             IPEndPoint ep = new IPEndPoint(new IPAddress(sin_addr), sin_port);
             return ep;
         }
-        // give 2 formats depending of the TypeID field
+
         public byte[] toByteArray()
         {
             byte[] retVal;
-            int shift = 0;
-            if (TypeID == 0)
-                retVal = new byte[16];
-            else
-            {
-                retVal = new byte[16 + 4];
-                shift = 4;
-                Array.Copy(BitConverter.GetBytes(TypeID), 0, retVal, 0, 2);
-                Array.Copy(BitConverter.GetBytes((ushort)16), 0, retVal, 2, 2);
-            }
 
-            retVal[0 + shift] = (byte)(sin_family >> 8);
-            retVal[1 + shift] = (byte)(sin_family & 0xFF);
-            retVal[2 + shift] = (byte)(sin_port >> 8);
-            retVal[3 + shift] = (byte)(sin_port & 0xFF);
+            retVal = new byte[16];
+           
 
-            retVal[4 + shift] = (byte)(sin_addr & 0xFF);
-            retVal[5 + shift] = (byte)((sin_addr & 0xFF00) >> 8);
-            retVal[6 + shift] = (byte)((sin_addr & 0xFF0000) >> 16);
-            retVal[7 + shift] = (byte)((sin_addr & 0xFF000000) >> 24);
+            retVal[0] = (byte)(sin_family >> 8);
+            retVal[1] = (byte)(sin_family & 0xFF);
+            retVal[2] = (byte)(sin_port >> 8);
+            retVal[3] = (byte)(sin_port & 0xFF);
+
+            retVal[4] = (byte)(sin_addr & 0xFF);
+            retVal[5] = (byte)((sin_addr & 0xFF00) >> 8);
+            retVal[6] = (byte)((sin_addr & 0xFF0000) >> 16);
+            retVal[7] = (byte)((sin_addr & 0xFF000000) >> 24);
 
             return retVal;
         }
