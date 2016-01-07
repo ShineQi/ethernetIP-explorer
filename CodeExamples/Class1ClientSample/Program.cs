@@ -69,7 +69,7 @@ namespace Class1ClientSample
             // Not required in P2P mode
             WagoPlc.Class1AddMulticast("239.192.72.32");
 
-            // Attach concerned attribut to the UDP callback handler : here just one
+            // Attach concerned attributs to the UDP callback handler : here just one
             Inputs.Class1Enrolment();
             
             // Register me to get notified

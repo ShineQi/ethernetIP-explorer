@@ -558,6 +558,8 @@ namespace System.Net.EnIPStack
         public uint T2O_ConnectionId, O2T_ConnectionId;
         // It got the required data to close the previous ForwardOpen
         ForwardClose_Packet closePkt;
+        // sequence for O->T
+        SequencedAddressItem SequenceItem;
 
         public event T2OEventHandler T2OEvent;
 
@@ -615,6 +617,7 @@ namespace System.Net.EnIPStack
             if (O2T)
             {
                 O2T_ConnectionId = FwPkt.O2T_ConnectionId;
+                SequenceItem = new SequencedAddressItem(O2T_ConnectionId); // ready to send
                 // Change ForwardOpen_Packet default value
                 FwPkt.T2O_RPI = 0;
                 FwPkt.O2T_RPI = CycleTime * 1000;

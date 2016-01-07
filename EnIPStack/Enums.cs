@@ -53,6 +53,7 @@ namespace System.Net.EnIPStack
         Invalid_Length = 0x000000065,
         // Exceptionnel
         // There is no protocol version id in the header !!!
+        // Information available only in ListInfo fields (upper protocol)
         Unsupported_Protocol_Revision= 0x000000069
     }
 

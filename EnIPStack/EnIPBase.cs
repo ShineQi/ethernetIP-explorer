@@ -388,7 +388,10 @@ namespace System.Net.EnIPStack
         public byte[] Connection_Path;
 
         // Only use for request up to now
-        // Seems that O2T & T2O are exclusive
+        // O2T & T2O could be use at the same time
+        // using a Connection_Path with more than 1 reference
+        // 1 Path : path is for Consumption & Production
+        // 2 Path : First path is for Consumption, second path is for Production.
         public ForwardOpen_Packet(byte[] Connection_Path, bool p2p, bool T2O, bool O2T, ushort datasize, uint? ConnectionId=null) 
         {
 
@@ -421,7 +424,7 @@ namespace System.Net.EnIPStack
             if (p2p) ConnectionParameters = 0x4600; else ConnectionParameters = 0x2600;
             // ConnectionParameters = (ushort)(ConnectionParameters | 0x8000);
 
-            // Don't relly understand +2 at this place
+            // Don't really understand +2 at this place
             // I've show it with Codesys 3.5 EIP scanner
             ConnectionParameters += (ushort)(datasize + 2); // voir avec +2+4 ici
 
@@ -508,6 +511,15 @@ namespace System.Net.EnIPStack
         public ushort Lenght2 = 8;
         public ushort SequenceCount; // ??
 
+        public byte[] data;
+
+        public SequencedAddressItem(uint ConnectionId, uint SequenceNumber=0, byte[] data=null)
+        {
+            this.ConnectionId = ConnectionId;
+            this.SequenceNumber = SequenceNumber;
+            this.data = data;
+        }
+
         public SequencedAddressItem(byte[] DataArray, ref int Offset, int Lenght)
         {
             // Itemcount=2, by now, could change maybe in this code !
@@ -534,9 +546,51 @@ namespace System.Net.EnIPStack
                 return;
             }
 
-            SequenceCount = BitConverter.ToUInt16(DataArray, Offset);
-            Offset += 2;
+            if (Lenght2 != 0)
+            {
+                SequenceCount = BitConverter.ToUInt16(DataArray, Offset);
+                Offset += 2;
+            }
             // Offset is now at the beginning of the raw data
+        }
+
+        public byte[] toByteArray(byte[] newdata=null)
+        {
+            byte[] retVal;
+
+            if (newdata != null) data = newdata;    
+
+            if (data == null)
+            {
+                Lenght2 = 0;
+                retVal = new byte[18];
+            }
+            else
+            {
+                Lenght2 = (ushort)data.Length;
+                retVal = new byte[20 + Lenght2];
+            }
+
+            // Itemcount=2
+            retVal[0] = 2;
+            Array.Copy(BitConverter.GetBytes((ushort)CommonPacketItemIdNumbers.SequencedAddressItem), 0, retVal, 2, 2);
+            Array.Copy(BitConverter.GetBytes(Lenght), 0, retVal, 4, 2);
+            Array.Copy(BitConverter.GetBytes(ConnectionId), 0, retVal, 6, 4);
+            Array.Copy(BitConverter.GetBytes(SequenceNumber), 0, retVal, 10, 4);
+            Array.Copy(BitConverter.GetBytes((ushort)CommonPacketItemIdNumbers.ConnectedDataItem), 0, retVal, 14, 2);
+
+            Array.Copy(BitConverter.GetBytes(Lenght2), 0, retVal, 16, 2);
+
+            if (Lenght2 != 0)
+            {
+                // Don't really understand this sequence count, so put something
+                Array.Copy(BitConverter.GetBytes((ushort)SequenceNumber), 0, retVal, 18, 2);
+                Array.Copy(data, 0, retVal, 20, Lenght2);
+            }
+
+            SequenceNumber++;
+
+            return retVal;
         }
 
         public bool IsOK { get { return ((TypeId == 0x8002) && (TypeId2 == 0x00b1)); } }
