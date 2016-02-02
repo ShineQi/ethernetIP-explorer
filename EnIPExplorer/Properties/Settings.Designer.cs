@@ -166,5 +166,17 @@ namespace EnIPExplorer.Properties {
                 this["ForwardOpenDuration_s"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int PeriodicUpdateRate {
+            get {
+                return ((int)(this["PeriodicUpdateRate"]));
+            }
+            set {
+                this["PeriodicUpdateRate"] = value;
+            }
+        }
     }
 }

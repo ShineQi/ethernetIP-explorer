@@ -80,11 +80,14 @@
 		  - In ms : used for connection & read & write operations. LAN is for
 		  autodiscovered devices, WAN for whoses added by the Menu Add manually.
 		  - For the connection, the timeout is two time this value.
-	3.2 DefaultRemoteDevice
+	3.2 PeriodicUpdateRate
+		  - In ms : used to update the current selected Instance or property value
+		    0 or less : option disabled. Min value is 200ms.
+	3.3 DefaultRemoteDevice
 		  - Used to fill the Textbox with this default value.
-	3.3 CSVSeparator
+	3.4 CSVSeparator
 		  - Value for treeview CSV file (spreadsheet compatible format) see §2.5.
-	3.4 ForwardOpen
+	3.5 ForwardOpen
 		  - Control parameters : requested cycle time (in ms) & duration (in sec.).
 		    If the cycle is 0 ms, then a ChangeOfstate request is used.
 			Duration is auto-adjusted in the range 1..60.

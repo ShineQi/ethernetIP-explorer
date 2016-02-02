@@ -377,10 +377,10 @@ namespace System.Net.EnIPStack
         public byte ConnectionTimeoutMultiplier;
         public byte[] Reserved = new byte[3];
         // It's O2T_API for reply, in microseconde
-        public uint O2T_RPI=200000;
+        public uint O2T_RPI=0;
         public ushort O2T_ConnectionParameters;
         // It's T2A_API for reply
-        public uint T2O_RPI = 200000;
+        public uint T2O_RPI = 0;
         public ushort T2O_ConnectionParameters;
         // volume 1 : Figure 3-4.2 Transport Class Trigger Attribute
         public byte TransportTrigger;
@@ -424,19 +424,21 @@ namespace System.Net.EnIPStack
             if (p2p) ConnectionParameters = 0x4600; else ConnectionParameters = 0x2600;
             // ConnectionParameters = (ushort)(ConnectionParameters | 0x8000);
 
-            // Don't really understand +2 at this place
-            // I've show it with Codesys 3.5 EIP scanner
-            ConnectionParameters += (ushort)(datasize + 2); // voir avec +2+4 ici
-
-            if (O2T)
-                O2T_ConnectionParameters = ConnectionParameters;
             if (T2O)
+            {
                 T2O_ConnectionParameters = ConnectionParameters;
-
-            if (T2O)
+                // 2 bytes CIP class 1 sequence count + datasize bytes application data
+                ConnectionParameters += (ushort)(datasize + 2);
                 TransportTrigger = 0x01; // Client class 1, cyclic
+            }
             if (O2T)
+            {
+                O2T_ConnectionParameters = ConnectionParameters;
+                // 2 bytes CIP class 1 sequence count + 4 bytes 32-bit real time header + datasize bytes application data
+                ConnectionParameters += (ushort)(datasize + 2 + 4);
                 TransportTrigger = 0x81; // Server class 1
+            }
+
         }
 
         public void SetTriggerType(TransportClassTriggerAttribute type)

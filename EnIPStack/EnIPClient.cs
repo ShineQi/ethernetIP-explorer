@@ -497,12 +497,12 @@ namespace System.Net.EnIPStack
 
     public class EnIPInstance : EnIPCIPObject
     {
-        public EnIPClass Class;
+        public EnIPClass myClass;
 
         public EnIPInstance(EnIPClass Class, ushort Id)
         {
             this.Id = Id;
-            this.Class = Class;
+            this.myClass = Class;
             this.RemoteDevice = Class.RemoteDevice;
             Status = EnIPNetworkStatus.OffLine;
         }
@@ -514,13 +514,13 @@ namespace System.Net.EnIPStack
 
         public override EnIPNetworkStatus ReadDataFromNetwork()
         {
-            byte[] DataPath = EnIPPath.GetPath(Class.Id, Id, null);
+            byte[] DataPath = EnIPPath.GetPath(myClass.Id, Id, null);
             return ReadDataFromNetwork(DataPath, CIPServiceCodes.GetAttributesAll);
         }
 
         public EnIPNetworkStatus GetClassInstanceAttributList()
         {
-            byte[] DataPath = EnIPPath.GetPath(Class.Id, Id, null);
+            byte[] DataPath = EnIPPath.GetPath(myClass.Id, Id, null);
 
             int Offset = 0;
             int Lenght = 0;
@@ -534,7 +534,7 @@ namespace System.Net.EnIPStack
         // Never tested, certainly not like this
         public bool CreateRemoteInstance()
         {
-            byte[] ClassDataPath = EnIPPath.GetPath(Class.Id, Id, null);
+            byte[] ClassDataPath = EnIPPath.GetPath(myClass.Id, Id, null);
 
             int Offset = 0;
             int Lenght = 0;
@@ -553,7 +553,7 @@ namespace System.Net.EnIPStack
 
     public class EnIPAttribut : EnIPCIPObject
     {
-        public EnIPInstance Instance;
+        public EnIPInstance myInstance;
         // Forward Open
         public uint T2O_ConnectionId, O2T_ConnectionId;
         // It got the required data to close the previous ForwardOpen
@@ -566,20 +566,20 @@ namespace System.Net.EnIPStack
         public EnIPAttribut(EnIPInstance Instance, ushort Id)
         {
             this.Id = Id;
-            this.Instance = Instance;
+            this.myInstance = Instance;
             this.RemoteDevice = Instance.RemoteDevice;
             Status = EnIPNetworkStatus.OffLine;
         }
 
         public override EnIPNetworkStatus WriteDataToNetwork()
         {
-            byte[] DataPath = EnIPPath.GetPath(Instance.Class.Id, Instance.Id, Id);
+            byte[] DataPath = EnIPPath.GetPath(myInstance.myClass.Id, myInstance.Id, Id);
             return WriteDataToNetwork(DataPath, CIPServiceCodes.SetAttributeSingle);
         }
 
         public override EnIPNetworkStatus ReadDataFromNetwork()
         {
-            byte[] DataPath = EnIPPath.GetPath(Instance.Class.Id, Instance.Id, Id);
+            byte[] DataPath = EnIPPath.GetPath(myInstance.myClass.Id, myInstance.Id, Id);
             return ReadDataFromNetwork(DataPath, CIPServiceCodes.GetAttributeSingle);
         }
 
@@ -605,21 +605,28 @@ namespace System.Net.EnIPStack
         {
             if (RawData == null) return EnIPNetworkStatus.OnLineForwardOpenReject;
 
-            byte[] DataPath = EnIPPath.GetPath(Instance.Class.Id, Instance.Id, Id);
+            byte[] DataPath;
+
+            if (Id == 3) // volume 1, § 3-5.5.1.10.2, Attribut 3 is implicit
+                DataPath = EnIPPath.GetPath(myInstance.myClass.Id, myInstance.Id);
+            else
+                DataPath = EnIPPath.GetPath(myInstance.myClass.Id, myInstance.Id, Id);
+
+            // connection Point in replacement of Instance Id, seems to be like this !
+            // DataPath[2] = 0x2c;
+
             ForwardOpen_Packet FwPkt = new ForwardOpen_Packet(DataPath, p2p, T2O, O2T, (ushort)RawData.Length);
             if (T2O)
             {
                 T2O_ConnectionId = FwPkt.T2O_ConnectionId;
                 // Change ForwardOpen_Packet default value
                 FwPkt.T2O_RPI = CycleTime * 1000;
-                FwPkt.O2T_RPI = 0;
             }
             if (O2T)
             {
                 O2T_ConnectionId = FwPkt.O2T_ConnectionId;
                 SequenceItem = new SequencedAddressItem(O2T_ConnectionId); // ready to send
                 // Change ForwardOpen_Packet default value
-                FwPkt.T2O_RPI = 0;
                 FwPkt.O2T_RPI = CycleTime * 1000;
             }
 

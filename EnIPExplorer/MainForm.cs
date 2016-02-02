@@ -43,6 +43,7 @@ namespace EnIPExplorer
     public partial class MainForm : Form
     {
         EnIPClient client;
+        EnIPNetworkStatus LastReadNetworkStatus;
 
         public MainForm()
         {
@@ -58,6 +59,14 @@ namespace EnIPExplorer
                 Properties.Settings.Default.DefaultTreeFile = Application.StartupPath+"\\SampleTree.csv";
 
             devicesTreeView.ShowNodeToolTips = Properties.Settings.Default.ShowNodeToolTip;
+
+            if (Properties.Settings.Default.PeriodicUpdateRate > 0)
+            {
+                tmrUpdate.Interval = Math.Max(200, Properties.Settings.Default.PeriodicUpdateRate);
+                tmrUpdate.Enabled = true;
+            }
+            else
+                tmrUpdate.Enabled = false;
         }
 
         // Each time we received a response to udp broadcast or udp/tcp unicast ListIdentity
@@ -245,6 +254,7 @@ namespace EnIPExplorer
                 // Read it from the remote devie
                 EnIPClass EnClass = (EnIPClass)e.Node.Tag;
                 ReadRet = EnClass.ReadDataFromNetwork();
+                LastReadNetworkStatus = EnIPNetworkStatus.OffLine; // to avoid periodic reading
                 // In the Grid
                 propertyGrid.SelectedObject = EnClass;
                 propertyGrid.ExpandAllGridItems();
@@ -260,7 +270,7 @@ namespace EnIPExplorer
             {
                 // Read it from the remote devie
                 EnIPInstance Instance = (EnIPInstance)e.Node.Tag;
-                ReadRet = Instance.ReadDataFromNetwork();
+                LastReadNetworkStatus=ReadRet = Instance.ReadDataFromNetwork();
                 // In the Grid
                 propertyGrid.SelectedObject = Instance;
                 propertyGrid.ExpandAllGridItems();
@@ -275,7 +285,7 @@ namespace EnIPExplorer
             {
                 // Read it from the remote devie
                 EnIPAttribut Att = (EnIPAttribut)e.Node.Tag;
-                ReadRet = Att.ReadDataFromNetwork();
+                LastReadNetworkStatus=ReadRet = Att.ReadDataFromNetwork();
                 // In the Grid
                 propertyGrid.SelectedObject = Att;
                 propertyGrid.ExpandAllGridItems();
@@ -304,10 +314,10 @@ namespace EnIPExplorer
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MessageBox.Show(this, "Ethernet/IP Explorer - EnIPExplorer\nVersion Beta " + this.GetType().Assembly.GetName().Version + "\nBy Frederic Chaxel - Copyright 2016\n" +
-                "\nReference: http://sourceforge.net/projects/EnIPExplorer" +
-                "\nReference: http://sourceforge.net/projects/yetanotherbacnetexplorer/" +
-                "\nReference: http://www.famfamfam.com/"+
-                "\nReference: http://www.jrsoftware.org/isinfo.php"
+                "\nReferences:\n\t http://sourceforge.net/projects/EnIPExplorer" +
+                "\n\t http://sourceforge.net/projects/yetanotherbacnetexplorer/" +
+                "\n\t http://www.famfamfam.com/"+
+                "\n\t http://www.jrsoftware.org/isinfo.php"
                 , "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -372,7 +382,6 @@ namespace EnIPExplorer
                 if (!inf.IsReceiveOnly && inf.OperationalStatus == System.Net.NetworkInformation.OperationalStatus.Up && inf.SupportsMulticast && inf.NetworkInterfaceType != System.Net.NetworkInformation.NetworkInterfaceType.Loopback)
                 {
                     System.Net.NetworkInformation.IPInterfaceProperties ipinfo = inf.GetIPProperties();
-                    if (ipinfo.GatewayAddresses == null || ipinfo.GatewayAddresses.Count == 0 || (ipinfo.GatewayAddresses.Count == 1 && ipinfo.GatewayAddresses[0].Address.ToString() == "0.0.0.0")) continue;
                     foreach (System.Net.NetworkInformation.UnicastIPAddressInformation addr in ipinfo.UnicastAddresses)
                     {
                         if (addr.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
@@ -410,6 +419,27 @@ namespace EnIPExplorer
                      (o) =>
                      {
                          o.Minimum = 1; o.Maximum = 65535; o.Value = Numbase;
+                         ToolTip tt = new ToolTip();
+                         tt.AutoPopDelay = 32767;
+                         // Helper two columns tooltip with the object Id list 
+                         StringBuilder sb = new StringBuilder();
+                         int i = 0;
+                         foreach (CIPObjectLibrary en in Enum.GetValues(typeof(CIPObjectLibrary)))
+                         {
+                             String s = ((int)en).ToString() + " : "+en.ToString();
+                             if (i == 0)
+                             {
+                                // 1, 2 or 3 tab
+                                sb.Append(s + "\t");
+                                if (s.Length < 17) sb.Append('\t');
+                                if (s.Length < 29) sb.Append('\t');
+                             }
+                             else
+                                 sb.Append( s + Environment.NewLine);
+                             i = ~i;
+                         }
+                         
+                         tt.SetToolTip(o, sb.ToString());
                      });
 
             DialogResult res = Input.ShowDialog();
@@ -517,6 +547,14 @@ namespace EnIPExplorer
             dlg.SelectedObject = Properties.Settings.Default;
             dlg.ShowDialog(this);
             devicesTreeView.ShowNodeToolTips = Properties.Settings.Default.ShowNodeToolTip;
+
+            if (Properties.Settings.Default.PeriodicUpdateRate > 0)
+            {
+                tmrUpdate.Interval = Math.Max(200,Properties.Settings.Default.PeriodicUpdateRate);
+                tmrUpdate.Enabled = true;
+            }
+            else
+                tmrUpdate.Enabled = false;
         }
 
         // Save the current Settings
@@ -650,9 +688,11 @@ namespace EnIPExplorer
         {
             if (propertyGrid.SelectedObject is EnIPCIPObject)
             {
-                (propertyGrid.SelectedObject as EnIPCIPObject).ReadDataFromNetwork();
+                LastReadNetworkStatus = (propertyGrid.SelectedObject as EnIPCIPObject).ReadDataFromNetwork();
                 propertyGrid.Refresh();
             }
+            else
+                LastReadNetworkStatus = EnIPNetworkStatus.OffLine;
         }
 
         // Menu Item
@@ -856,6 +896,12 @@ namespace EnIPExplorer
             renameCurrentNodeToolStripMenuItem_Click(null, null);
         }
         #endregion
+
+        private void tmrUpdate_Tick(object sender, EventArgs e)
+        {
+            if (LastReadNetworkStatus == EnIPNetworkStatus.OnLine)
+                readAgainToolStripMenuItem_Click(null, null);
+        }
 
     }
 

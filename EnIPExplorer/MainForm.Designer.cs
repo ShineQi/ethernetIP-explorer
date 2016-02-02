@@ -75,6 +75,7 @@
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tmrUpdate = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -321,7 +322,7 @@
             this.loadConfigurationToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.database_edit;
             this.loadConfigurationToolStripMenuItem.Name = "loadConfigurationToolStripMenuItem";
             this.loadConfigurationToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
-            this.loadConfigurationToolStripMenuItem.Text = "Load Tree Configuration";
+            this.loadConfigurationToolStripMenuItem.Text = "Load Configuration Tree";
             this.loadConfigurationToolStripMenuItem.Click += new System.EventHandler(this.loadConfigurationToolStripMenuItem_Click);
             // 
             // saveConfigurationAsToolStripMenuItem
@@ -412,14 +413,14 @@
             // multicastToolStripMenuItem
             // 
             this.multicastToolStripMenuItem.Name = "multicastToolStripMenuItem";
-            this.multicastToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.multicastToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.multicastToolStripMenuItem.Text = "Multicast";
             this.multicastToolStripMenuItem.Click += new System.EventHandler(this.ForwardOpenToolStripMenuItem_Click);
             // 
             // point2PointToolStripMenuItem
             // 
             this.point2PointToolStripMenuItem.Name = "point2PointToolStripMenuItem";
-            this.point2PointToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.point2PointToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.point2PointToolStripMenuItem.Text = "Point 2 Point";
             this.point2PointToolStripMenuItem.Click += new System.EventHandler(this.ForwardOpenToolStripMenuItem_Click);
             // 
@@ -492,7 +493,7 @@
             // 
             this.settingsToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.application_form;
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.settingsToolStripMenuItem.Text = "Settings";
             this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
@@ -509,7 +510,7 @@
             // 
             this.helpToolStripMenuItem1.Image = global::EnIPExplorer.Properties.Resources.information;
             this.helpToolStripMenuItem1.Name = "helpToolStripMenuItem1";
-            this.helpToolStripMenuItem1.Size = new System.Drawing.Size(107, 22);
+            this.helpToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
             this.helpToolStripMenuItem1.Text = "Help";
             this.helpToolStripMenuItem1.Click += new System.EventHandler(this.helpToolStripMenuItem1_Click);
             // 
@@ -517,9 +518,13 @@
             // 
             this.aboutToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.information;
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
+            // 
+            // tmrUpdate
+            // 
+            this.tmrUpdate.Tick += new System.EventHandler(this.tmrUpdate_Tick);
             // 
             // MainForm
             // 
@@ -599,6 +604,7 @@
         private System.Windows.Forms.ToolStripMenuItem popupP2PToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sendForwardOpenTOToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem popuForward2ToolStripMenuItem;
+        private System.Windows.Forms.Timer tmrUpdate;
     }
 }
 
