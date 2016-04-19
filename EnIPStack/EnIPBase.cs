@@ -41,8 +41,8 @@ namespace System.Net.EnIPStack
             if (value > 255)
             {
                 path[offset] = (byte)(code|0x1);
-                path[offset + 2] = (byte)((value & 0xFF00) >> 8);
-                path[offset + 3] = (byte)(value & 0xFF);
+                path[offset + 2] = (byte)(value & 0xFF);
+                path[offset + 3] = (byte)((value & 0xFF00) >> 8);
                 offset += 4;
             }
             else
