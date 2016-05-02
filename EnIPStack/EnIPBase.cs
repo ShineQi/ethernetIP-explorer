@@ -426,16 +426,16 @@ namespace System.Net.EnIPStack
 
             if (T2O)
             {
-                T2O_ConnectionParameters = ConnectionParameters;
                 // 2 bytes CIP class 1 sequence count + datasize bytes application data
                 ConnectionParameters += (ushort)(datasize + 2);
+                T2O_ConnectionParameters = ConnectionParameters;
                 TransportTrigger = 0x01; // Client class 1, cyclic
             }
             if (O2T)
             {
-                O2T_ConnectionParameters = ConnectionParameters;
                 // 2 bytes CIP class 1 sequence count + 4 bytes 32-bit real time header + datasize bytes application data
                 ConnectionParameters += (ushort)(datasize + 2 + 4);
+                O2T_ConnectionParameters = ConnectionParameters;
                 TransportTrigger = 0x81; // Server class 1
             }
 
