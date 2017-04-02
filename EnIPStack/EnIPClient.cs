@@ -32,6 +32,8 @@ using System.Net;
 using System.Diagnostics;
 using System.ComponentModel;
 using System.Threading;
+using System.Net.EnIPStack.ObjectsLibrary;
+using System.Reflection;
 
 namespace System.Net.EnIPStack
 {
@@ -438,7 +440,7 @@ namespace System.Net.EnIPStack
         // set is present to shows not greyed in the property grid
         public ushort Id { get; set; }
         public EnIPNetworkStatus Status { get; set; }
-        public object DecodedMembers { get; set; }
+        public CIPObject DecodedMembers { get; set; }
         public byte[] RawData { get; set; }
 
         public abstract EnIPNetworkStatus ReadDataFromNetwork();
@@ -491,7 +493,19 @@ namespace System.Net.EnIPStack
         public override EnIPNetworkStatus ReadDataFromNetwork()
         {
             byte[] ClassDataPath = EnIPPath.GetPath(Id, 0, null);
-            return ReadDataFromNetwork(ClassDataPath, CIPServiceCodes.GetAttributesAll);
+            EnIPNetworkStatus ret= ReadDataFromNetwork(ClassDataPath, CIPServiceCodes.GetAttributesAll);
+            if (ret == EnIPNetworkStatus.OnLine)
+            {
+                CIPObjectLibrary classid = (CIPObjectLibrary)Id;
+                try
+                {
+                    var o = Activator.CreateInstance(Assembly.GetExecutingAssembly().FullName, "System.Net.EnIPStack.ObjectsLibrary.CIP_" + classid.ToString() + "_class");
+                    DecodedMembers = (CIPObject)o.Unwrap();
+                    DecodedMembers.SetRawBytes(RawData);
+                }
+                catch { }
+            }
+            return ret;
         }
     }
 
@@ -515,7 +529,19 @@ namespace System.Net.EnIPStack
         public override EnIPNetworkStatus ReadDataFromNetwork()
         {
             byte[] DataPath = EnIPPath.GetPath(myClass.Id, Id, null);
-            return ReadDataFromNetwork(DataPath, CIPServiceCodes.GetAttributesAll);
+            EnIPNetworkStatus ret = ReadDataFromNetwork(DataPath, CIPServiceCodes.GetAttributesAll);
+            if (ret == EnIPNetworkStatus.OnLine)
+            {
+                CIPObjectLibrary classid = (CIPObjectLibrary)Id;
+                try
+                {
+                    var o = Activator.CreateInstance(Assembly.GetExecutingAssembly().FullName, "System.Net.EnIPStack.ObjectsLibrary.CIP_" + classid.ToString() + "_instance");
+                    DecodedMembers = (CIPObject)o.Unwrap();
+                    DecodedMembers.SetRawBytes(RawData);
+                }
+                catch { }
+            }
+            return ret;
         }
 
         public EnIPNetworkStatus GetClassInstanceAttributList()
@@ -616,6 +642,8 @@ namespace System.Net.EnIPStack
             // DataPath[2] = 0x2c;
 
             ForwardOpen_Packet FwPkt = new ForwardOpen_Packet(DataPath, p2p, T2O, O2T, (ushort)RawData.Length);
+      //      FwPkt.T2O_RPI = CycleTime * 1000;
+      //      FwPkt.O2T_RPI = CycleTime * 1000;
             if (T2O)
             {
                 T2O_ConnectionId = FwPkt.T2O_ConnectionId;

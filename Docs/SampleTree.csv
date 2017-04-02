@@ -1,16 +1,16 @@
 Device IP;Name;Class;ClassName;Instance;InstanceName;Attribut;AttributName
-//
-// EnIPExplorer Device Tree, can be modified with a spreadsheet
-// No empy line, comment first with a / char
-// All comments removed by EnIPExplorer save As menu.
-//
-// Device IP & Name
-172.20.54.58;WAGO 750-881 PFC ETHERNET
-// Class 1 under the Wago Plc
+//;;;;;;;
+// EnIPExplorer Device Tree, can be modified with a spreadsheet;;;;;;;
+// No empy line, comment first with a / char;;;;;;;
+// All comments removed by EnIPExplorer save As menu.;;;;;;;
+//;;;;;;;
+// Device IP & Name;;;;;;;
+172.20.54.58;WAGO 750-881 PFC ETHERNET;;;;;;
+// Class 1 under the Wago Plc;;;;;;;
 ;;1;Identity  #1;;;;
-// instance 1 under the class 1
+// instance 1 under the class 1;;;;;;;
 ;;;;1;Instance #1;;
-// class 2
+// class 2;;;;;;;
 ;;2;MessageRouter #2;;;;
 ;;;;1;Instance #1;;
 ;;;;;;1;ObjectList #1
@@ -41,9 +41,25 @@ Device IP;Name;Class;ClassName;Instance;InstanceName;Attribut;AttributName
 ;;110;Proprietary #110;;;;
 ;;111;I can put the name I want;;;;
 ;;112;Proprietary #112;;;;
-// Next device
-172.20.54.59;WAGO 750-881 PFC ETHERNET
+// Next device;;;;;;;
+172.20.54.59;WAGO 750-881 PFC ETHERNET;;;;;;
 ;;1;Identity  #1;;;;
 ;;103;Proprietary Analog Inputs #103;;;;
 ;;;;1;Instance #1;;
 ;;;;;;1;First Analog Input #1 
+// Next device;;;;;;;
+172.20.54.119;Eurotherm Epack;;;;;;
+;;1;Identity  #1;;;;
+;;2;MessageRouter #2;;;;
+;;;;1;Instance #1;;
+;;;;;;1;ObjectList #1
+;;4;Assembly #4;;;;
+;;;;100;Instance #100 - Input;;
+;;;;;;3;Attribut #3
+;;;;150;Instance #150 - Output;;
+;;;;;;3;Attribut #3
+;;6;ConnectionManager  #6;;;;
+;;245;TCPIPInterface #245;;;;
+;;;;1;Instance #1;;
+;;246;EthernetLink #246;;;;
+;;;;1;Instance #1;;

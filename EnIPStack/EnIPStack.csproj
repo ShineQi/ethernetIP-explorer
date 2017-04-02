@@ -50,6 +50,9 @@
     <Compile Include="EnIPClient.cs" />
     <Compile Include="EnIPTransport.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="ObjectsLibrary\CIPObject.cs" />
+    <Compile Include="ObjectsLibrary\Identity.cs" />
+    <Compile Include="ObjectsLibrary\TCPIPInterface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

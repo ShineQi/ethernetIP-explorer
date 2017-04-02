@@ -715,6 +715,17 @@ namespace EnIPExplorer
 
         }
 
+        private void sendForwardOpenTOToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!(propertyGrid.SelectedObject is EnIPAttribut)) return;
+            EnIPAttribut att = (EnIPAttribut)propertyGrid.SelectedObject;
+            int Duration = Properties.Settings.Default.ForwardOpenDuration_s;
+            if (Duration <= 0) Duration = 1;
+            if (Duration > 60) Duration = 60;
+            if (att.ForwardOpen(true, false, true, 100, 20)==EnIPNetworkStatus.OnLine)
+                 Trace.WriteLine("ForwardOpen O->T OK, close will be sent in 20 seconds");
+        }
+
         // Recursive usage
         private void SaveFileEnIPOject(StreamWriter sw, string pre,TreeNodeCollection tnc)
         {
@@ -902,6 +913,7 @@ namespace EnIPExplorer
             if (LastReadNetworkStatus == EnIPNetworkStatus.OnLine)
                 readAgainToolStripMenuItem_Click(null, null);
         }
+
 
     }
 

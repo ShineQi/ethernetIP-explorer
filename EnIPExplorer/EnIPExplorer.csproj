@@ -61,6 +61,15 @@
     <Compile Include="..\EnIPStack\Enums.cs">
       <Link>Enums.cs</Link>
     </Compile>
+    <Compile Include="..\EnIPStack\ObjectsLibrary\CIPObject.cs">
+      <Link>ObjectsLibrary\CIPObject.cs</Link>
+    </Compile>
+    <Compile Include="..\EnIPStack\ObjectsLibrary\Identity.cs">
+      <Link>ObjectsLibrary\Identity.cs</Link>
+    </Compile>
+    <Compile Include="..\EnIPStack\ObjectsLibrary\TCPIPInterface.cs">
+      <Link>ObjectsLibrary\TCPIPInterface.cs</Link>
+    </Compile>
     <Compile Include="GenericInputBox.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>

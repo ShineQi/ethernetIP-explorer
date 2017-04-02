@@ -224,6 +224,7 @@
             this.popuForward2ToolStripMenuItem.Name = "popuForward2ToolStripMenuItem";
             this.popuForward2ToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.popuForward2ToolStripMenuItem.Text = "Configure : ForwardOpen O->T";
+            this.popuForward2ToolStripMenuItem.Click += new System.EventHandler(this.sendForwardOpenTOToolStripMenuItem_Click);
             // 
             // imageList1
             // 
@@ -430,6 +431,7 @@
             this.sendForwardOpenTOToolStripMenuItem1.Name = "sendForwardOpenTOToolStripMenuItem1";
             this.sendForwardOpenTOToolStripMenuItem1.Size = new System.Drawing.Size(240, 22);
             this.sendForwardOpenTOToolStripMenuItem1.Text = "Configure : ForwardOpen O->T";
+            this.sendForwardOpenTOToolStripMenuItem1.Click += new System.EventHandler(this.sendForwardOpenTOToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
@@ -493,7 +495,7 @@
             // 
             this.settingsToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.application_form;
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.settingsToolStripMenuItem.Text = "Settings";
             this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
@@ -510,7 +512,7 @@
             // 
             this.helpToolStripMenuItem1.Image = global::EnIPExplorer.Properties.Resources.information;
             this.helpToolStripMenuItem1.Name = "helpToolStripMenuItem1";
-            this.helpToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.helpToolStripMenuItem1.Size = new System.Drawing.Size(107, 22);
             this.helpToolStripMenuItem1.Text = "Help";
             this.helpToolStripMenuItem1.Click += new System.EventHandler(this.helpToolStripMenuItem1_Click);
             // 
@@ -518,7 +520,7 @@
             // 
             this.aboutToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.information;
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 

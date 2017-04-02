@@ -420,22 +420,18 @@ namespace System.Net.EnIPStack
             .... ..1. .... .... = Connection Size Type: Variable (1)
             .... ...0 0011 1011 = Connection Size: 59
             */
-            ushort ConnectionParameters;
-            if (p2p) ConnectionParameters = 0x4600; else ConnectionParameters = 0x2600;
-            // ConnectionParameters = (ushort)(ConnectionParameters | 0x8000);
-
             if (T2O)
             {
                 // 2 bytes CIP class 1 sequence count + datasize bytes application data
-                ConnectionParameters += (ushort)(datasize + 2);
-                T2O_ConnectionParameters = ConnectionParameters;
+                if (p2p) T2O_ConnectionParameters = 0x4600; else T2O_ConnectionParameters = 0x2600;
+                T2O_ConnectionParameters += (ushort)(datasize + 2);
                 TransportTrigger = 0x01; // Client class 1, cyclic
             }
             if (O2T)
             {
                 // 2 bytes CIP class 1 sequence count + 4 bytes 32-bit real time header + datasize bytes application data
-                ConnectionParameters += (ushort)(datasize + 2 + 4);
-                O2T_ConnectionParameters = ConnectionParameters;
+                if (p2p) O2T_ConnectionParameters = 0x4600; else O2T_ConnectionParameters = 0x2600;
+                O2T_ConnectionParameters += (ushort)(datasize + 2 + 4);
                 TransportTrigger = 0x81; // Server class 1
             }
 

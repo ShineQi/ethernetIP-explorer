@@ -95,7 +95,8 @@
 4.  TESTS
 	The EnIPExplorer has been tested with really a too few number of others tools :
 		- Wireshark.
-		- Wago 750/881 	
+		- Wago 750/881
+		- Eurotherm (Schneider Electric) EPack 	
 
 5.  SUPPORT
 	There's no support for the project at this time, and certainly never. 

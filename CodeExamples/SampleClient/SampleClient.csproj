@@ -55,6 +55,9 @@
     <Compile Include="..\..\EnIPStack\Enums.cs">
       <Link>Enums.cs</Link>
     </Compile>
+    <Compile Include="..\..\EnIPStack\ObjectsLibrary\CIPObject.cs">
+      <Link>CIPObject.cs</Link>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
