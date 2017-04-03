@@ -122,5 +122,4 @@
 	https://sourceforge.net/projects/EnIPExplorer/
 
 9.  DEV. ROADMAP 
-	Maybe decoding of standard classes.
 	Maybe a rawdata user selectable format : byte, short, uhsort ...

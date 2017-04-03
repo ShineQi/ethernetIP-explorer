@@ -30,15 +30,17 @@ using System.Text;
 
 namespace System.Net.EnIPStack.ObjectsLibrary
 {
-    public class CIP_Identity_class:CIPObject
+
+    public class CIP_DLR_class : CIPObject
     {
         public UInt16? Revision { get; set; }
         public UInt16? Max_Instance { get; set; }
+        public UInt16? Number_of_Instances { get; set; }
         public byte[] Remain_Undecoded_Bytes { get; set; }
 
         public override string ToString()
         {
-            return "Identity class";
+            return "DLR class";
         }
         public override bool SetRawBytes(byte[] b)
         {
@@ -46,6 +48,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
 
             Revision = GetUInt16(ref Idx, b);
             Max_Instance = GetUInt16(ref Idx, b);
+            Number_of_Instances = GetUInt16(ref Idx, b);
 
             if (Idx < b.Length)
             {
@@ -53,7 +56,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
                 Array.Copy(b, Idx, Remain_Undecoded_Bytes, 0, Remain_Undecoded_Bytes.Length);
             }
 
-            return true;   
+            return true;
         }
         // maybe
         public override byte[] GetRawBytes()
@@ -61,47 +64,47 @@ namespace System.Net.EnIPStack.ObjectsLibrary
             return null;
         }
     }
-    public class CIP_Identity_instance : CIPObject
+    public class CIP_DLR_instance : CIPObject
     {
-        public UInt16? Vendor_ID { get; set; }
-        public UInt16? Device_Type { get; set; }
-        public UInt16? Product_Code { get; set; }
-        public Byte? Major_Revision { get; set; }
-        public Byte? Minor_Revision { get; set; }
-        public UInt16? Status { get; set; } // WORD ?
-        public UInt32? Serial_Number { get; set; }
-        public String Product_Name { get; set; }
+        public byte? Network_Topology  { get; set; }
+        public byte? Network_Status { get; set; }
+
+        public string Active_Supervisor_IPAddress { get; set; }
+        public string Active_Supervisor_PhysicalAddress { get; set; }
+
+        public UInt32? Capability_Flag { get; set; }
+
+
         public byte[] Remain_Undecoded_Bytes { get; set; }
 
         public override string ToString()
         {
-            return "Identity instance";
+            return "DLR instance";
         }
 
         public override bool SetRawBytes(byte[] b)
         {
             int Idx = 0;
 
-            Vendor_ID = GetUInt16(ref Idx, b);
-            Device_Type = GetUInt16(ref Idx, b);
-            Product_Code = GetUInt16(ref Idx, b);
-            Major_Revision = GetByte(ref Idx, b);
-            Minor_Revision = GetByte(ref Idx, b);
-            Status = GetUInt16(ref Idx, b);
-            Serial_Number = GetUInt32(ref Idx, b);
-            Product_Name = GetShortString(ref Idx, b);
+            Network_Topology = GetByte(ref Idx, b);
+            Network_Status = GetByte(ref Idx, b);
+
+            Active_Supervisor_IPAddress = GetIPAddress(ref Idx, b).ToString();
+            Active_Supervisor_PhysicalAddress = GetPhysicalAddress(ref Idx, b).ToString();
+
+            Capability_Flag = GetUInt32(ref Idx, b);
 
             if (Idx < b.Length)
             {
                 Remain_Undecoded_Bytes = new byte[b.Length - Idx];
                 Array.Copy(b, Idx, Remain_Undecoded_Bytes, 0, Remain_Undecoded_Bytes.Length);
             }
+
             return true;
         }
         // maybe
         public override byte[] GetRawBytes()
         {
-
             return null;
         }
     }

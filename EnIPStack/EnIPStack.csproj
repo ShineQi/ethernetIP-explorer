@@ -51,6 +51,8 @@
     <Compile Include="EnIPTransport.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="ObjectsLibrary\CIPObject.cs" />
+    <Compile Include="ObjectsLibrary\DLR.cs" />
+    <Compile Include="ObjectsLibrary\EtherNetLink.cs" />
     <Compile Include="ObjectsLibrary\Identity.cs" />
     <Compile Include="ObjectsLibrary\TCPIPInterface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

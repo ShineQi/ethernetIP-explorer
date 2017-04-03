@@ -5,7 +5,7 @@ Device IP;Name;Class;ClassName;Instance;InstanceName;Attribut;AttributName
 // All comments removed by EnIPExplorer save As menu.;;;;;;;
 //;;;;;;;
 // Device IP & Name;;;;;;;
-172.20.54.58;WAGO 750-881 PFC ETHERNET;;;;;;
+100.75.137.5;WAGO 750-881 PFC ETHERNET;;;;;;
 // Class 1 under the Wago Plc;;;;;;;
 ;;1;Identity  #1;;;;
 // instance 1 under the class 1;;;;;;;
@@ -26,6 +26,8 @@ Device IP;Name;Class;ClassName;Instance;InstanceName;Attribut;AttributName
 ;;;;1;Instance #1;;
 ;;246;EthernetLink #246;;;;
 ;;;;1;Instance #1;;
+;;;;2;Instance #2;;
+;;;;3;Instance #3 - InternalPort;;
 ;;100;Proprietary #100;;;;
 ;;101;Proprietary #101;;;;
 ;;102;Proprietary #102;;;;

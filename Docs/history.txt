@@ -23,7 +23,9 @@
  - Class1 sample client
  - Clean multicast & P2P ForwardOpen
 
+0.1.6
+ - Decoding of some standard classes
+
 Roadmap
  - Forward Open O->T
- - Maybe decoding of standard classes
  - Rawdata user selectable format ? byte, short, uhsort ... 

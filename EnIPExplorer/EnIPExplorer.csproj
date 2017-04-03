@@ -64,6 +64,12 @@
     <Compile Include="..\EnIPStack\ObjectsLibrary\CIPObject.cs">
       <Link>ObjectsLibrary\CIPObject.cs</Link>
     </Compile>
+    <Compile Include="..\EnIPStack\ObjectsLibrary\DLR.cs">
+      <Link>ObjectsLibrary\DLR.cs</Link>
+    </Compile>
+    <Compile Include="..\EnIPStack\ObjectsLibrary\EtherNetLink.cs">
+      <Link>ObjectsLibrary\EtherNetLink.cs</Link>
+    </Compile>
     <Compile Include="..\EnIPStack\ObjectsLibrary\Identity.cs">
       <Link>ObjectsLibrary\Identity.cs</Link>
     </Compile>

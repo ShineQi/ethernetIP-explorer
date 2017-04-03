@@ -499,8 +499,11 @@ namespace System.Net.EnIPStack
                 CIPObjectLibrary classid = (CIPObjectLibrary)Id;
                 try
                 {
-                    var o = Activator.CreateInstance(Assembly.GetExecutingAssembly().FullName, "System.Net.EnIPStack.ObjectsLibrary.CIP_" + classid.ToString() + "_class");
-                    DecodedMembers = (CIPObject)o.Unwrap();
+                    if (DecodedMembers == null)
+                    {
+                        var o = Activator.CreateInstance(Assembly.GetExecutingAssembly().FullName, "System.Net.EnIPStack.ObjectsLibrary.CIP_" + classid.ToString() + "_class");
+                        DecodedMembers = (CIPObject)o.Unwrap();
+                    }
                     DecodedMembers.SetRawBytes(RawData);
                 }
                 catch { }
@@ -532,11 +535,14 @@ namespace System.Net.EnIPStack
             EnIPNetworkStatus ret = ReadDataFromNetwork(DataPath, CIPServiceCodes.GetAttributesAll);
             if (ret == EnIPNetworkStatus.OnLine)
             {
-                CIPObjectLibrary classid = (CIPObjectLibrary)Id;
+                CIPObjectLibrary classid = (CIPObjectLibrary)myClass.Id;
                 try
                 {
-                    var o = Activator.CreateInstance(Assembly.GetExecutingAssembly().FullName, "System.Net.EnIPStack.ObjectsLibrary.CIP_" + classid.ToString() + "_instance");
-                    DecodedMembers = (CIPObject)o.Unwrap();
+                    if (DecodedMembers == null)
+                    {
+                        var o = Activator.CreateInstance(Assembly.GetExecutingAssembly().FullName, "System.Net.EnIPStack.ObjectsLibrary.CIP_" + classid.ToString() + "_instance");
+                        DecodedMembers = (CIPObject)o.Unwrap();
+                    }
                     DecodedMembers.SetRawBytes(RawData);
                 }
                 catch { }
