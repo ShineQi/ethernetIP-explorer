@@ -32,14 +32,39 @@ using System.Net.NetworkInformation;
 
 namespace System.Net.EnIPStack.ObjectsLibrary
 {
+    public class CIPAttributId:Attribute
+    {
+        public int Id;
+        public CIPAttributId(int Id) { this.Id = Id; }
+    }
     // base class used into the propertyGrid container to displays decoded members
     // also used to decode rawdata
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public abstract class CIPObject : ICustomTypeDescriptor
     {
+        public byte[] Remain_Undecoded_Bytes { get; set; } // if name changes, remember to modify GetProperties method also !
 
-        public abstract bool SetRawBytes(byte[] b);
-        public abstract byte[] GetRawBytes();
+        protected int FilteredAttribut=-1;
+        protected int AttIdMax;
+
+        public void FilterAttribut(int AttId) { FilteredAttribut = AttId; }
+
+        public virtual bool DecodeAttr(int AttrNum, ref int Idx, byte[] b) { return false; }
+
+        public bool SetRawBytes(byte[] b)
+        {
+            int Idx = 0;
+
+            for (int i = 1; i < AttIdMax+1; i++)
+                DecodeAttr(i, ref Idx, b);
+
+            if (Idx < b.Length)
+            {
+                Remain_Undecoded_Bytes = new byte[b.Length - Idx];
+                Array.Copy(b, Idx, Remain_Undecoded_Bytes, 0, Remain_Undecoded_Bytes.Length);
+            }
+            return true;
+        }
 
         public bool? GetBool(ref int Idx, byte[] buf)
         {
@@ -150,7 +175,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
             //Array.Reverse(b_ip);
             return new PhysicalAddress(b_eth);
     }
-
+        
         #region CustomTypeDescriptor
         public AttributeCollection GetAttributes()
         {
@@ -199,13 +224,44 @@ namespace System.Net.EnIPStack.ObjectsLibrary
 
         public PropertyDescriptorCollection GetProperties(Attribute[] attributes)
         {
-            PropertyDescriptorCollection props = TypeDescriptor.GetProperties(this, true);
-            return props;
+
+            return GetProperties();
         }
 
         public PropertyDescriptorCollection GetProperties()
         {
-            return TypeDescriptor.GetProperties(this, true);
+
+            PropertyDescriptorCollection props = TypeDescriptor.GetProperties(this, true);
+
+            // For CIP Attribut we get the class and hides all attributs with
+            // the wrong Id
+            PropertyDescriptor Remain_Undecoded_Bytes_Prop=null;
+            if (FilteredAttribut == -1)
+            {
+                // Reorder the list to shows Remain_Undecoded_Bytes at the last index
+                PropertyDescriptor[] reordered = new PropertyDescriptor[props.Count];
+                int i = 0;
+                foreach (PropertyDescriptor p in props)
+                    if (p.Name == "Remain_Undecoded_Bytes")
+                        Remain_Undecoded_Bytes_Prop = p;
+                    else
+                        reordered[i++]=p;
+                reordered[i]=Remain_Undecoded_Bytes_Prop;
+
+                return new PropertyDescriptorCollection(reordered);
+            }
+
+            List<PropertyDescriptor> propsfiltered = new List<PropertyDescriptor>();
+            foreach (PropertyDescriptor p in props)
+            {
+                Attribute a = p.Attributes[typeof(CIPAttributId)];
+                if (a != null)
+                {
+                    if ((a as CIPAttributId).Id == FilteredAttribut)
+                        propsfiltered.Add(p);
+                }
+            }
+            return new PropertyDescriptorCollection(propsfiltered.ToArray());
         }
 
         public object GetPropertyOwner(PropertyDescriptor pd)
@@ -213,6 +269,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
             return this;
         }
         #endregion
-
+        
     }
+
 }

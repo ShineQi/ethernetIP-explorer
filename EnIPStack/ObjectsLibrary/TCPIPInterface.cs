@@ -30,113 +30,114 @@ using System.Text;
 
 namespace System.Net.EnIPStack.ObjectsLibrary
 {
-    public class CIP_TCPIPInterface_class : CIPObject
-    {
-        public UInt16? Revision { get; set; }
-        public UInt16? Max_Instance { get; set; }
-        public UInt16? Number_of_Instances { get; set; }
-        public byte[] Remain_Undecoded_Bytes { get; set; }
+    // CIP_TCPIPInterface_class not required, nothing new than in CIPObjectBaseClass
 
-        public override string ToString()
-        {
-            return "TCPIPInterface class";
-        }
-        public override bool SetRawBytes(byte[] b)
-        {
-            int Idx = 0;
-
-            Revision = GetUInt16(ref Idx, b);
-            Max_Instance = GetUInt16(ref Idx, b);
-            Number_of_Instances = GetUInt16(ref Idx, b);
-
-            if (Idx < b.Length)
-            {
-                Remain_Undecoded_Bytes = new byte[b.Length - Idx];
-                Array.Copy(b, Idx, Remain_Undecoded_Bytes, 0, Remain_Undecoded_Bytes.Length);
-            }
-
-            return true;
-        }
-        // maybe
-        public override byte[] GetRawBytes()
-        {
-            return null;
-        }
-    }
     public class CIP_TCPIPInterface_instance : CIPObject
     {
+        [CIPAttributId(1)]
         public UInt32? Status { get; set; }
+        [CIPAttributId(2)]
         public UInt32? Configuration_Capability { get; set; }
+        [CIPAttributId(3)]
         public UInt32? Configuration_Control { get; set; }
+        [CIPAttributId(4)]
         public UInt16? Path_Size { get; set; }
+        [CIPAttributId(4)]
         public string PhysicalObjectLinkPath { get; set; }
+        [CIPAttributId(5)]
         public string IP_Address { get; set; } // string because IPAddress a greyed in the property grid
+        [CIPAttributId(5)]
         public string NetMask { get; set; }
+        [CIPAttributId(5)]
         public string Gateway_Address { get; set; }
+        [CIPAttributId(5)]
         public string Name_Server_1 { get; set; }
+        [CIPAttributId(5)]
         public string Name_Server_2 { get; set; }
+        [CIPAttributId(5)]
         public string Domain_Name { get; set; }
+        [CIPAttributId(6)]
         public string Host_Name { get; set; }
-        public byte[] Remain_Undecoded_Bytes { get; set; }
-        
+        [CIPAttributId(7)]
+        public Byte[] Safety_Network_Number { get; set; }
+        [CIPAttributId(8)]
+        public Byte? TTL_Value { get; set; }
+        [CIPAttributId(9)]
+        public Byte?Alloc_Control { get; set; }
+        [CIPAttributId(9)]
+        public Byte?Reserved { get; set; }
+        [CIPAttributId(9)]
+        public UInt16? Num_Mcast { get; set; }
+        [CIPAttributId(9)]
+        public String Mcast_Start_Addr { get; set; }
+
+        public CIP_TCPIPInterface_instance() { AttIdMax = 9; }
+
         public override string ToString()
         {
-            return "TCPIPInterface instance";
+            if (FilteredAttribut == -1)
+                return "TCPIPInterface instance";
+            else
+                return "TCPIPInterface instance attribut #" + FilteredAttribut.ToString();
         }
 
-        public override bool SetRawBytes(byte[] b)
+        public override bool DecodeAttr(int AttrNum, ref int Idx, byte[] b)
         {
-            int Idx = 0;
-
-            Status = GetUInt32(ref Idx, b);
-            Configuration_Capability = GetUInt32(ref Idx, b);
-            Configuration_Control = GetUInt32(ref Idx, b);
-            Path_Size = GetUInt16(ref Idx, b);
-
-            /*
-            for (int i = 0; i < Path_Size.Value; i++)
+            switch (AttrNum)
             {
-                UInt16? _Path;
-                _Path = (UInt16)GetUInt16(ref Idx, b);
-                if (i!=0)
-                    Path = Path + "." + _Path.ToString();
-                else
-                Path = _Path.ToString();
+                case 1:
+                    Status = GetUInt32(ref Idx, b);
+                    return true;
+                case 2:
+                    Configuration_Capability = GetUInt32(ref Idx, b);
+                    return true;
+                case 3:
+                    Configuration_Control = GetUInt32(ref Idx, b);
+                    return true;
+                case 4:
+                    Path_Size = GetUInt16(ref Idx, b);
+                    if (Path_Size.Value != 0)
+                    {
+                        byte[] _Path = new byte[Path_Size.Value * 2];
+                        Array.Copy(b, Idx, _Path, 0, Path_Size.Value * 2);
+                        Idx += Path_Size.Value * 2;
+                        PhysicalObjectLinkPath = EnIPPath.GetPath(_Path);
+                    }
+                    return true;
+                case 5:
+                    IP_Address = GetIPAddress(ref Idx, b).ToString();
+                    NetMask = GetIPAddress(ref Idx, b).ToString();
+                    Gateway_Address = GetIPAddress(ref Idx, b).ToString();
+                    Name_Server_1 = GetIPAddress(ref Idx, b).ToString();
+                    Name_Server_2 = GetIPAddress(ref Idx, b).ToString();
+
+                    Domain_Name = GetString(ref Idx, b);
+                    if ((Domain_Name.Length % 2) != 0) Idx++; // padd to even number of characters
+                    return true;
+                case 6:
+                    Host_Name = GetString(ref Idx, b);
+                    if ((Host_Name.Length % 2) != 0) Idx++; // padd to even number of characters
+                    return true;
+                case 7:
+                    if (b.Length >= Idx + 5)
+                    {
+                        Safety_Network_Number = new byte[6];
+                        Array.Copy(b, Idx, Safety_Network_Number, 0, 6);
+                        Idx += 6;
+                    }
+                    return true;
+                case 8:
+                    TTL_Value = GetByte(ref Idx, b);
+                    return true;
+                case 9:
+                    Alloc_Control = GetByte(ref Idx, b);
+                    Reserved = GetByte(ref Idx, b);
+                    Num_Mcast = GetUInt16(ref Idx, b);
+                    Mcast_Start_Addr = GetIPAddress(ref Idx, b).ToString();
+                    return true;
             }
-             * */
-            if (Path_Size.Value != 0)
-            {
-                byte[] _Path = new byte[Path_Size.Value * 2];
-                Array.Copy(b, Idx, _Path,0, Path_Size.Value * 2);
-                Idx+=Path_Size.Value * 2;
-                PhysicalObjectLinkPath = EnIPPath.GetPath(_Path);
-            }
 
-
-            IP_Address = GetIPAddress(ref Idx, b).ToString();
-            NetMask = GetIPAddress(ref Idx, b).ToString();
-            Gateway_Address = GetIPAddress(ref Idx, b).ToString();
-            Name_Server_1 = GetIPAddress(ref Idx, b).ToString();
-            Name_Server_2 = GetIPAddress(ref Idx, b).ToString();
-
-            Domain_Name=GetString(ref Idx, b);
-            if ((Domain_Name.Length % 2) != 0) Idx++; // padd to even number of characters
-
-            Host_Name = GetString(ref Idx, b);
-            if ((Host_Name.Length % 2) != 0) Idx++; // padd to even number of characters
-
-            if (Idx < b.Length)
-            {
-                Remain_Undecoded_Bytes = new byte[b.Length - Idx];
-                Array.Copy(b, Idx, Remain_Undecoded_Bytes, 0, Remain_Undecoded_Bytes.Length);
-            }
-
-            return true;
-        }
-        // maybe
-        public override byte[] GetRawBytes()
-        {
-            return null;
+            return false;
         }
     }
 }

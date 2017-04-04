@@ -501,8 +501,17 @@ namespace System.Net.EnIPStack
                 {
                     if (DecodedMembers == null)
                     {
-                        var o = Activator.CreateInstance(Assembly.GetExecutingAssembly().FullName, "System.Net.EnIPStack.ObjectsLibrary.CIP_" + classid.ToString() + "_class");
-                        DecodedMembers = (CIPObject)o.Unwrap();
+                        try
+                        {
+                            // try to create the associated class object
+                            var o = Activator.CreateInstance(Assembly.GetExecutingAssembly().FullName, "System.Net.EnIPStack.ObjectsLibrary.CIP_" + classid.ToString() + "_class");
+                            DecodedMembers = (CIPObject)o.Unwrap();
+                        }
+                        catch
+                        {
+                            // echec, get the base class as described in Volume 1, §4-4.1 Class Attributes
+                            DecodedMembers = new CIPObjectBaseClass(classid.ToString());
+                        }
                     }
                     DecodedMembers.SetRawBytes(RawData);
                 }
@@ -612,7 +621,24 @@ namespace System.Net.EnIPStack
         public override EnIPNetworkStatus ReadDataFromNetwork()
         {
             byte[] DataPath = EnIPPath.GetPath(myInstance.myClass.Id, myInstance.Id, Id);
-            return ReadDataFromNetwork(DataPath, CIPServiceCodes.GetAttributeSingle);
+            EnIPNetworkStatus ret = ReadDataFromNetwork(DataPath, CIPServiceCodes.GetAttributeSingle);
+            if (ret == EnIPNetworkStatus.OnLine)
+            {
+                CIPObjectLibrary classid = (CIPObjectLibrary)myInstance.myClass.Id;
+                try
+                {
+                    if (DecodedMembers == null)
+                    {
+                        var o = Activator.CreateInstance(Assembly.GetExecutingAssembly().FullName, "System.Net.EnIPStack.ObjectsLibrary.CIP_" + classid.ToString() + "_instance");
+                        DecodedMembers = (CIPObject)o.Unwrap();
+                        DecodedMembers.FilterAttribut(Id);
+                    }
+                    int Idx = 0;
+                    (DecodedMembers as CIPObject).DecodeAttr(Id, ref Idx, RawData);
+                }
+                catch { }
+            }
+            return ret;
         }
 
         public void Class1Enrolment()

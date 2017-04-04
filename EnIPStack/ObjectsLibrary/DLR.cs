@@ -31,81 +31,52 @@ using System.Text;
 namespace System.Net.EnIPStack.ObjectsLibrary
 {
 
-    public class CIP_DLR_class : CIPObject
-    {
-        public UInt16? Revision { get; set; }
-        public UInt16? Max_Instance { get; set; }
-        public UInt16? Number_of_Instances { get; set; }
-        public byte[] Remain_Undecoded_Bytes { get; set; }
+    // CIP_DLR_class not required, nothing new than in CIPObjectBaseClass
 
-        public override string ToString()
-        {
-            return "DLR class";
-        }
-        public override bool SetRawBytes(byte[] b)
-        {
-            int Idx = 0;
-
-            Revision = GetUInt16(ref Idx, b);
-            Max_Instance = GetUInt16(ref Idx, b);
-            Number_of_Instances = GetUInt16(ref Idx, b);
-
-            if (Idx < b.Length)
-            {
-                Remain_Undecoded_Bytes = new byte[b.Length - Idx];
-                Array.Copy(b, Idx, Remain_Undecoded_Bytes, 0, Remain_Undecoded_Bytes.Length);
-            }
-
-            return true;
-        }
-        // maybe
-        public override byte[] GetRawBytes()
-        {
-            return null;
-        }
-    }
     public class CIP_DLR_instance : CIPObject
     {
+        [CIPAttributId(1)]
         public byte? Network_Topology  { get; set; }
+        [CIPAttributId(2)]
         public byte? Network_Status { get; set; }
-
+        [CIPAttributId(3)]
         public string Active_Supervisor_IPAddress { get; set; }
+        [CIPAttributId(4)]
         public string Active_Supervisor_PhysicalAddress { get; set; }
-
+        [CIPAttributId(5)]
         public UInt32? Capability_Flag { get; set; }
 
-
-        public byte[] Remain_Undecoded_Bytes { get; set; }
+        public CIP_DLR_instance() { AttIdMax = 5; }
 
         public override string ToString()
         {
-            return "DLR instance";
+            if (FilteredAttribut == -1)
+                return "DLR instance";
+            else
+                return "DLR instance attribut #" + FilteredAttribut.ToString();
         }
 
-        public override bool SetRawBytes(byte[] b)
+        public override bool DecodeAttr(int AttrNum, ref int Idx, byte[] b)
         {
-            int Idx = 0;
-
-            Network_Topology = GetByte(ref Idx, b);
-            Network_Status = GetByte(ref Idx, b);
-
-            Active_Supervisor_IPAddress = GetIPAddress(ref Idx, b).ToString();
-            Active_Supervisor_PhysicalAddress = GetPhysicalAddress(ref Idx, b).ToString();
-
-            Capability_Flag = GetUInt32(ref Idx, b);
-
-            if (Idx < b.Length)
+            switch (AttrNum)
             {
-                Remain_Undecoded_Bytes = new byte[b.Length - Idx];
-                Array.Copy(b, Idx, Remain_Undecoded_Bytes, 0, Remain_Undecoded_Bytes.Length);
+                case 1:
+                    Network_Topology = GetByte(ref Idx, b);
+                    return true;
+                case 2:
+                    Network_Status = GetByte(ref Idx, b);
+                    return true;
+                case 3:
+                    Active_Supervisor_IPAddress = GetIPAddress(ref Idx, b).ToString();
+                    return true;
+                case 4:
+                    Active_Supervisor_PhysicalAddress = GetPhysicalAddress(ref Idx, b).ToString();
+                    return true;
+                case 5:
+                    Capability_Flag = GetUInt32(ref Idx, b);
+                    return true;
             }
-
-            return true;
-        }
-        // maybe
-        public override byte[] GetRawBytes()
-        {
-            return null;
+            return false;
         }
     }
 }

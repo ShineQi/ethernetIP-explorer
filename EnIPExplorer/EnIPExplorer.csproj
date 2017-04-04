@@ -64,6 +64,9 @@
     <Compile Include="..\EnIPStack\ObjectsLibrary\CIPObject.cs">
       <Link>ObjectsLibrary\CIPObject.cs</Link>
     </Compile>
+    <Compile Include="..\EnIPStack\ObjectsLibrary\CIPObjectBaseClass.cs">
+      <Link>ObjectsLibrary\CIPObjectBaseClass.cs</Link>
+    </Compile>
     <Compile Include="..\EnIPStack\ObjectsLibrary\DLR.cs">
       <Link>ObjectsLibrary\DLR.cs</Link>
     </Compile>
@@ -142,6 +145,9 @@
     <None Include="ico\arrow_refresh.png" />
     <None Include="ico\door_out.png" />
     <None Include="ico\door_in.png" />
+    <None Include="..\EnIPStack\ObjectsLibrary\Readme.txt">
+      <Link>ObjectsLibrary\Readme.txt</Link>
+    </None>
     <Content Include="Search.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

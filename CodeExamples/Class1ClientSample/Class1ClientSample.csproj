@@ -58,6 +58,9 @@
     <Compile Include="..\..\EnIPStack\ObjectsLibrary\CIPObject.cs">
       <Link>CIPObject.cs</Link>
     </Compile>
+    <Compile Include="..\..\EnIPStack\ObjectsLibrary\CIPObjectBaseClass.cs">
+      <Link>CIPObjectBaseClass.cs</Link>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -30,75 +30,79 @@ using System.Text;
 
 namespace System.Net.EnIPStack.ObjectsLibrary
 {
-    // CIP_Identity_class not required, nothing new than in CIPObjectBaseClass
-    // but implemented here to show how it should be done if additional attribut are present
-    public class CIP_Identity_class : CIPObjectBaseClass
-    {
-        public CIP_Identity_class() { AttIdMax = 7; }
-        public override string ToString()
-        {
-            return "class Identity";
-        }
-        public override bool DecodeAttr(int AttrNum, ref int Idx, byte[] b)
-        {
-            // base decoding, but should be used only for attribut 1 to 7 and 
-            // other decoding for attribut 8 and more
-            return base.DecodeAttr(AttrNum, ref Idx, b);
-        }
-    }
-    public class CIP_Identity_instance : CIPObject
+
+    // Common class attribut : 4-4.1 Class Attributes
+    public class CIPObjectBaseClass : CIPObject
     {
         [CIPAttributId(1)]
-        public UInt16? Vendor_ID { get; set; }
+        public UInt16? Revision { get; set; }
         [CIPAttributId(2)]
-        public UInt16? Device_Type { get; set; }
+        public UInt16? Max_Instance { get; set; }
         [CIPAttributId(3)]
-        public UInt16? Product_Code { get; set; }
+        public UInt16? Number_of_Instances { get; set; }
         [CIPAttributId(4)]
-        public Byte? Major_Revision { get; set; }
+        public UInt16? Number_of_Attributes { get; set; }
         [CIPAttributId(4)]
-        public Byte? Minor_Revision { get; set; }
+        public UInt16?[] Optional_Attributes { get; set; }
         [CIPAttributId(5)]
-        public UInt16? Status { get; set; }
+        public UInt16? Number_of_Services { get; set; }
+        [CIPAttributId(5)]
+        public UInt16?[] Optional_Services { get; set; }
         [CIPAttributId(6)]
-        public UInt32? Serial_Number { get; set; }
+        public UInt16? Maximum_ID_Number_Class_Attributes { get; set; }
         [CIPAttributId(7)]
-        public String Product_Name { get; set; }
+        public UInt16? Maximum_ID_Number_Instance_Attributes { get; set; }
 
-        public CIP_Identity_instance() { AttIdMax = 7; }
+        String Name = "Base";
+        public CIPObjectBaseClass() { AttIdMax = 7; }
+
+        public CIPObjectBaseClass(string Name)
+        {
+            this.Name = Name;
+            AttIdMax = 3;
+        }
 
         public override string ToString()
         {
-            if (FilteredAttribut==-1)
-                return "Identity instance";
-            else
-                return "Identity instance attribut #" + FilteredAttribut.ToString();
+            return "class " + Name;
         }
+
         public override bool DecodeAttr(int AttrNum, ref int Idx, byte[] b)
         {
             switch (AttrNum)
             {
                 case 1:
-                    Vendor_ID = GetUInt16(ref Idx, b);
+                    Revision = GetUInt16(ref Idx, b);
                     return true;
                 case 2:
-                    Device_Type = GetUInt16(ref Idx, b);
+                    Max_Instance = GetUInt16(ref Idx, b);
                     return true;
                 case 3:
-                    Product_Code = GetUInt16(ref Idx, b);
+                    Number_of_Instances = GetUInt16(ref Idx, b);
                     return true;
                 case 4:
-                    Major_Revision = GetByte(ref Idx, b);
-                    Minor_Revision = GetByte(ref Idx, b);
+                    Number_of_Attributes = GetUInt16(ref Idx, b);
+                    if ((Number_of_Attributes != null) && (Number_of_Attributes.Value > 0))
+                    {
+                        Optional_Attributes = new UInt16?[Number_of_Attributes.Value];
+                        for (int i = 0; i < Number_of_Attributes.Value; i++)
+                            Optional_Attributes[i] = GetUInt16(ref Idx, b);
+                    }
                     return true;
                 case 5:
-                    Status = GetUInt16(ref Idx, b);
+                    Number_of_Services = GetUInt16(ref Idx, b);
+                    if ((Number_of_Services != null) && (Number_of_Services.Value > 0))
+                    {
+                        Optional_Services = new UInt16?[Number_of_Services.Value];
+                        for (int i = 0; i < Number_of_Services.Value; i++)
+                            Optional_Services[i] = GetUInt16(ref Idx, b);
+                    }
                     return true;
                 case 6:
-                    Serial_Number = GetUInt32(ref Idx, b);
+                    Maximum_ID_Number_Class_Attributes = GetUInt16(ref Idx, b);
                     return true;
                 case 7:
-                    Product_Name = GetShortString(ref Idx, b);
+                    Maximum_ID_Number_Instance_Attributes = GetUInt16(ref Idx, b);
                     return true;
             }
 
