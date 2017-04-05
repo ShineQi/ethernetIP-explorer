@@ -313,7 +313,7 @@ namespace EnIPExplorer
         // Menu Item
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(this, "Ethernet/IP Explorer - EnIPExplorer\nVersion Beta " + this.GetType().Assembly.GetName().Version + "\nBy Frederic Chaxel - Copyright 2016\n" +
+            MessageBox.Show(this, "Ethernet/IP Explorer - EnIPExplorer\nVersion Beta " + this.GetType().Assembly.GetName().Version + "\nBy Frederic Chaxel - Copyright 2016,2017\n" +
                 "\nReferences:\n\t http://sourceforge.net/projects/EnIPExplorer" +
                 "\n\t http://sourceforge.net/projects/yetanotherbacnetexplorer/" +
                 "\n\t http://www.famfamfam.com/"+
@@ -722,8 +722,8 @@ namespace EnIPExplorer
             int Duration = Properties.Settings.Default.ForwardOpenDuration_s;
             if (Duration <= 0) Duration = 1;
             if (Duration > 60) Duration = 60;
-            if (att.ForwardOpen(true, false, true, 100, 20)==EnIPNetworkStatus.OnLine)
-                 Trace.WriteLine("ForwardOpen O->T OK, close will be sent in 20 seconds");
+            if (att.ForwardOpen(true, false, true, 100, Duration) == EnIPNetworkStatus.OnLine)
+                 Trace.WriteLine("ForwardOpen O->T OK, close will be sent in "+Duration.ToString()+" seconds");
         }
 
         // Recursive usage

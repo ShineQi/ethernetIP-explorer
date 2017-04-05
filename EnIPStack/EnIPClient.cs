@@ -478,11 +478,19 @@ namespace System.Net.EnIPStack
     public class EnIPClass : EnIPCIPObject
     {
 
-        public EnIPClass(EnIPRemoteDevice RemoteDevice, ushort Id)
+        Type DecoderClass;
+
+        public EnIPClass(EnIPRemoteDevice RemoteDevice, ushort Id, Type DecoderClass = null)
         {
             this.Id = Id;
             this.RemoteDevice = RemoteDevice;
-            Status=EnIPNetworkStatus.OffLine;
+            Status = EnIPNetworkStatus.OffLine;
+            if (DecoderClass != null)
+            {
+                this.DecoderClass = DecoderClass;
+                if (!DecoderClass.IsSubclassOf(typeof(CIPObject)))
+                    throw new ArgumentException("Wrong Decoder class, not subclass of CIPObject", "DecoderClass");
+            }
         }
 
         public override EnIPNetworkStatus WriteDataToNetwork()
@@ -503,9 +511,18 @@ namespace System.Net.EnIPStack
                     {
                         try
                         {
-                            // try to create the associated class object
-                            var o = Activator.CreateInstance(Assembly.GetExecutingAssembly().FullName, "System.Net.EnIPStack.ObjectsLibrary.CIP_" + classid.ToString() + "_class");
-                            DecodedMembers = (CIPObject)o.Unwrap();
+                            if (DecoderClass == null)
+                            {
+                                // try to create the associated class object
+                                var o = Activator.CreateInstance(Assembly.GetExecutingAssembly().FullName, "System.Net.EnIPStack.ObjectsLibrary.CIP_" + classid.ToString() + "_class");
+                                DecodedMembers = (CIPObject)o.Unwrap();
+                            }
+                            else
+                            {
+                                var o = Activator.CreateInstance(DecoderClass);
+                                DecodedMembers = (CIPObject)o;
+
+                            }
                         }
                         catch
                         {
@@ -524,13 +541,20 @@ namespace System.Net.EnIPStack
     public class EnIPInstance : EnIPCIPObject
     {
         public EnIPClass myClass;
+        public Type DecoderClass;
 
-        public EnIPInstance(EnIPClass Class, ushort Id)
+        public EnIPInstance(EnIPClass Class, ushort Id, Type DecoderClass = null)
         {
             this.Id = Id;
             this.myClass = Class;
             this.RemoteDevice = Class.RemoteDevice;
             Status = EnIPNetworkStatus.OffLine;
+            if (DecoderClass != null)
+            {
+                this.DecoderClass = DecoderClass;
+                if (!DecoderClass.IsSubclassOf(typeof(CIPObject)))
+                    throw new ArgumentException("Wrong Decoder class, not subclass of CIPObject", "DecoderClass");
+            }
         }
 
         public override EnIPNetworkStatus WriteDataToNetwork()
@@ -549,8 +573,17 @@ namespace System.Net.EnIPStack
                 {
                     if (DecodedMembers == null)
                     {
-                        var o = Activator.CreateInstance(Assembly.GetExecutingAssembly().FullName, "System.Net.EnIPStack.ObjectsLibrary.CIP_" + classid.ToString() + "_instance");
-                        DecodedMembers = (CIPObject)o.Unwrap();
+                        if (DecoderClass == null)
+                        {
+                            var o = Activator.CreateInstance(Assembly.GetExecutingAssembly().FullName, "System.Net.EnIPStack.ObjectsLibrary.CIP_" + classid.ToString() + "_instance");
+                            DecodedMembers = (CIPObject)o.Unwrap();
+                        }
+                        else
+                        {
+                            var o = Activator.CreateInstance(DecoderClass);
+                            DecodedMembers = (CIPObject)o;
+
+                        }
                     }
                     DecodedMembers.SetRawBytes(RawData);
                 }
@@ -629,12 +662,21 @@ namespace System.Net.EnIPStack
                 {
                     if (DecodedMembers == null)
                     {
-                        var o = Activator.CreateInstance(Assembly.GetExecutingAssembly().FullName, "System.Net.EnIPStack.ObjectsLibrary.CIP_" + classid.ToString() + "_instance");
-                        DecodedMembers = (CIPObject)o.Unwrap();
+                        if (myInstance.DecoderClass == null)
+                        {
+
+                            var o = Activator.CreateInstance(Assembly.GetExecutingAssembly().FullName, "System.Net.EnIPStack.ObjectsLibrary.CIP_" + classid.ToString() + "_instance");
+                            DecodedMembers = (CIPObject)o.Unwrap();
+                        }
+                        else
+                        {
+                            var o = Activator.CreateInstance(myInstance.DecoderClass);
+                            DecodedMembers = (CIPObject)o;
+                        }
                         DecodedMembers.FilterAttribut(Id);
                     }
                     int Idx = 0;
-                    (DecodedMembers as CIPObject).DecodeAttr(Id, ref Idx, RawData);
+                    DecodedMembers.DecodeAttr(Id, ref Idx, RawData);
                 }
                 catch { }
             }
@@ -654,6 +696,17 @@ namespace System.Net.EnIPStack
 
             RawData = new byte[msg_length - offset];
             Array.Copy(packet, offset, RawData, 0, RawData.Length);
+
+            if (DecodedMembers != null)
+            {
+                int Idx = 0;
+                try
+                {
+                    DecodedMembers.DecodeAttr(Id, ref Idx, RawData);
+                }
+                catch { }
+            }
+
 
             if (T2OEvent != null)
                 T2OEvent(this);

@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.ComponentModel;
 
 namespace System.Net.EnIPStack.ObjectsLibrary
 {
@@ -34,6 +35,28 @@ namespace System.Net.EnIPStack.ObjectsLibrary
 
     public class CIP_TCPIPInterface_instance : CIPObject
     {
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public class TCPIPInterface_Configuration
+        {
+            public string IP_Address { get; set; } // string because IPAddress a greyed in the property grid
+            public string NetMask { get; set; }
+            public string Gateway_Address { get; set; }
+            public string Name_Server_1 { get; set; }
+            public string Name_Server_2 { get; set; }
+            public string Domain_Name { get; set; }
+            public override string ToString() { return ""; }
+        }
+
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public class TCPIPMcastConfig
+        {
+            public Byte? Alloc_Control { get; set; }
+            public Byte? Reserved { get; set; }
+            public UInt16? Num_Mcast { get; set; }
+            public String Mcast_Start_Addr { get; set; }
+            public override string ToString() { return ""; }
+        }
+
         [CIPAttributId(1)]
         public UInt32? Status { get; set; }
         [CIPAttributId(2)]
@@ -45,17 +68,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
         [CIPAttributId(4)]
         public string PhysicalObjectLinkPath { get; set; }
         [CIPAttributId(5)]
-        public string IP_Address { get; set; } // string because IPAddress a greyed in the property grid
-        [CIPAttributId(5)]
-        public string NetMask { get; set; }
-        [CIPAttributId(5)]
-        public string Gateway_Address { get; set; }
-        [CIPAttributId(5)]
-        public string Name_Server_1 { get; set; }
-        [CIPAttributId(5)]
-        public string Name_Server_2 { get; set; }
-        [CIPAttributId(5)]
-        public string Domain_Name { get; set; }
+        public TCPIPInterface_Configuration Interface_Configuration { get; set; }       
         [CIPAttributId(6)]
         public string Host_Name { get; set; }
         [CIPAttributId(7)]
@@ -63,13 +76,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
         [CIPAttributId(8)]
         public Byte? TTL_Value { get; set; }
         [CIPAttributId(9)]
-        public Byte?Alloc_Control { get; set; }
-        [CIPAttributId(9)]
-        public Byte?Reserved { get; set; }
-        [CIPAttributId(9)]
-        public UInt16? Num_Mcast { get; set; }
-        [CIPAttributId(9)]
-        public String Mcast_Start_Addr { get; set; }
+        public TCPIPMcastConfig Mcast_Config { get; set; }
 
         public CIP_TCPIPInterface_instance() { AttIdMax = 9; }
 
@@ -105,14 +112,16 @@ namespace System.Net.EnIPStack.ObjectsLibrary
                     }
                     return true;
                 case 5:
-                    IP_Address = GetIPAddress(ref Idx, b).ToString();
-                    NetMask = GetIPAddress(ref Idx, b).ToString();
-                    Gateway_Address = GetIPAddress(ref Idx, b).ToString();
-                    Name_Server_1 = GetIPAddress(ref Idx, b).ToString();
-                    Name_Server_2 = GetIPAddress(ref Idx, b).ToString();
-
-                    Domain_Name = GetString(ref Idx, b);
-                    if ((Domain_Name.Length % 2) != 0) Idx++; // padd to even number of characters
+                    Interface_Configuration = new TCPIPInterface_Configuration
+                    {
+                        IP_Address = GetIPAddress(ref Idx, b).ToString(),
+                        NetMask = GetIPAddress(ref Idx, b).ToString(),
+                        Gateway_Address = GetIPAddress(ref Idx, b).ToString(),
+                        Name_Server_1 = GetIPAddress(ref Idx, b).ToString(),
+                        Name_Server_2 = GetIPAddress(ref Idx, b).ToString(),
+                        Domain_Name = GetString(ref Idx, b)
+                    };
+                    if ((Interface_Configuration.Domain_Name.Length % 2) != 0) Idx++; // padd to even number of characters
                     return true;
                 case 6:
                     Host_Name = GetString(ref Idx, b);
@@ -130,10 +139,13 @@ namespace System.Net.EnIPStack.ObjectsLibrary
                     TTL_Value = GetByte(ref Idx, b);
                     return true;
                 case 9:
-                    Alloc_Control = GetByte(ref Idx, b);
-                    Reserved = GetByte(ref Idx, b);
-                    Num_Mcast = GetUInt16(ref Idx, b);
-                    Mcast_Start_Addr = GetIPAddress(ref Idx, b).ToString();
+                    Mcast_Config = new TCPIPMcastConfig
+                    {
+                        Alloc_Control = GetByte(ref Idx, b),
+                        Reserved = GetByte(ref Idx, b),
+                        Num_Mcast = GetUInt16(ref Idx, b),
+                        Mcast_Start_Addr = GetIPAddress(ref Idx, b).ToString(),
+                    };
                     return true;
             }
 

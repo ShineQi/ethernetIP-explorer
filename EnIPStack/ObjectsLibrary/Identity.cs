@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.ComponentModel;
 
 namespace System.Net.EnIPStack.ObjectsLibrary
 {
@@ -46,8 +47,17 @@ namespace System.Net.EnIPStack.ObjectsLibrary
             return base.DecodeAttr(AttrNum, ref Idx, b);
         }
     }
+
     public class CIP_Identity_instance : CIPObject
     {
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public class IdentityRevision
+        {
+            public Byte? Major_Revision { get; set; }
+            public Byte? Minor_Revision { get; set; }
+            public override string ToString() {return "";}
+        }
+
         [CIPAttributId(1)]
         public UInt16? Vendor_ID { get; set; }
         [CIPAttributId(2)]
@@ -55,15 +65,14 @@ namespace System.Net.EnIPStack.ObjectsLibrary
         [CIPAttributId(3)]
         public UInt16? Product_Code { get; set; }
         [CIPAttributId(4)]
-        public Byte? Major_Revision { get; set; }
-        [CIPAttributId(4)]
-        public Byte? Minor_Revision { get; set; }
+        public IdentityRevision Revision { get; set; }
         [CIPAttributId(5)]
         public UInt16? Status { get; set; }
         [CIPAttributId(6)]
         public UInt32? Serial_Number { get; set; }
         [CIPAttributId(7)]
         public String Product_Name { get; set; }
+
 
         public CIP_Identity_instance() { AttIdMax = 7; }
 
@@ -88,8 +97,10 @@ namespace System.Net.EnIPStack.ObjectsLibrary
                     Product_Code = GetUInt16(ref Idx, b);
                     return true;
                 case 4:
-                    Major_Revision = GetByte(ref Idx, b);
-                    Minor_Revision = GetByte(ref Idx, b);
+                    Revision = new IdentityRevision { 
+                        Major_Revision = GetByte(ref Idx, b), 
+                        Minor_Revision = GetByte(ref Idx, b) 
+                    };
                     return true;
                 case 5:
                     Status = GetUInt16(ref Idx, b);

@@ -9,23 +9,23 @@
  - Full tree view Device-Class-Instance-Attribut
  - Read & display raw data from class, instance, attribut
 
-0.1.2
+0.2.0
  - Add Single Write attribut (undecoded byte[] raw data)
 
-0.1.3
+0.3.0
  - Save&load Tree structure in a spreadsheet editable format
  - Clean device Online/Offline display
 
-0.1.4
+0.4.0
  - ForwardOpen T->O
 
-0.1.5
+0.5.0
  - Class1 sample client
  - Clean multicast & P2P ForwardOpen
 
-0.1.6
+0.6.0
+0.7.0
  - Decoding of some standard classes
 
 Roadmap
- - Forward Open O->T
- - Rawdata user selectable format ? byte, short, uhsort ... 
+ - Adds decoding class

@@ -43,11 +43,11 @@ namespace System.Net.EnIPStack.ObjectsLibrary
         [CIPAttributId(4)]
         public UInt16? Number_of_Attributes { get; set; }
         [CIPAttributId(4)]
-        public UInt16?[] Optional_Attributes { get; set; }
+        public UInt16[] Optional_Attributes { get; set; }
         [CIPAttributId(5)]
         public UInt16? Number_of_Services { get; set; }
         [CIPAttributId(5)]
-        public UInt16?[] Optional_Services { get; set; }
+        public UInt16[] Optional_Services { get; set; }
         [CIPAttributId(6)]
         public UInt16? Maximum_ID_Number_Class_Attributes { get; set; }
         [CIPAttributId(7)]
@@ -59,7 +59,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
         public CIPObjectBaseClass(string Name)
         {
             this.Name = Name;
-            AttIdMax = 3;
+            AttIdMax = 7;
         }
 
         public override string ToString()
@@ -84,18 +84,18 @@ namespace System.Net.EnIPStack.ObjectsLibrary
                     Number_of_Attributes = GetUInt16(ref Idx, b);
                     if ((Number_of_Attributes != null) && (Number_of_Attributes.Value > 0))
                     {
-                        Optional_Attributes = new UInt16?[Number_of_Attributes.Value];
+                        Optional_Attributes = new UInt16[Number_of_Attributes.Value];
                         for (int i = 0; i < Number_of_Attributes.Value; i++)
-                            Optional_Attributes[i] = GetUInt16(ref Idx, b);
+                            Optional_Attributes[i] = GetUInt16(ref Idx, b).Value;
                     }
                     return true;
                 case 5:
                     Number_of_Services = GetUInt16(ref Idx, b);
                     if ((Number_of_Services != null) && (Number_of_Services.Value > 0))
                     {
-                        Optional_Services = new UInt16?[Number_of_Services.Value];
+                        Optional_Services = new UInt16[Number_of_Services.Value];
                         for (int i = 0; i < Number_of_Services.Value; i++)
-                            Optional_Services[i] = GetUInt16(ref Idx, b);
+                            Optional_Services[i] = GetUInt16(ref Idx, b).Value;
                     }
                     return true;
                 case 6:
