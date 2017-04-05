@@ -242,4 +242,22 @@ namespace System.Net.EnIPStack
         ChangeOfState = 0x10,
         ApplicationObject = 0x20
     }
+
+    public enum CIPType : byte
+    {
+        BOOL,
+        SINT,
+        INT,
+        DINT,
+        LINT,
+        USINT,
+        UINT,
+        UDINT,
+        STRING,
+        SHORT_STRING,
+        BYTE,
+        WORD,
+        DWORD,
+        LWORD
+    }
 }

@@ -98,8 +98,8 @@ namespace System.Net.EnIPStack.ObjectsLibrary
                     return true;
                 case 4:
                     Revision = new IdentityRevision { 
-                        Major_Revision = GetByte(ref Idx, b), 
-                        Minor_Revision = GetByte(ref Idx, b) 
+                        Major_Revision = Getbyte(ref Idx, b), 
+                        Minor_Revision = Getbyte(ref Idx, b) 
                     };
                     return true;
                 case 5:

@@ -37,6 +37,7 @@ using System.Threading;
 using System.Globalization;
 using System.Net;
 using System.IO;
+using System.Net.EnIPStack.ObjectsLibrary;
 
 namespace EnIPExplorer
 {
@@ -44,6 +45,8 @@ namespace EnIPExplorer
     {
         EnIPClient client;
         EnIPNetworkStatus LastReadNetworkStatus;
+
+        Type[] UserTypeDecoders;
 
         public MainForm()
         {
@@ -67,6 +70,25 @@ namespace EnIPExplorer
             }
             else
                 tmrUpdate.Enabled = false;
+
+            // Gets all UserDecoders
+            try
+            {
+                UserTypesCompiler Compiler = new UserTypesCompiler();
+                UserTypeDecoders = Compiler.GetUserTypeDecoders();
+
+                foreach (Type t in UserTypeDecoders)
+                {
+                    ToolStripMenuItem menu=new ToolStripMenuItem(t.Name);
+                    menu.Click += new EventHandler(DecodeMenuItem_Click);
+                    menu.Tag = t;
+                    decodeAttributAsToolStripMenuItem.DropDownItems.Add(menu);
+                }
+            }
+            catch 
+            {
+                Trace.TraceError("Problem with the user type compiler");
+            }
         }
 
         // Each time we received a response to udp broadcast or udp/tcp unicast ListIdentity
@@ -202,6 +224,7 @@ namespace EnIPExplorer
                 popupAddCToolStripMenuItem.Visible = true;
                 popupAddIToolStripMenuItem.Visible = false;
                 popupAddAToolStripMenuItem.Visible = false;
+                decodeAttributAsToolStripMenuItem.Visible = false;
 
                 popupDeleteToolStripMenuItem.Text = deleteToolStripMenuItem.Text = "Delete current Device";
 
@@ -262,6 +285,7 @@ namespace EnIPExplorer
                 popupAddCToolStripMenuItem.Visible = true;
                 popupAddIToolStripMenuItem.Visible = true;
                 popupAddAToolStripMenuItem.Visible = false;
+                decodeAttributAsToolStripMenuItem.Visible = false;
                 popupDeleteToolStripMenuItem.Text = deleteToolStripMenuItem.Text = "Delete current Class";
 
             }
@@ -270,6 +294,14 @@ namespace EnIPExplorer
             {
                 // Read it from the remote devie
                 EnIPInstance Instance = (EnIPInstance)e.Node.Tag;
+
+                LastReadNetworkStatus = ReadRet = Instance.ReadDataFromNetwork();
+
+                // remove properties litse filter based on CIPAttribut
+                // in order to show all atrbiuts in the property grid
+                if (Instance.DecodedMembers != null)
+                    Instance.DecodedMembers.FilterAttribut(-1); 
+
                 LastReadNetworkStatus=ReadRet = Instance.ReadDataFromNetwork();
                 // In the Grid
                 propertyGrid.SelectedObject = Instance;
@@ -278,6 +310,7 @@ namespace EnIPExplorer
                 popupAddCToolStripMenuItem.Visible = true;
                 popupAddIToolStripMenuItem.Visible = true;
                 popupAddAToolStripMenuItem.Visible = true;
+                decodeAttributAsToolStripMenuItem.Visible = false;
                 popupDeleteToolStripMenuItem.Text = deleteToolStripMenuItem.Text = "Delete current Instance";
             }
             // It's an Attribut
@@ -285,7 +318,13 @@ namespace EnIPExplorer
             {
                 // Read it from the remote devie
                 EnIPAttribut Att = (EnIPAttribut)e.Node.Tag;
+
                 LastReadNetworkStatus=ReadRet = Att.ReadDataFromNetwork();
+
+                // filter properties list for only the given attribut
+                if (Att.DecodedMembers != null)
+                    Att.DecodedMembers.FilterAttribut(Att.Id); 
+
                 // In the Grid
                 propertyGrid.SelectedObject = Att;
                 propertyGrid.ExpandAllGridItems();
@@ -295,6 +334,7 @@ namespace EnIPExplorer
                 popupAddAToolStripMenuItem.Visible = true;
                 popupForwardToolStripMenuItem.Visible = true;
                 popuForward2ToolStripMenuItem.Visible = true;
+                decodeAttributAsToolStripMenuItem.Visible = true;
                 popupDeleteToolStripMenuItem.Text = deleteToolStripMenuItem.Text = "Delete current Attribut";
             }
 
@@ -906,6 +946,32 @@ namespace EnIPExplorer
         {
             renameCurrentNodeToolStripMenuItem_Click(null, null);
         }
+        
+        private void DecodeMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!(devicesTreeView.SelectedNode.Tag is EnIPAttribut)) return; // hoops !
+
+            EnIPAttribut attribut = (EnIPAttribut)devicesTreeView.SelectedNode.Tag;
+
+            if (sender == defaultToolStripMenuItem)
+            {
+                // sset to null, next Read will put back the default decoder
+                attribut.DecodedMembers = null;
+            }
+            else
+                if (sender == arrayOfUINTToolStripMenuItem)
+                {
+                    attribut.DecodedMembers = new CIPUInt16Array();
+                }
+                else
+                {
+                    ToolStripMenuItem menustrip=(ToolStripMenuItem)sender;
+                    attribut.DecodedMembers = (CIPObject)Activator.CreateInstance((Type)menustrip.Tag);
+                }
+
+            readAgainToolStripMenuItem_Click(null,null);
+        }
+
         #endregion
 
         private void tmrUpdate_Tick(object sender, EventArgs e)
@@ -913,7 +979,6 @@ namespace EnIPExplorer
             if (LastReadNetworkStatus == EnIPNetworkStatus.OnLine)
                 readAgainToolStripMenuItem_Click(null, null);
         }
-
 
     }
 

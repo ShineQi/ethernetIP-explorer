@@ -568,28 +568,39 @@ namespace System.Net.EnIPStack
             EnIPNetworkStatus ret = ReadDataFromNetwork(DataPath, CIPServiceCodes.GetAttributesAll);
             if (ret == EnIPNetworkStatus.OnLine)
             {
-                CIPObjectLibrary classid = (CIPObjectLibrary)myClass.Id;
-                try
-                {
-                    if (DecodedMembers == null)
-                    {
-                        if (DecoderClass == null)
+                if (DecodedMembers == null)
+                    if (AttachDecoderClass()==true)
+                        try
                         {
-                            var o = Activator.CreateInstance(Assembly.GetExecutingAssembly().FullName, "System.Net.EnIPStack.ObjectsLibrary.CIP_" + classid.ToString() + "_instance");
-                            DecodedMembers = (CIPObject)o.Unwrap();
+                            DecodedMembers.SetRawBytes(RawData);
                         }
-                        else
-                        {
-                            var o = Activator.CreateInstance(DecoderClass);
-                            DecodedMembers = (CIPObject)o;
-
-                        }
-                    }
-                    DecodedMembers.SetRawBytes(RawData);
-                }
-                catch { }
+                        catch { }
             }
             return ret;
+        }
+
+        public bool AttachDecoderClass()
+        {
+            CIPObjectLibrary classid = (CIPObjectLibrary)myClass.Id;
+            try
+            {
+                    if (DecoderClass == null)
+                    {
+                        var o = Activator.CreateInstance(Assembly.GetExecutingAssembly().FullName, "System.Net.EnIPStack.ObjectsLibrary.CIP_" + classid.ToString() + "_instance");
+                        DecodedMembers = (CIPObject)o.Unwrap();
+                    }
+                    else
+                    {
+                        var o = Activator.CreateInstance(DecoderClass);
+                        DecodedMembers = (CIPObject)o;
+
+                    }
+                    return true;
+            }
+            catch { }
+
+            return false;
+
         }
 
         public EnIPNetworkStatus GetClassInstanceAttributList()
@@ -660,20 +671,12 @@ namespace System.Net.EnIPStack
                 CIPObjectLibrary classid = (CIPObjectLibrary)myInstance.myClass.Id;
                 try
                 {
-                    if (DecodedMembers == null)
+                    if (DecodedMembers == null) // No decoder
                     {
-                        if (myInstance.DecoderClass == null)
-                        {
+                        if (myInstance.DecodedMembers == null)
+                            myInstance.AttachDecoderClass();
 
-                            var o = Activator.CreateInstance(Assembly.GetExecutingAssembly().FullName, "System.Net.EnIPStack.ObjectsLibrary.CIP_" + classid.ToString() + "_instance");
-                            DecodedMembers = (CIPObject)o.Unwrap();
-                        }
-                        else
-                        {
-                            var o = Activator.CreateInstance(myInstance.DecoderClass);
-                            DecodedMembers = (CIPObject)o;
-                        }
-                        DecodedMembers.FilterAttribut(Id);
+                        DecodedMembers = myInstance.DecodedMembers; // get the same object as the associated Instance
                     }
                     int Idx = 0;
                     DecodedMembers.DecodeAttr(Id, ref Idx, RawData);

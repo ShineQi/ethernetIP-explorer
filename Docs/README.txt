@@ -57,6 +57,9 @@
 		- RawByte data could be modified at this level, and are sent to the 
 		  remote device (change a value then hit Enter key).
 		- F3 key will refresh the values.
+		- Decoder could be the default (depending of the class & attribut n°),
+		  or a standard default of UINT, or a user defined : see Option menu.
+		  The decoder can be changed using the context popupmenu.
 	2.5 Advise : ForwardOpen T->O
 		- On attributs one could place a ForwardOpen T->O (Device to EnIPExplorer).
 		  If accepted, the Class 1 device (Plc or other) will send back 

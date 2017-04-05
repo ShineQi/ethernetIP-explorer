@@ -136,13 +136,13 @@ namespace System.Net.EnIPStack.ObjectsLibrary
                     }
                     return true;
                 case 8:
-                    TTL_Value = GetByte(ref Idx, b);
+                    TTL_Value = Getbyte(ref Idx, b);
                     return true;
                 case 9:
                     Mcast_Config = new TCPIPMcastConfig
                     {
-                        Alloc_Control = GetByte(ref Idx, b),
-                        Reserved = GetByte(ref Idx, b),
+                        Alloc_Control = Getbyte(ref Idx, b),
+                        Reserved = Getbyte(ref Idx, b),
                         Num_Mcast = GetUInt16(ref Idx, b),
                         Mcast_Start_Addr = GetIPAddress(ref Idx, b).ToString(),
                     };

@@ -66,14 +66,14 @@ namespace System.Net.EnIPStack.ObjectsLibrary
             return true;
         }
 
-        public bool? GetBool(ref int Idx, byte[] buf)
+        public bool? Getbool(ref int Idx, byte[] buf)
         {
             if (buf.Length < Idx) return null;
             var ret = (buf[Idx] == 1);
             Idx+=1;
             return ret;
         }
-        public byte? GetByte(ref int Idx, byte[] buf)
+        public byte? Getbyte(ref int Idx, byte[] buf)
         {
             if (buf.Length < Idx) return null;
             var ret = buf[Idx];
@@ -101,7 +101,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
             Idx += 8;
             return ret;
         }
-        public sbyte? GetSByte(ref int Idx, byte[] buf)
+        public sbyte? Getsbyte(ref int Idx, byte[] buf)
         {
             if (buf.Length < Idx) return null;
             var ret = (sbyte) buf[Idx];
@@ -143,7 +143,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
         }
         public String GetShortString(ref int Idx, byte[] buf)
         {
-            Byte? t = GetByte(ref Idx, buf);
+            Byte? t = Getbyte(ref Idx, buf);
             if ((t != null) && (buf.Length >= Idx + t.Value))
             {
                 Encoding iso = Encoding.GetEncoding("ISO-8859-1");
@@ -260,6 +260,8 @@ namespace System.Net.EnIPStack.ObjectsLibrary
                     if ((a as CIPAttributId).Id == FilteredAttribut)
                         propsfiltered.Add(p);
                 }
+                else
+                    propsfiltered.Add(p); // leave also all not tagged properties
             }
             return new PropertyDescriptorCollection(propsfiltered.ToArray());
         }

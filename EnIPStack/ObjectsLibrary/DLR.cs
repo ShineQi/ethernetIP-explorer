@@ -61,10 +61,10 @@ namespace System.Net.EnIPStack.ObjectsLibrary
             switch (AttrNum)
             {
                 case 1:
-                    Network_Topology = GetByte(ref Idx, b);
+                    Network_Topology = Getbyte(ref Idx, b);
                     return true;
                 case 2:
-                    Network_Status = GetByte(ref Idx, b);
+                    Network_Status = Getbyte(ref Idx, b);
                     return true;
                 case 3:
                     Active_Supervisor_IPAddress = GetIPAddress(ref Idx, b).ToString();

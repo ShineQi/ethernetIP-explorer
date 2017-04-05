@@ -26,6 +26,7 @@
 0.6.0
 0.7.0
  - Decoding of some standard classes
+ - User defined Attribut decoders
 
 Roadmap
  - Adds decoding class

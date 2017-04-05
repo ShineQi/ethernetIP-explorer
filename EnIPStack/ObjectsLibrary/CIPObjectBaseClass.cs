@@ -109,4 +109,40 @@ namespace System.Net.EnIPStack.ObjectsLibrary
             return false;
         }
     }
+
+    // Only used for Attribut decoding
+    public class CIPUInt16Array : CIPObject
+    {
+        public UInt16[] UINT { get; set; }
+
+        public override string ToString() { return ""; }
+
+        public override bool DecodeAttr(int AttrNum, ref int Idx, byte[] b)
+        {
+            UINT=new UInt16[b.Length>>1];
+
+            for (int i = 0; i < UINT.Length; i++)
+                UINT[i] = GetUInt16(ref Idx, b).Value;
+
+            if (b.Length > UINT.Length * 2)
+            {
+                Remain_Undecoded_Bytes = new byte[1];
+                Remain_Undecoded_Bytes[0] = b[Idx];
+            }
+
+            return true;
+        }
+    }
+
+    // Only used to fill the Remain_Undecoded_Bytes
+    public class CIPBaseUserDecoder : CIPObject
+    {
+        public override string ToString() { return ""; }
+        protected void Finish(int Idx, byte[] b)
+        {
+            Remain_Undecoded_Bytes=new byte[b.Length-Idx];
+            for (int i = 0; i < Remain_Undecoded_Bytes.Length; i++)
+                Remain_Undecoded_Bytes[i] = b[Idx++];
+        }
+    }
 }

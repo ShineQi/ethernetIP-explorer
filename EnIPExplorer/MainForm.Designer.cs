@@ -39,6 +39,10 @@
             this.popupAddCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.popupAddIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.popupAddAToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.decodeAttributAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.defaultToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.arrayOfUINTToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.popupForwardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.popupMulticastToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.popupP2PToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -72,6 +76,7 @@
             this.addInstanceAttributToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editAttributsDecodersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -149,10 +154,11 @@
             this.popupAddCToolStripMenuItem,
             this.popupAddIToolStripMenuItem,
             this.popupAddAToolStripMenuItem,
+            this.decodeAttributAsToolStripMenuItem,
             this.popupForwardToolStripMenuItem,
             this.popuForward2ToolStripMenuItem});
             this.MenuPopup.Name = "MenuPopup";
-            this.MenuPopup.Size = new System.Drawing.Size(241, 158);
+            this.MenuPopup.Size = new System.Drawing.Size(241, 180);
             // 
             // popupDeleteToolStripMenuItem
             // 
@@ -193,6 +199,36 @@
             this.popupAddAToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.popupAddAToolStripMenuItem.Text = "Add Attribut";
             this.popupAddAToolStripMenuItem.Click += new System.EventHandler(this.popupAddAToolStripMenuItem_Click);
+            // 
+            // decodeAttributAsToolStripMenuItem
+            // 
+            this.decodeAttributAsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.defaultToolStripMenuItem,
+            this.arrayOfUINTToolStripMenuItem,
+            this.toolStripSeparator3});
+            this.decodeAttributAsToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.text_dropcaps;
+            this.decodeAttributAsToolStripMenuItem.Name = "decodeAttributAsToolStripMenuItem";
+            this.decodeAttributAsToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.decodeAttributAsToolStripMenuItem.Text = "Decode Attribut as";
+            // 
+            // defaultToolStripMenuItem
+            // 
+            this.defaultToolStripMenuItem.Name = "defaultToolStripMenuItem";
+            this.defaultToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.defaultToolStripMenuItem.Text = "Default";
+            this.defaultToolStripMenuItem.Click += new System.EventHandler(this.DecodeMenuItem_Click);
+            // 
+            // arrayOfUINTToolStripMenuItem
+            // 
+            this.arrayOfUINTToolStripMenuItem.Name = "arrayOfUINTToolStripMenuItem";
+            this.arrayOfUINTToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.arrayOfUINTToolStripMenuItem.Text = "Array of UINT";
+            this.arrayOfUINTToolStripMenuItem.Click += new System.EventHandler(this.DecodeMenuItem_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(149, 6);
             // 
             // popupForwardToolStripMenuItem
             // 
@@ -486,7 +522,8 @@
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.settingsToolStripMenuItem});
+            this.settingsToolStripMenuItem,
+            this.editAttributsDecodersToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.optionsToolStripMenuItem.Text = "Options";
@@ -495,9 +532,16 @@
             // 
             this.settingsToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.application_form;
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
             this.settingsToolStripMenuItem.Text = "Settings";
             this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
+            // 
+            // editAttributsDecodersToolStripMenuItem
+            // 
+            this.editAttributsDecodersToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.text_dropcaps;
+            this.editAttributsDecodersToolStripMenuItem.Name = "editAttributsDecodersToolStripMenuItem";
+            this.editAttributsDecodersToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.editAttributsDecodersToolStripMenuItem.Text = "Edit User Attributs Decoders";
             // 
             // helpToolStripMenuItem
             // 
@@ -607,6 +651,11 @@
         private System.Windows.Forms.ToolStripMenuItem sendForwardOpenTOToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem popuForward2ToolStripMenuItem;
         private System.Windows.Forms.Timer tmrUpdate;
+        private System.Windows.Forms.ToolStripMenuItem decodeAttributAsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem defaultToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem arrayOfUINTToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem editAttributsDecodersToolStripMenuItem;
     }
 }
 

@@ -154,13 +154,13 @@ namespace System.Net.EnIPStack.ObjectsLibrary
                     Forced_Interface_Speed = GetUInt16(ref Idx, b);
                     return true;
                 case 7:
-                    Interface_Type = GetByte(ref Idx, b);
+                    Interface_Type = Getbyte(ref Idx, b);
                     return true;
                 case 8:
-                    Interface_State = GetByte(ref Idx, b);
+                    Interface_State = Getbyte(ref Idx, b);
                     return true;
                 case 9:
-                    Admin_State = GetByte(ref Idx, b);
+                    Admin_State = Getbyte(ref Idx, b);
                     return true;
                 case 10:
                     Interface_Label = GetShortString(ref Idx, b);
