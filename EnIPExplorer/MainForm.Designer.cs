@@ -542,6 +542,7 @@
             this.editAttributsDecodersToolStripMenuItem.Name = "editAttributsDecodersToolStripMenuItem";
             this.editAttributsDecodersToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
             this.editAttributsDecodersToolStripMenuItem.Text = "Edit User Attributs Decoders";
+            this.editAttributsDecodersToolStripMenuItem.Click += new System.EventHandler(this.editAttributsDecodersToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 

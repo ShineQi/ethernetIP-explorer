@@ -110,12 +110,22 @@ namespace System.Net.EnIPStack.ObjectsLibrary
         }
     }
 
+    // Only used to fill the Remain_Undecoded_Bytes
+    public class CIPBaseUserDecoder : CIPObject
+    {
+        public override string ToString() { return ""; }
+        protected void Finish(int Idx, byte[] b)
+        {
+            Remain_Undecoded_Bytes = new byte[b.Length - Idx];
+            for (int i = 0; i < Remain_Undecoded_Bytes.Length; i++)
+                Remain_Undecoded_Bytes[i] = b[Idx++];
+        }
+    }
+
     // Only used for Attribut decoding
-    public class CIPUInt16Array : CIPObject
+    public class CIPUInt16Array : CIPBaseUserDecoder
     {
         public UInt16[] UINT { get; set; }
-
-        public override string ToString() { return ""; }
 
         public override bool DecodeAttr(int AttrNum, ref int Idx, byte[] b)
         {
@@ -124,25 +134,10 @@ namespace System.Net.EnIPStack.ObjectsLibrary
             for (int i = 0; i < UINT.Length; i++)
                 UINT[i] = GetUInt16(ref Idx, b).Value;
 
-            if (b.Length > UINT.Length * 2)
-            {
-                Remain_Undecoded_Bytes = new byte[1];
-                Remain_Undecoded_Bytes[0] = b[Idx];
-            }
-
+            Idx = UINT.Length * 2;
+            Finish(Idx, b);
             return true;
         }
     }
 
-    // Only used to fill the Remain_Undecoded_Bytes
-    public class CIPBaseUserDecoder : CIPObject
-    {
-        public override string ToString() { return ""; }
-        protected void Finish(int Idx, byte[] b)
-        {
-            Remain_Undecoded_Bytes=new byte[b.Length-Idx];
-            for (int i = 0; i < Remain_Undecoded_Bytes.Length; i++)
-                Remain_Undecoded_Bytes[i] = b[Idx++];
-        }
-    }
 }

@@ -59,7 +59,7 @@
 		- F3 key will refresh the values.
 		- Decoder could be the default (depending of the class & attribut n°),
 		  or a standard default of UINT, or a user defined : see Option menu.
-		  The decoder can be changed using the context popupmenu.
+		  The decoder can be changed using the context popupmenu (see §2.8).
 	2.5 Advise : ForwardOpen T->O
 		- On attributs one could place a ForwardOpen T->O (Device to EnIPExplorer).
 		  If accepted, the Class 1 device (Plc or other) will send back 
@@ -77,6 +77,22 @@
 		  difference appears. The names coming from the file are the winners.
 		- Several files could be open successively, the content are added.
 		- Save is not automatic, but must be done by hand.
+	2.8 User Decoders for Attributs
+		- Attributs could be decoded using a simple editor. A right click
+		  on an attribut shows a popup with an item "Decode Attribut As". 
+		  The list is build with the file saved using the TypeEditor present in
+		  the top level Menu : "Option"-"Edit User ....".
+		- The editor Grid could be filled with the description of the user types.
+		  Looks the default types and do it yourself for new one. Insert key can
+		  be used to add new lines, Delete key also after selecting the full line.
+		  Type name should be unique, field name in it's type also.
+		  The number of user types is not limited.
+		- To avoid compiler errors, names should respect something like described
+		  in http://www.c4learn.com/c-programming/c-variable-nameing-rules/
+		  Basicaly with the editor, names are +-checked before validation (but
+		  not unicity).
+		  You can also modify the file using a text editor or a programmed code. 
+		  The format isn't too complex to be infers. It must be strictly respected.
 
 3.  SETTINGS OPTIONS
 	3.1 TCP_LAN_Timeout & TCP_WAN_Timeout

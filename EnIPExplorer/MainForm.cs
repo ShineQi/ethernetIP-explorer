@@ -47,6 +47,7 @@ namespace EnIPExplorer
         EnIPNetworkStatus LastReadNetworkStatus;
 
         Type[] UserTypeDecoders;
+        List<UserType> UserTypeList;
 
         public MainForm()
         {
@@ -71,21 +72,32 @@ namespace EnIPExplorer
             else
                 tmrUpdate.Enabled = false;
 
+            
+            UserDecoderMgmt();
+        }
+
+        void UserDecoderMgmt()
+        {
+            // Remove all dynamic elements
+            for (int i = decodeAttributAsToolStripMenuItem.DropDownItems.Count-1; i > 2; i--)
+                decodeAttributAsToolStripMenuItem.DropDownItems.RemoveAt(i);
             // Gets all UserDecoders
             try
             {
+                UserTypeList = UserType.LoadUserTypes(Properties.Settings.Default.UserAttributsDecodersFile);
+
                 UserTypesCompiler Compiler = new UserTypesCompiler();
-                UserTypeDecoders = Compiler.GetUserTypeDecoders();
+                UserTypeDecoders = Compiler.GetUserTypeDecoders(UserTypeList);
 
                 foreach (Type t in UserTypeDecoders)
                 {
-                    ToolStripMenuItem menu=new ToolStripMenuItem(t.Name);
+                    ToolStripMenuItem menu = new ToolStripMenuItem(t.Name);
                     menu.Click += new EventHandler(DecodeMenuItem_Click);
                     menu.Tag = t;
                     decodeAttributAsToolStripMenuItem.DropDownItems.Add(menu);
                 }
             }
-            catch 
+            catch
             {
                 Trace.TraceError("Problem with the user type compiler");
             }
@@ -386,12 +398,14 @@ namespace EnIPExplorer
                          {
                              string[] local_endpoints = GetAvailableIps();
                              o.Items.AddRange(local_endpoints);
+                             o.Text = Properties.Settings.Default.DefaultIPInterface;
                          });
 
                 DialogResult res = Input.ShowDialog();
 
                 if (res != DialogResult.OK) return;
                 String userinput = Input.genericInput.Text;
+                Properties.Settings.Default.DefaultIPInterface = userinput;
 
                 try
                 {
@@ -708,7 +722,7 @@ namespace EnIPExplorer
         {
             TreeNode tn= devicesTreeView.SelectedNode;
 
-            if (!(tn.Tag is EnIPCIPObject)) return;
+            if ((devicesTreeView.SelectedNode==null)||(!(tn.Tag is EnIPCIPObject))) return;
 
             var Input =
                 new GenericInputBox<TextBox>("Rename", "New name",
@@ -754,7 +768,7 @@ namespace EnIPExplorer
                 Trace.WriteLine("ForwardOpen T->O OK, good luck with Wireshark or Class1 client sample source code");
 
         }
-
+        // Menu Item
         private void sendForwardOpenTOToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (!(propertyGrid.SelectedObject is EnIPAttribut)) return;
@@ -913,7 +927,16 @@ namespace EnIPExplorer
             }
 
         }
+        // Menu Item
+        private void editAttributsDecodersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DecoderEditor editor = new DecoderEditor(UserTypeList);
+            DialogResult result=editor.ShowDialog();
 
+            if (result == DialogResult.OK)
+                UserDecoderMgmt();
+            
+        }
         // Remove the Log content
         private void LogText_MouseDoubleClick(object sender, MouseEventArgs e)
         {
@@ -949,7 +972,8 @@ namespace EnIPExplorer
         
         private void DecodeMenuItem_Click(object sender, EventArgs e)
         {
-            if (!(devicesTreeView.SelectedNode.Tag is EnIPAttribut)) return; // hoops !
+            if ((devicesTreeView.SelectedNode==null) ||
+             (!(devicesTreeView.SelectedNode.Tag is EnIPAttribut))) return; // hoops !
 
             EnIPAttribut attribut = (EnIPAttribut)devicesTreeView.SelectedNode.Tag;
 

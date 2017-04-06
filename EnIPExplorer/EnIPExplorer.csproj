@@ -79,6 +79,12 @@
     <Compile Include="..\EnIPStack\ObjectsLibrary\TCPIPInterface.cs">
       <Link>ObjectsLibrary\TCPIPInterface.cs</Link>
     </Compile>
+    <Compile Include="DecoderEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DecoderEditor.Designer.cs">
+      <DependentUpon>DecoderEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="GenericInputBox.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -95,6 +101,9 @@
       <DependentUpon>SettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="UserTypesCompiler.cs" />
+    <EmbeddedResource Include="DecoderEditor.resx">
+      <DependentUpon>DecoderEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -131,6 +140,9 @@
       <Link>README.txt</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="UserAttributsDecoders.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="ico\cross.png" />
     <None Include="ico\add.png" />
     <None Include="ico\application_form.png" />

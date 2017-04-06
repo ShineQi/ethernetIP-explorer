@@ -178,5 +178,41 @@ namespace EnIPExplorer.Properties {
                 this["PeriodicUpdateRate"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("UserAttributsDecoders.txt")]
+        public string UserAttributsDecodersFile {
+            get {
+                return ((string)(this["UserAttributsDecodersFile"]));
+            }
+            set {
+                this["UserAttributsDecodersFile"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SettingDefault {
+            get {
+                return ((string)(this["SettingDefault"]));
+            }
+            set {
+                this["SettingDefault"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string DefaultIPInterface {
+            get {
+                return ((string)(this["DefaultIPInterface"]));
+            }
+            set {
+                this["DefaultIPInterface"] = value;
+            }
+        }
     }
 }

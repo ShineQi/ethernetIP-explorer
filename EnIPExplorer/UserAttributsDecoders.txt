@@ -1,0 +1,10 @@
+MyInputs_4_100_3
+PV;UINT
+Frequency;UINT
+Voltage;UINT
+Intensity;UINT
+ActivePower;UINT
+MyOutputs_4_150_3
+SP;UINT
+Relay;BOOL
+Ack;BOOL
