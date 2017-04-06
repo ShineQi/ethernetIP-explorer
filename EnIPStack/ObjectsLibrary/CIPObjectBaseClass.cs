@@ -114,11 +114,19 @@ namespace System.Net.EnIPStack.ObjectsLibrary
     public class CIPBaseUserDecoder : CIPObject
     {
         public override string ToString() { return ""; }
-        protected void Finish(int Idx, byte[] b)
+        protected void FinishDecode(int Idx, byte[] b)
         {
-            Remain_Undecoded_Bytes = new byte[b.Length - Idx];
-            for (int i = 0; i < Remain_Undecoded_Bytes.Length; i++)
-                Remain_Undecoded_Bytes[i] = b[Idx++];
+            if ((b.Length - Idx) > 0)
+            {
+                Remain_Undecoded_Bytes = new byte[b.Length - Idx];
+                for (int i = 0; i < Remain_Undecoded_Bytes.Length; i++)
+                    Remain_Undecoded_Bytes[i] = b[Idx++];
+            }
+        }
+        protected void FinishEncode(int Idx, byte[] b)
+        {
+            if (Idx < b.Length)
+                Array.Copy(Remain_Undecoded_Bytes, 0, b, Idx, Remain_Undecoded_Bytes.Length);
         }
     }
 
@@ -135,7 +143,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
                 UINT[i] = GetUInt16(ref Idx, b).Value;
 
             Idx = UINT.Length * 2;
-            Finish(Idx, b);
+            FinishDecode(Idx, b);
             return true;
         }
     }

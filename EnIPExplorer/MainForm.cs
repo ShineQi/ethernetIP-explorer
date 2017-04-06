@@ -546,8 +546,19 @@ namespace EnIPExplorer
                 tnI.Tag = instance;
                 tnI.ToolTipText = "Node " +cl.Id.ToString()+"."+ Id.ToString();
 
+                // speed me ... automatic add Attribut 3 (Data - Array of Bytes) to all Assembly instances
+                if (cl.Id == (ushort)CIPObjectLibrary.Assembly)
+                {
+                    EnIPAttribut att = new EnIPAttribut(instance, 3);
+                    TreeNode tnI2 = new TreeNode("Attribut #3", 10, 10);
+                    tnI2.Tag = att;
+                    tnI2.ToolTipText = "Node " + cl.Id + "." + instance.Id.ToString() + ".3";
+                    tnI.Nodes.Add(tnI2);
+                }
+
                 tn.Nodes.Add(tnI);
                 tn.Expand();
+                tnI.Expand();
             }
 
         }
@@ -634,7 +645,21 @@ namespace EnIPExplorer
                     Trace.WriteLine("Write OK");
             }
             else
-                Trace.WriteLine("Modifications are not taken into account at this level");
+                if ((e.ChangedItem.Parent != null) && (e.ChangedItem.Parent.Label == "DecodedMembers") && (devicesTreeView.SelectedNode.Tag is EnIPAttribut))
+                {
+                    EnIPAttribut v = (EnIPAttribut)devicesTreeView.SelectedNode.Tag;
+                    if (v.EncodeFromDecodedMembers() == true) // encoding is done into the previous RawByte (and same size)
+                    {
+                        if (v.WriteDataToNetwork() == EnIPNetworkStatus.OnLine)
+                            Trace.WriteLine("Write OK");
+                    }
+                    else
+                        Trace.WriteLine("Encoding not allow here or error during the encoding process, nothing written");
+                }
+                else
+                    Trace.WriteLine("Modifications are not taken into account here");
+
+            readAgainToolStripMenuItem_Click(null,null);
         }
 
         // Menu Item

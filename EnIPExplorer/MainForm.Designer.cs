@@ -214,21 +214,21 @@
             // defaultToolStripMenuItem
             // 
             this.defaultToolStripMenuItem.Name = "defaultToolStripMenuItem";
-            this.defaultToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.defaultToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.defaultToolStripMenuItem.Text = "Default";
             this.defaultToolStripMenuItem.Click += new System.EventHandler(this.DecodeMenuItem_Click);
             // 
             // arrayOfUINTToolStripMenuItem
             // 
             this.arrayOfUINTToolStripMenuItem.Name = "arrayOfUINTToolStripMenuItem";
-            this.arrayOfUINTToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.arrayOfUINTToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.arrayOfUINTToolStripMenuItem.Text = "Array of UINT";
             this.arrayOfUINTToolStripMenuItem.Click += new System.EventHandler(this.DecodeMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(143, 6);
             // 
             // popupForwardToolStripMenuItem
             // 

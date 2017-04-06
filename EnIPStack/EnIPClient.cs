@@ -444,6 +444,7 @@ namespace System.Net.EnIPStack
         public byte[] RawData { get; set; }
 
         public abstract EnIPNetworkStatus ReadDataFromNetwork();
+        public virtual bool EncodeFromDecodedMembers() { return false; } // Encode the existing RawData with the decoded membrer (maybe modified)
         public abstract EnIPNetworkStatus WriteDataToNetwork();
 
         public EnIPRemoteDevice RemoteDevice;
@@ -654,6 +655,27 @@ namespace System.Net.EnIPStack
             this.myInstance = Instance;
             this.RemoteDevice = Instance.RemoteDevice;
             Status = EnIPNetworkStatus.OffLine;
+        }
+        
+        public override bool EncodeFromDecodedMembers() 
+        {
+            byte[] NewRaw = new byte[RawData.Length];
+
+            try
+            {
+                int Idx=0;
+                if (DecodedMembers.EncodeAttr(Id, ref Idx, NewRaw) == true)
+                {
+                    RawData = NewRaw;
+                    return true;
+                }
+                else
+                    return false;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public override EnIPNetworkStatus WriteDataToNetwork()

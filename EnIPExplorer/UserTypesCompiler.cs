@@ -150,10 +150,14 @@ namespace EnIPExplorer
             "byte",
             "UInt16",
             "UInt32",
-            "UInt64"
+            "UInt64",
+            "Single",
+            "Double"
         };
 
         // Compile the code provided as string, and give all the user Type ready to be used
+        // only usable at the 1 Attribut level for encoding and decoding
+        // cannot be used for instance encodind/decoding
         Type[] Compile(string code)
         {
             CSharpCodeProvider provider = new CSharpCodeProvider();
@@ -208,6 +212,7 @@ namespace EnIPExplorer
 
                 // The only method DecodeAttr
                 StringBuilder DecodeAttrMethod = new StringBuilder("public override bool DecodeAttr(int AttrNum, ref int Idx, byte[] b){");
+                StringBuilder EncodeAttrMethod = new StringBuilder("public override bool EncodeAttr(int AttrNum, ref int Idx, byte[] b){");
 
                 foreach (UserAttribut ua in t.Lattr)
                 {
@@ -215,16 +220,27 @@ namespace EnIPExplorer
                     sb.Append("public " + CIPType2dotNET[(byte)ua.type] + "? " + GetName(ua.name, provider) + " " + "{ get; set; }");
                     
                     // property decoding such as MyField=GetUInt16(ref Idx, b);
+                    // property encoding such as SetUInt16(ref Idx, b, MyField);
                     if (ua.type == CIPType.SHORT_STRING)
+                    {
                         DecodeAttrMethod.Append(ua.name + "=GetShortString(ref Idx, b);");
+                        EncodeAttrMethod.Append("SetShortString(ref Idx, b," + ua.name + ");");
+                    }
                     else
-                        DecodeAttrMethod.Append(ua.name + "=Get"+CIPType2dotNET[(byte)ua.type]+"(ref Idx, b);");
+                    {
+                        DecodeAttrMethod.Append(ua.name + "=Get" + CIPType2dotNET[(byte)ua.type] + "(ref Idx, b);");
+                        EncodeAttrMethod.Append("Set"+CIPType2dotNET[(byte)ua.type]+"(ref Idx, b," + ua.name + ");");
+                    }
+
                 }
 
                 // call to the Finish base class method & return
-                DecodeAttrMethod.Append("Finish(Idx,b);return true;}"); // end method
+                DecodeAttrMethod.Append("FinishDecode(Idx,b);return true;}"); // end method
+                EncodeAttrMethod.Append("FinishEncode(Idx,b);return true;}"); // end method
 
                 sb.Append(DecodeAttrMethod);
+                sb.Append(EncodeAttrMethod);
+
                 sb.Append("}"); // closing class
             }
 

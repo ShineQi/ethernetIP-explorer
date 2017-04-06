@@ -258,6 +258,8 @@ namespace System.Net.EnIPStack
         BYTE,
         WORD,
         DWORD,
-        LWORD
+        LWORD,
+        REAL,
+        LREAL
     }
 }
