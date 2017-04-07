@@ -347,7 +347,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
                         Remain_Undecoded_Bytes_Prop = p;
                     else
                         reordered[i++]=p;
-                reordered[i]=Remain_Undecoded_Bytes_Prop;
+                reordered[i] = Remain_Undecoded_Bytes_Prop;
 
                 return new PropertyDescriptorCollection(reordered);
             }
@@ -362,7 +362,9 @@ namespace System.Net.EnIPStack.ObjectsLibrary
                         propsfiltered.Add(p);
                 }
                 else
+                {
                     propsfiltered.Add(p); // leave also all not tagged properties
+                }
             }
             return new PropertyDescriptorCollection(propsfiltered.ToArray());
         }

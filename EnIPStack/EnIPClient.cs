@@ -688,7 +688,7 @@ namespace System.Net.EnIPStack
         {
             byte[] DataPath = EnIPPath.GetPath(myInstance.myClass.Id, myInstance.Id, Id);
             EnIPNetworkStatus ret = ReadDataFromNetwork(DataPath, CIPServiceCodes.GetAttributeSingle);
-            if (ret == EnIPNetworkStatus.OnLine)
+           // if (ret == EnIPNetworkStatus.OnLine)
             {
                 CIPObjectLibrary classid = (CIPObjectLibrary)myInstance.myClass.Id;
                 try
@@ -701,6 +701,7 @@ namespace System.Net.EnIPStack
                         DecodedMembers = myInstance.DecodedMembers; // get the same object as the associated Instance
                     }
                     int Idx = 0;
+                    RawData = new byte[11];
                     DecodedMembers.DecodeAttr(Id, ref Idx, RawData);
                 }
                 catch { }

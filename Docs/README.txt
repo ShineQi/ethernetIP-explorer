@@ -54,8 +54,8 @@
 		- F3 key will refresh the values.	
 	2.4 Attribut data (Read & Write)
 		- With the shortcut key CTRL-A, same behaviour as §2.2 and $2.3
-		- RawByte data could be modified at this level, and are sent to the 
-		  remote device (change a value then hit Enter key).
+		- RawByte & Decoded (with user decoder) data could be modified and are
+		  sent to the remote device (change a value then hit Enter key).
 		- F3 key will refresh the values.
 		- Decoder could be the default (depending of the class & attribut n°),
 		  or a standard default of UINT, or a user defined : see Option menu.

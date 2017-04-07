@@ -25,10 +25,9 @@ see TCPIPInterface
 	CIP_TCPIPInterface_instance : CIPObject
 		see attribut 4 with 2 fields without structure (flat)
 
-Sends me classes to be added : 
+Send me classes to be added : 
 	Names must be CIP_xxxx_class & CIP_xxxx_instance where xxxx
 	is the exact name found in the CIPObjectLibrary enumeration
 	Takes care to identify each attribut [CIPAttributId(xxx)]
 	according to the standard.
 
-There is a way to add proprietary classes decoders in externals dll.

@@ -113,7 +113,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
     // Only used to fill the Remain_Undecoded_Bytes
     public class CIPBaseUserDecoder : CIPObject
     {
-        public override string ToString() { return ""; }
+        public override string ToString() { return GetType().Name; }
         protected void FinishDecode(int Idx, byte[] b)
         {
             if ((b.Length - Idx) > 0)

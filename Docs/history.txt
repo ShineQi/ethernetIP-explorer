@@ -28,5 +28,8 @@
  - Decoding of some standard classes
  - User defined Attribut decoders
 
+0.8.0
+ - Write attributs using the user decoders
+
 Roadmap
  - Adds decoding class

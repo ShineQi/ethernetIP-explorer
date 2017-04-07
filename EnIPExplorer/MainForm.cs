@@ -797,7 +797,14 @@ namespace EnIPExplorer
         private void sendForwardOpenTOToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (!(propertyGrid.SelectedObject is EnIPAttribut)) return;
+
             EnIPAttribut att = (EnIPAttribut)propertyGrid.SelectedObject;
+
+            if (att.RemoteDevice.VendorId==40)
+                if (MessageBox.Show("Wago PLC, do it at your own risk,\r\n this action could destroy it,\r\n Cancel please it's better", "Takes care", MessageBoxButtons.OKCancel, MessageBoxIcon.Question)
+                    == DialogResult.Cancel) return;
+
+
             int Duration = Properties.Settings.Default.ForwardOpenDuration_s;
             if (Duration <= 0) Duration = 1;
             if (Duration > 60) Duration = 60;

@@ -207,10 +207,10 @@ namespace EnIPExplorer
 
             foreach (UserType t in Ltype)
             {
-                // Type -> class subclassof CIPBaseUserDecoder such as : class Myclass:CIPBaseUserDecoder
+                // Type -> class subclassof CIPBaseUserDecoder such as : public class Myclass:CIPBaseUserDecoder
                 sb.Append("public class " + GetName(t.name,provider) + ":CIPBaseUserDecoder{");
 
-                // The only method DecodeAttr
+                // Two methods for encoding & decoding
                 StringBuilder DecodeAttrMethod = new StringBuilder("public override bool DecodeAttr(int AttrNum, ref int Idx, byte[] b){");
                 StringBuilder EncodeAttrMethod = new StringBuilder("public override bool EncodeAttr(int AttrNum, ref int Idx, byte[] b){");
 
