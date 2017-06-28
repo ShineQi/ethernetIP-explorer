@@ -197,7 +197,7 @@
             this.popupAddAToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.bullet_purple;
             this.popupAddAToolStripMenuItem.Name = "popupAddAToolStripMenuItem";
             this.popupAddAToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
-            this.popupAddAToolStripMenuItem.Text = "Add Attribut";
+            this.popupAddAToolStripMenuItem.Text = "Add Attribute";
             this.popupAddAToolStripMenuItem.Click += new System.EventHandler(this.popupAddAToolStripMenuItem_Click);
             // 
             // decodeAttributAsToolStripMenuItem
@@ -209,7 +209,7 @@
             this.decodeAttributAsToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.text_dropcaps;
             this.decodeAttributAsToolStripMenuItem.Name = "decodeAttributAsToolStripMenuItem";
             this.decodeAttributAsToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
-            this.decodeAttributAsToolStripMenuItem.Text = "Decode Attribut as";
+            this.decodeAttributAsToolStripMenuItem.Text = "Decode Attribute as";
             // 
             // defaultToolStripMenuItem
             // 
@@ -516,7 +516,7 @@
             this.addInstanceAttributToolStripMenuItem.Name = "addInstanceAttributToolStripMenuItem";
             this.addInstanceAttributToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
             this.addInstanceAttributToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
-            this.addInstanceAttributToolStripMenuItem.Text = "Add Attribut";
+            this.addInstanceAttributToolStripMenuItem.Text = "Add Attribute";
             this.addInstanceAttributToolStripMenuItem.Click += new System.EventHandler(this.addInstanceAttributToolStripMenuItem_Click);
             // 
             // optionsToolStripMenuItem
@@ -532,7 +532,7 @@
             // 
             this.settingsToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.application_form;
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
             this.settingsToolStripMenuItem.Text = "Settings";
             this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
@@ -540,8 +540,8 @@
             // 
             this.editAttributsDecodersToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.text_dropcaps;
             this.editAttributsDecodersToolStripMenuItem.Name = "editAttributsDecodersToolStripMenuItem";
-            this.editAttributsDecodersToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
-            this.editAttributsDecodersToolStripMenuItem.Text = "Edit User Attributs Decoders";
+            this.editAttributsDecodersToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
+            this.editAttributsDecodersToolStripMenuItem.Text = "Edit User Attributes Decoders";
             this.editAttributsDecodersToolStripMenuItem.Click += new System.EventHandler(this.editAttributsDecodersToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem

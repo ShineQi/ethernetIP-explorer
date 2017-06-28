@@ -99,7 +99,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
             if (FilteredAttribut == -1)
                 return "EtherNetLink instance";
             else
-                return "EtherNetLink instance attribut #" + FilteredAttribut.ToString();
+                return "EtherNetLink instance attribute #" + FilteredAttribut.ToString();
         }
 
         public override bool DecodeAttr(int AttrNum, ref int Idx, byte[] b)

@@ -111,7 +111,7 @@ namespace System.Net.EnIPStack
 
         private IPEndPoint ep;
         // Not a property to avoid browsable in propertyGrid, also [Browsable(false)] could be used
-        public string IPString() { return ep.Address.ToString(); }
+        public IPAddress IPAdd() { return ep.Address; }
 
         public bool autoConnect = true;
         public bool autoRegisterSession = true;

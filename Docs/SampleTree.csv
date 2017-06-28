@@ -1,4 +1,4 @@
-Device IP;Name;Class;ClassName;Instance;InstanceName;Attribut;AttributName
+Device IP;Name;Class;ClassName;Instance;InstanceName;Attribute;AttributeName
 //;;;;;;;
 // EnIPExplorer Device Tree, can be modified with a spreadsheet;;;;;;;
 // No empy line, comment first with a / char;;;;;;;
@@ -16,9 +16,9 @@ Device IP;Name;Class;ClassName;Instance;InstanceName;Attribut;AttributName
 ;;;;;;1;ObjectList #1
 ;;4;Assembly #4;;;;
 ;;;;101;Instance #101 - Output;;
-;;;;;;3;Attribut #3
+;;;;;;3;Attribute #3
 ;;;;107;Instance #107 - Input;;
-;;;;;;3;Attribut #3
+;;;;;;3;Attribute #3
 ;;6;ConnectionManager  #6;;;;
 ;;244;Port #244;;;;
 ;;;;1;Instance #1;;
@@ -57,9 +57,9 @@ Device IP;Name;Class;ClassName;Instance;InstanceName;Attribut;AttributName
 ;;;;;;1;ObjectList #1
 ;;4;Assembly #4;;;;
 ;;;;100;Instance #100 - Input;;
-;;;;;;3;Attribut #3
+;;;;;;3;Attribute #3
 ;;;;150;Instance #150 - Output;;
-;;;;;;3;Attribut #3
+;;;;;;3;Attribute #3
 ;;6;ConnectionManager  #6;;;;
 ;;245;TCPIPInterface #245;;;;
 ;;;;1;Instance #1;;

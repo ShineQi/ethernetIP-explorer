@@ -53,7 +53,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
             if (FilteredAttribut == -1)
                 return "DLR instance";
             else
-                return "DLR instance attribut #" + FilteredAttribut.ToString();
+                return "DLR instance attribute #" + FilteredAttribut.ToString();
         }
 
         public override bool DecodeAttr(int AttrNum, ref int Idx, byte[] b)

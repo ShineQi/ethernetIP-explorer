@@ -81,7 +81,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
             if (FilteredAttribut==-1)
                 return "Identity instance";
             else
-                return "Identity instance attribut #" + FilteredAttribut.ToString();
+                return "Identity instance attribute #" + FilteredAttribut.ToString();
         }
         public override bool DecodeAttr(int AttrNum, ref int Idx, byte[] b)
         {

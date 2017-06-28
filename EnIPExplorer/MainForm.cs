@@ -38,6 +38,7 @@ using System.Globalization;
 using System.Net;
 using System.IO;
 using System.Net.EnIPStack.ObjectsLibrary;
+using System.Collections;
 
 namespace EnIPExplorer
 {
@@ -72,6 +73,7 @@ namespace EnIPExplorer
             else
                 tmrUpdate.Enabled = false;
 
+            devicesTreeView.TreeViewNodeSorter = new NodeSorter();
             
             UserDecoderMgmt();
         }
@@ -123,7 +125,7 @@ namespace EnIPExplorer
                     if (tn.SelectedImageIndex != 0)
                         tn.ImageIndex = tn.SelectedImageIndex = 0;
                     // change the Text maybe
-                    tn.Text = device.IPString() + " - " + device.ProductName;
+                    tn.Text = device.IPAdd().ToString() + " - " + device.ProductName;
                     
                     if (devicesTreeView.SelectedNode == tn) devicesTreeView.SelectedNode = null;
 
@@ -131,7 +133,7 @@ namespace EnIPExplorer
                 }
             }
 
-            TreeNode tn2 = new TreeNode(device.IPString() + " - " + device.ProductName, 0, 0);
+            TreeNode tn2 = new TreeNode(device.IPAdd().ToString() + " - " + device.ProductName, 0, 0);
             tn2.Tag = device;
             devicesTreeView.Nodes.Add(tn2);
 
@@ -263,7 +265,7 @@ namespace EnIPExplorer
                 }
 
                 // change the Text maybe
-                String txt = device.IPString() + " - " + device.ProductName;
+                String txt = device.IPAdd().ToString() + " - " + device.ProductName;
                 if (e.Node.Text!=txt)
                     e.Node.Text = txt;
 
@@ -347,7 +349,7 @@ namespace EnIPExplorer
                 popupForwardToolStripMenuItem.Visible = true;
                 popuForward2ToolStripMenuItem.Visible = true;
                 decodeAttributAsToolStripMenuItem.Visible = true;
-                popupDeleteToolStripMenuItem.Text = deleteToolStripMenuItem.Text = "Delete current Attribut";
+                popupDeleteToolStripMenuItem.Text = deleteToolStripMenuItem.Text = "Delete current Attribute";
             }
 
             propertyGrid.Enabled = (ReadRet==EnIPNetworkStatus.OnLine);
@@ -550,7 +552,7 @@ namespace EnIPExplorer
                 if (cl.Id == (ushort)CIPObjectLibrary.Assembly)
                 {
                     EnIPAttribut att = new EnIPAttribut(instance, 3);
-                    TreeNode tnI2 = new TreeNode("Attribut #3", 10, 10);
+                    TreeNode tnI2 = new TreeNode("Attribute #3", 10, 10);
                     tnI2.Tag = att;
                     tnI2.ToolTipText = "Node " + cl.Id + "." + instance.Id.ToString() + ".3";
                     tnI.Nodes.Add(tnI2);
@@ -584,7 +586,7 @@ namespace EnIPExplorer
             }
 
             var Input =
-                new GenericInputBox<NumericUpDown>("Add Attribut", "Attribut Id :",
+                new GenericInputBox<NumericUpDown>("Add Attribute", "Attribute Id :",
                      (o) =>
                      {
                          o.Minimum = 1; o.Maximum = 65535; o.Value = Numbase;
@@ -597,7 +599,7 @@ namespace EnIPExplorer
                 byte Id = (byte)Input.genericInput.Value;
                 EnIPInstance ist = (EnIPInstance)tn.Tag;
                 EnIPAttribut att = new EnIPAttribut(ist, Id);
-                TreeNode tnI = new TreeNode("Attribut #"+Id.ToString(), 10, 10);
+                TreeNode tnI = new TreeNode("Attribute #"+Id.ToString(), 10, 10);
                 tnI.Tag = att;
                 tnI.ToolTipText = "Node "+ (tn.Parent.Tag as EnIPClass).Id+"." + ist.Id.ToString() + "." + Id.ToString();
                 tn.Nodes.Add(tnI);
@@ -668,8 +670,8 @@ namespace EnIPExplorer
             foreach (TreeNode tn in devicesTreeView.Nodes)
                 if ((tn.Tag as EnIPRemoteDevice).Equals(remotedevice))
                     return tn;
-            
-            TreeNode tn2 = new TreeNode(remotedevice.IPString()+ " - " +remotedevice.ProductName, 1, 1);
+
+            TreeNode tn2 = new TreeNode(remotedevice.IPAdd().ToString() + " - " + remotedevice.ProductName, 1, 1);
             tn2.Tag = remotedevice;
             devicesTreeView.Nodes.Add(tn2);
 
@@ -841,13 +843,13 @@ namespace EnIPExplorer
 
                 char s = Properties.Settings.Default.CSVSeparator;
 
-                sw.WriteLine("Device IP" + s + "Name" + s + "Class" + s + "Instance" + s + "Attribut");
+                sw.WriteLine("Device IP"+s+"Name"+s+"Class"+s+"ClassName"+s+"Instance"+s+"InstanceName"+s+"Attribute"+s+"AttributeName");
                 sw.WriteLine("// EnIPExplorer Device Tree, can be modified with a spreadsheet");
 
                 foreach (TreeNode tn in devicesTreeView.Nodes)
                 {
                     EnIPRemoteDevice remote = (EnIPRemoteDevice)tn.Tag;
-                    sw.WriteLine(remote.IPString() + s + remote.ProductName);
+                    sw.WriteLine(remote.IPAdd().ToString() + s + remote.ProductName);
                     SaveFileEnIPOject(sw, s.ToString()+s.ToString(), tn.Nodes);
                 }
 
@@ -1059,7 +1061,24 @@ namespace EnIPExplorer
         {
             if (!m_form.IsHandleCreated) return;
 
-            m_form.BeginInvoke((MethodInvoker)delegate { m_form.LogText.AppendText(message+ Environment.NewLine); });
+             m_form.BeginInvoke((MethodInvoker)delegate { m_form.LogText.AppendText(message+ Environment.NewLine); });
+        }
+    }
+
+    // In order to sort the treeview
+    class NodeSorter : IComparer
+    {
+        public int Compare(object x, object y)
+        {
+            TreeNode tx = (TreeNode)x;
+            TreeNode ty = (TreeNode)y;
+              
+            #pragma warning disable 0618
+            if (tx.Tag is EnIPRemoteDevice) // Top level
+                return (tx.Tag as EnIPRemoteDevice).IPAdd().Address.CompareTo((ty.Tag as EnIPRemoteDevice).IPAdd().Address);
+            else
+                return (tx.Tag as EnIPCIPObject).Id.CompareTo((ty.Tag as EnIPCIPObject).Id);
+            #pragma warning restore 0618
         }
     }
 }
