@@ -105,6 +105,14 @@ namespace EnIPExplorer
             }
         }
 
+        string IdStr(int Id)
+        {
+            if (Properties.Settings.Default.IdHexDisplay)
+                return Properties.Settings.Default.IdHexPrefix + Convert.ToString(Id, 16).ToUpper();
+            else
+                return Id.ToString();
+        }
+
         // Each time we received a response to udp broadcast or udp/tcp unicast ListIdentity
         void On_DeviceArrival(EnIPRemoteDevice device)
         {
@@ -175,22 +183,22 @@ namespace EnIPExplorer
             {
                 CIPObjectLibrary cipobj = (CIPObjectLibrary)Class.Id;
                 int img = Classe2Ico(cipobj);
-                tn = new TreeNode(cipobj.ToString()+" #"+ Class.Id.ToString(), img, img);
+                tn = new TreeNode(cipobj.ToString()+" #"+ IdStr(Class.Id), img, img);
 
                 // Special classes with the known instance(s)
                 if ((Class.Id == 1) || (Class.Id == 2) || (Class.Id == 0xF4) || (Class.Id == 0xF5) || (Class.Id == 0xF6))
                 {
-                    EnIPInstance instance = new EnIPInstance(Class, 1);
-                    TreeNode tnI = new TreeNode("Instance #1", 9, 9);
+                    EnIPInstance instance = new EnIPInstance(Class, 1); // Instance 1
+                    TreeNode tnI = new TreeNode("Instance #"+IdStr(1), 9, 9);
                     tnI.Tag = instance;
-                    tnI.ToolTipText = "Node " + Class.Id.ToString()+".1";
+                    tnI.ToolTipText = "Node " + IdStr(Class.Id)+"."+IdStr(1);
                     tn.Nodes.Add(tnI);
                 }
             }
             else
-                tn = new TreeNode("Proprietary #" + Class.Id.ToString(), 2, 2);
+                tn = new TreeNode("Proprietary #" + IdStr(Class.Id), 2, 2);
 
-            tn.ToolTipText = "Node "+Class.Id.ToString();
+            tn.ToolTipText = "Node "+IdStr(Class.Id);
             tn.Tag = Class;
             return tn;
         }
@@ -475,6 +483,7 @@ namespace EnIPExplorer
                      (o) =>
                      {
                          o.Minimum = 1; o.Maximum = 65535; o.Value = Numbase;
+                         o.Hexadecimal = Properties.Settings.Default.IdHexDisplay;
                          ToolTip tt = new ToolTip();
                          tt.AutoPopDelay = 32767;
                          // Helper two columns tooltip with the object Id list 
@@ -482,11 +491,12 @@ namespace EnIPExplorer
                          int i = 0;
                          foreach (CIPObjectLibrary en in Enum.GetValues(typeof(CIPObjectLibrary)))
                          {
-                             String s = ((int)en).ToString() + " : "+en.ToString();
+                             String s = IdStr((int)en)+ " : "+en.ToString();
                              if (i == 0)
                              {
-                                // 1, 2 or 3 tab
+                                // 1, 2,3 or 4 tab
                                 sb.Append(s + "\t");
+                                if (s.Length < 10) sb.Append('\t');
                                 if (s.Length < 17) sb.Append('\t');
                                 if (s.Length < 29) sb.Append('\t');
                              }
@@ -535,6 +545,7 @@ namespace EnIPExplorer
                      (o) =>
                      {
                          o.Minimum = 1; o.Maximum = 65535; o.Value = Numbase;
+                         o.Hexadecimal = Properties.Settings.Default.IdHexDisplay;
                      });
 
             DialogResult res = Input.ShowDialog();
@@ -544,17 +555,17 @@ namespace EnIPExplorer
                 byte Id = (byte)Input.genericInput.Value;
                 EnIPClass cl=(EnIPClass)tn.Tag;
                 EnIPInstance instance = new EnIPInstance(cl, Id);
-                TreeNode tnI = new TreeNode("Instance #"+Id.ToString(), 9, 9);
+                TreeNode tnI = new TreeNode("Instance #"+IdStr(Id), 9, 9);
                 tnI.Tag = instance;
-                tnI.ToolTipText = "Node " +cl.Id.ToString()+"."+ Id.ToString();
+                tnI.ToolTipText = "Node " + IdStr(cl.Id) + "." + IdStr(Id);
 
                 // speed me ... automatic add Attribut 3 (Data - Array of Bytes) to all Assembly instances
                 if (cl.Id == (ushort)CIPObjectLibrary.Assembly)
                 {
                     EnIPAttribut att = new EnIPAttribut(instance, 3);
-                    TreeNode tnI2 = new TreeNode("Attribute #3", 10, 10);
+                    TreeNode tnI2 = new TreeNode("Attribute #" + IdStr(3), 10, 10);
                     tnI2.Tag = att;
-                    tnI2.ToolTipText = "Node " + cl.Id + "." + instance.Id.ToString() + ".3";
+                    tnI2.ToolTipText = "Node " + IdStr(cl.Id) + "." + IdStr(instance.Id) + ".3";
                     tnI.Nodes.Add(tnI2);
                 }
 
@@ -590,6 +601,7 @@ namespace EnIPExplorer
                      (o) =>
                      {
                          o.Minimum = 1; o.Maximum = 65535; o.Value = Numbase;
+                         o.Hexadecimal = Properties.Settings.Default.IdHexDisplay;
                      });
 
             DialogResult res = Input.ShowDialog();
@@ -599,9 +611,9 @@ namespace EnIPExplorer
                 byte Id = (byte)Input.genericInput.Value;
                 EnIPInstance ist = (EnIPInstance)tn.Tag;
                 EnIPAttribut att = new EnIPAttribut(ist, Id);
-                TreeNode tnI = new TreeNode("Attribute #"+Id.ToString(), 10, 10);
+                TreeNode tnI = new TreeNode("Attribute #"+IdStr(Id), 10, 10);
                 tnI.Tag = att;
-                tnI.ToolTipText = "Node "+ (tn.Parent.Tag as EnIPClass).Id+"." + ist.Id.ToString() + "." + Id.ToString();
+                tnI.ToolTipText = "Node " + IdStr((tn.Parent.Tag as EnIPClass).Id) + "." + IdStr(ist.Id) + "." + IdStr(Id);
                 tn.Nodes.Add(tnI);
                 tn.Expand();
             }
@@ -916,17 +928,17 @@ namespace EnIPExplorer
                                 else
                                     ico = 2;
                                 ParentClassTreeNode = AddeNode(ParentDeviceTreeNode, Class, Strs[3], ico);
-                                ParentClassTreeNode.ToolTipText = "Node " + Class.Id.ToString();
+                                ParentClassTreeNode.ToolTipText = "Node " + IdStr(Class.Id);
                                 break;
                             case 6: // An instance
                                 Instance = new EnIPInstance(Class, Convert.ToByte(Strs[4]));
                                 ParentInstanceTreeNode = AddeNode(ParentClassTreeNode, Instance, Strs[5], 9);
-                                ParentInstanceTreeNode.ToolTipText = ParentClassTreeNode.ToolTipText + "." + Instance.Id.ToString();
+                                ParentInstanceTreeNode.ToolTipText = ParentClassTreeNode.ToolTipText + "." + IdStr(Instance.Id);
                                 break;
                             case 8: // An attribut
                                 EnIPAttribut Attribut = new EnIPAttribut(Instance, Convert.ToByte(Strs[6]));
                                 TreeNode tnAtt=AddeNode(ParentInstanceTreeNode, Attribut, Strs[7], 10);
-                                tnAtt.ToolTipText = ParentInstanceTreeNode.ToolTipText + "." + Attribut.Id.ToString();
+                                tnAtt.ToolTipText = ParentInstanceTreeNode.ToolTipText + "." + IdStr(Attribut.Id);
                                 break;
                             default:
                                 throw new Exception("Not the good number of colums");

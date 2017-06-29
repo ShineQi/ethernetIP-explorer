@@ -214,5 +214,29 @@ namespace EnIPExplorer.Properties {
                 this["DefaultIPInterface"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IdHexDisplay {
+            get {
+                return ((bool)(this["IdHexDisplay"]));
+            }
+            set {
+                this["IdHexDisplay"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0x")]
+        public string IdHexPrefix {
+            get {
+                return ((string)(this["IdHexPrefix"]));
+            }
+            set {
+                this["IdHexPrefix"] = value;
+            }
+        }
     }
 }

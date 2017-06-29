@@ -50,5 +50,11 @@
     <Setting Name="DefaultIPInterface" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="IdHexDisplay" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="IdHexPrefix" Type="System.String" Scope="User">
+      <Value Profile="(Default)">0x</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
