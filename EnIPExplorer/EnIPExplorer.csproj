@@ -76,6 +76,9 @@
     <Compile Include="..\EnIPStack\ObjectsLibrary\Identity.cs">
       <Link>ObjectsLibrary\Identity.cs</Link>
     </Compile>
+    <Compile Include="..\EnIPStack\ObjectsLibrary\MessageRouter.cs">
+      <Link>ObjectsLibrary\MessageRouter.cs</Link>
+    </Compile>
     <Compile Include="..\EnIPStack\ObjectsLibrary\TCPIPInterface.cs">
       <Link>ObjectsLibrary\TCPIPInterface.cs</Link>
     </Compile>

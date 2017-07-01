@@ -34,6 +34,7 @@ using System.ComponentModel;
 using System.Threading;
 using System.Net.EnIPStack.ObjectsLibrary;
 using System.Reflection;
+using System.IO;
 
 namespace System.Net.EnIPStack
 {
@@ -417,6 +418,17 @@ namespace System.Net.EnIPStack
                     Offset += 2;
                 }
             }
+
+            if (SupportedClassLists.Count == 0) // service not supported : add basic class, but some could be not present
+            {
+                SupportedClassLists.Add(new EnIPClass(this, (ushort)CIPObjectLibrary.Identity));
+                SupportedClassLists.Add(new EnIPClass(this, (ushort)CIPObjectLibrary.MessageRouter));
+                SupportedClassLists.Add(new EnIPClass(this, (ushort)CIPObjectLibrary.Assembly));
+                SupportedClassLists.Add(new EnIPClass(this, (ushort)CIPObjectLibrary.TCPIPInterface));
+                SupportedClassLists.Add(new EnIPClass(this, (ushort)CIPObjectLibrary.EtherNetLink));
+                SupportedClassLists.Add(new EnIPClass(this, (ushort)CIPObjectLibrary.ConnectionManager));
+            }
+
             return SupportedClassLists;
         }
 
@@ -501,8 +513,40 @@ namespace System.Net.EnIPStack
 
         public override EnIPNetworkStatus ReadDataFromNetwork()
         {
+            
+            // Read all class static attributes
             byte[] ClassDataPath = EnIPPath.GetPath(Id, 0, null);
             EnIPNetworkStatus ret= ReadDataFromNetwork(ClassDataPath, CIPServiceCodes.GetAttributesAll);
+
+            // If rejected try to read all attributes one by one
+            if (ret == EnIPNetworkStatus.OnLineReadRejected) 
+            {
+
+                MemoryStream rawbuffer=new MemoryStream();
+
+                ushort AttId = 1; // first static attribut number
+
+                do
+                {
+                    ClassDataPath = EnIPPath.GetPath(Id, 0, AttId);
+                    ret = ReadDataFromNetwork(ClassDataPath, CIPServiceCodes.GetAttributeSingle);
+
+                    // push the buffer into the data stream
+                    if (ret == EnIPNetworkStatus.OnLine)
+                        rawbuffer.Write(RawData, 0, RawData.Length);
+                    AttId++;
+                }
+                while (ret == EnIPNetworkStatus.OnLine);
+
+                // yes OK like this, pull the data out of the stream into the RawData
+                if (rawbuffer.Length != 0)
+                {
+                    Status= ret = EnIPNetworkStatus.OnLine; // all is OK even if the last request is (always) rejected
+                    RawData = rawbuffer.ToArray();
+                }
+
+            }
+
             if (ret == EnIPNetworkStatus.OnLine)
             {
                 CIPObjectLibrary classid = (CIPObjectLibrary)Id;
@@ -570,12 +614,13 @@ namespace System.Net.EnIPStack
             if (ret == EnIPNetworkStatus.OnLine)
             {
                 if (DecodedMembers == null)
-                    if (AttachDecoderClass()==true)
-                        try
-                        {
-                            DecodedMembers.SetRawBytes(RawData);
-                        }
-                        catch { }
+                    AttachDecoderClass();
+
+                try
+                {
+                    DecodedMembers.SetRawBytes(RawData);
+                }
+                catch { }
             }
             return ret;
         }
@@ -688,7 +733,7 @@ namespace System.Net.EnIPStack
         {
             byte[] DataPath = EnIPPath.GetPath(myInstance.myClass.Id, myInstance.Id, Id);
             EnIPNetworkStatus ret = ReadDataFromNetwork(DataPath, CIPServiceCodes.GetAttributeSingle);
-           // if (ret == EnIPNetworkStatus.OnLine)
+            if (ret == EnIPNetworkStatus.OnLine)
             {
                 CIPObjectLibrary classid = (CIPObjectLibrary)myInstance.myClass.Id;
                 try
@@ -701,7 +746,6 @@ namespace System.Net.EnIPStack
                         DecodedMembers = myInstance.DecodedMembers; // get the same object as the associated Instance
                     }
                     int Idx = 0;
-                    RawData = new byte[11];
                     DecodedMembers.DecodeAttr(Id, ref Idx, RawData);
                 }
                 catch { }
