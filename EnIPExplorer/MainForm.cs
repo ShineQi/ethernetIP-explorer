@@ -512,7 +512,7 @@ namespace EnIPExplorer
 
             if (res == DialogResult.OK)
             {
-                byte Id = (byte)Input.genericInput.Value;
+                ushort Id = (ushort)Input.genericInput.Value;
                 EnIPClass Class = new EnIPClass(tn.Tag as EnIPRemoteDevice, Id);
                 tn.Nodes.Add(ClassToTreeNode(Class));
                 tn.Expand();
@@ -552,7 +552,7 @@ namespace EnIPExplorer
 
             if (res == DialogResult.OK)
             {
-                byte Id = (byte)Input.genericInput.Value;
+                ushort Id = (ushort)Input.genericInput.Value;
                 EnIPClass cl=(EnIPClass)tn.Tag;
                 EnIPInstance instance = new EnIPInstance(cl, Id);
                 TreeNode tnI = new TreeNode("Instance #"+IdStr(Id), 9, 9);
@@ -608,7 +608,7 @@ namespace EnIPExplorer
 
             if (res == DialogResult.OK)
             {
-                byte Id = (byte)Input.genericInput.Value;
+                ushort Id = (ushort)Input.genericInput.Value;
                 EnIPInstance ist = (EnIPInstance)tn.Tag;
                 EnIPAttribut att = new EnIPAttribut(ist, Id);
                 TreeNode tnI = new TreeNode("Attribute #"+IdStr(Id), 10, 10);

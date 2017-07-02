@@ -4,13 +4,13 @@
 
 SampleClient
 	Device discovery.
-	Read a simple attribut data, on a Wago Plc.
-	Write a simple attribut data.
+	Read a simple attribute data, on a Wago Plc.
+	Write a simple attribute data.
 Class1Sampleclient
-	Read an attribut using Tcp.
+	Read an attribute using Tcp.
 	Advise in P2P for it
 SampleClient2
     Device discovery.
-    Read a simple attribut data, on an Eurotherm device
+    Read a simple attribute data, on an Eurotherm device
     using a InstanceDecoder class for value
     decoding instead of raw data.

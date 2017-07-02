@@ -116,7 +116,7 @@ namespace SampleClient
 
         static void client_DeviceArrival(EnIPRemoteDevice device)
         {
-            Console.WriteLine("Arrvial of : " + device.IPString() + " - " + device.ProductName);
+            Console.WriteLine("Arrvial of : " + device.IPAdd().ToString() + " - " + device.ProductName);
             // Query the object list : Assembly object, instance 1, atribut 1
             Console.WriteLine("Classes inside :");
             device.GetObjectList();

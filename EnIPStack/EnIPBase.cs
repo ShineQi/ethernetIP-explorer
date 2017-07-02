@@ -53,8 +53,6 @@ namespace System.Net.EnIPStack
             }
         }
 
-        // Instance seems to be only byte
-        // FIXME
         public static byte[] GetPath(ushort Class, ushort Instance, ushort? Attribut=null)
         {
 
