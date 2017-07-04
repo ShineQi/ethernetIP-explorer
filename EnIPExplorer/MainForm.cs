@@ -403,7 +403,7 @@ namespace EnIPExplorer
             if (client == null)
             {
                 var Input =
-                    new GenericInputBox<ComboBox>("Local Interface", "IP address",
+                    new GenericInputBoxExtended<ComboBox>("Local Interface", "IP address",
                          (o) =>
                          {
                              string[] local_endpoints = GetAvailableIps();
@@ -479,7 +479,7 @@ namespace EnIPExplorer
             }
 
             var Input =
-                new GenericInputBox<NumericUpDown>("Add Class", "Class Id :",
+                new GenericInputBoxExtended<NumericUpDown>("Add Class", "Class Id :",
                      (o) =>
                      {
                          o.Minimum = 1; o.Maximum = 65535; o.Value = Numbase;
@@ -491,32 +491,33 @@ namespace EnIPExplorer
                          int i = 0;
                          foreach (CIPObjectLibrary en in Enum.GetValues(typeof(CIPObjectLibrary)))
                          {
-                             String s = IdStr((int)en)+ " : "+en.ToString();
+                             String s = IdStr((int)en) + " : " + en.ToString();
                              if (i == 0)
                              {
-                                // 1, 2,3 or 4 tab
-                                sb.Append(s + "\t");
-                                if (s.Length < 10) sb.Append('\t');
-                                if (s.Length < 17) sb.Append('\t');
-                                if (s.Length < 29) sb.Append('\t');
+                                 // 1, 2,3 or 4 tab
+                                 sb.Append(s + "\t");
+                                 if (s.Length < 10) sb.Append('\t');
+                                 if (s.Length < 17) sb.Append('\t');
+                                 if (s.Length < 29) sb.Append('\t');
                              }
                              else
-                                 sb.Append( s + Environment.NewLine);
+                                 sb.Append(s + Environment.NewLine);
                              i = ~i;
                          }
-                         
+
                          tt.SetToolTip(o, sb.ToString());
+                     },
+                     (o) =>
+                     {
+                         ushort Id = (ushort)o.Value;
+                         EnIPClass Class = new EnIPClass(tn.Tag as EnIPRemoteDevice, Id);
+                         tn.Nodes.Add(ClassToTreeNode(Class));
+                         tn.Expand();
+                         if (o.Value!=o.Maximum) o.Value++;
                      });
 
             DialogResult res = Input.ShowDialog();
 
-            if (res == DialogResult.OK)
-            {
-                ushort Id = (ushort)Input.genericInput.Value;
-                EnIPClass Class = new EnIPClass(tn.Tag as EnIPRemoteDevice, Id);
-                tn.Nodes.Add(ClassToTreeNode(Class));
-                tn.Expand();
-            }
         }
 
         // Menu Item
@@ -541,39 +542,39 @@ namespace EnIPExplorer
             }
 
             var Input =
-                new GenericInputBox<NumericUpDown>("Add Instance", "Instance Id :",
+                new GenericInputBoxExtended<NumericUpDown>("Add Instance", "Instance Id :",
                      (o) =>
                      {
                          o.Minimum = 1; o.Maximum = 65535; o.Value = Numbase;
                          o.Hexadecimal = Properties.Settings.Default.IdHexDisplay;
+                     },
+                     (o) =>
+                     {
+                         ushort Id = (ushort)o.Value;
+                         EnIPClass cl = (EnIPClass)tn.Tag;
+                         EnIPInstance instance = new EnIPInstance(cl, Id);
+                         TreeNode tnI = new TreeNode("Instance #" + IdStr(Id), 9, 9);
+                         tnI.Tag = instance;
+                         tnI.ToolTipText = "Node " + IdStr(cl.Id) + "." + IdStr(Id);
+
+                         // speed me ... automatic add Attribut 3 (Data - Array of Bytes) to all Assembly instances
+                         if (cl.Id == (ushort)CIPObjectLibrary.Assembly)
+                         {
+                             EnIPAttribut att = new EnIPAttribut(instance, 3);
+                             TreeNode tnI2 = new TreeNode("Attribute #" + IdStr(3), 10, 10);
+                             tnI2.Tag = att;
+                             tnI2.ToolTipText = "Node " + IdStr(cl.Id) + "." + IdStr(instance.Id) + ".3";
+                             tnI.Nodes.Add(tnI2);
+                         }
+
+                         tn.Nodes.Add(tnI);
+                         tn.Expand();
+                         tnI.Expand();
+
+                         if (o.Value != o.Maximum) o.Value++;
                      });
 
-            DialogResult res = Input.ShowDialog();
-
-            if (res == DialogResult.OK)
-            {
-                ushort Id = (ushort)Input.genericInput.Value;
-                EnIPClass cl=(EnIPClass)tn.Tag;
-                EnIPInstance instance = new EnIPInstance(cl, Id);
-                TreeNode tnI = new TreeNode("Instance #"+IdStr(Id), 9, 9);
-                tnI.Tag = instance;
-                tnI.ToolTipText = "Node " + IdStr(cl.Id) + "." + IdStr(Id);
-
-                // speed me ... automatic add Attribut 3 (Data - Array of Bytes) to all Assembly instances
-                if (cl.Id == (ushort)CIPObjectLibrary.Assembly)
-                {
-                    EnIPAttribut att = new EnIPAttribut(instance, 3);
-                    TreeNode tnI2 = new TreeNode("Attribute #" + IdStr(3), 10, 10);
-                    tnI2.Tag = att;
-                    tnI2.ToolTipText = "Node " + IdStr(cl.Id) + "." + IdStr(instance.Id) + ".3";
-                    tnI.Nodes.Add(tnI2);
-                }
-
-                tn.Nodes.Add(tnI);
-                tn.Expand();
-                tnI.Expand();
-            }
-
+            DialogResult res = Input.ShowDialog();            
         }
 
         // Menu Item
@@ -597,26 +598,27 @@ namespace EnIPExplorer
             }
 
             var Input =
-                new GenericInputBox<NumericUpDown>("Add Attribute", "Attribute Id :",
+                new GenericInputBoxExtended<NumericUpDown>("Add Attribute", "Attribute Id :",
                      (o) =>
                      {
                          o.Minimum = 1; o.Maximum = 65535; o.Value = Numbase;
                          o.Hexadecimal = Properties.Settings.Default.IdHexDisplay;
+                     },
+                     (o) =>
+                     {
+                         ushort Id = (ushort)o.Value;
+                         EnIPInstance ist = (EnIPInstance)tn.Tag;
+                         EnIPAttribut att = new EnIPAttribut(ist, Id);
+                         TreeNode tnI = new TreeNode("Attribute #" + IdStr(Id), 10, 10);
+                         tnI.Tag = att;
+                         tnI.ToolTipText = "Node " + IdStr((tn.Parent.Tag as EnIPClass).Id) + "." + IdStr(ist.Id) + "." + IdStr(Id);
+                         tn.Nodes.Add(tnI);
+                         tn.Expand();
+                         if (o.Value != o.Maximum) o.Value++;
                      });
 
             DialogResult res = Input.ShowDialog();
 
-            if (res == DialogResult.OK)
-            {
-                ushort Id = (ushort)Input.genericInput.Value;
-                EnIPInstance ist = (EnIPInstance)tn.Tag;
-                EnIPAttribut att = new EnIPAttribut(ist, Id);
-                TreeNode tnI = new TreeNode("Attribute #"+IdStr(Id), 10, 10);
-                tnI.Tag = att;
-                tnI.ToolTipText = "Node " + IdStr((tn.Parent.Tag as EnIPClass).Id) + "." + IdStr(ist.Id) + "." + IdStr(Id);
-                tn.Nodes.Add(tnI);
-                tn.Expand();
-            }
         }
 
         // Menu Item
@@ -697,7 +699,7 @@ namespace EnIPExplorer
             if (client==null) return;
 
             var Input =
-                new GenericInputBox<TextBox>("Remote device", "IP address",
+                new GenericInputBoxExtended<TextBox>("Remote device", "IP address",
                      (o) =>
                      {
                          o.Text = Properties.Settings.Default.DefaultRemoteDevice;
@@ -715,6 +717,8 @@ namespace EnIPExplorer
 
                 remotedevice.DeviceArrival += new DeviceArrivalHandler(On_DeviceArrival);
                 remotedevice.DiscoverServer();
+
+                Properties.Settings.Default.DefaultRemoteDevice = Input.genericInput.Text;
             }
             catch
             {
@@ -764,7 +768,7 @@ namespace EnIPExplorer
             if ((devicesTreeView.SelectedNode==null)||(!(tn.Tag is EnIPCIPObject))) return;
 
             var Input =
-                new GenericInputBox<TextBox>("Rename", "New name",
+                new GenericInputBoxExtended<TextBox>("Rename", "New name",
                      (o) =>
                      {
                          o.Text = tn.Text;

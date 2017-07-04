@@ -26,6 +26,7 @@
 
 // A dialog form for simple control input : textbox, combo, list, numeric, date Time, trackbar ....
 // latest adapation should be done using the delegate parameters
+// OK button can close the form or execute an OnOK handler without closing
 
 /*
   var Input =
@@ -44,12 +45,16 @@
 namespace System.Windows.Forms
 {
     public delegate void PostInitializeComponent<T>(T generic);
+    public delegate void ActionOnOK<T>(T generic);
 
     [System.ComponentModel.DesignerCategory("")] // Avoid failure opening with the GUI Designer
-    public partial class GenericInputBox<T> : Form where T : Control, new()
+    public class GenericInputBoxExtended<T> : Form where T : Control, new()
     {
-        public GenericInputBox(String BoxTitle, String Lbl, PostInitializeComponent<T> FillInput = null, double sizeFactor=1, bool BtCancelVisible=true, String ToolTipText=null)
+        ActionOnOK<T> OnOK;
+
+        public GenericInputBoxExtended(String BoxTitle, String Lbl, PostInitializeComponent<T> FillInput = null, ActionOnOK<T> OnOK=null, double sizeFactor = 1, bool BtCancelVisible = true, String ToolTipText = null)
         {
+            this.OnOK = OnOK;
             this.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             InitializeComponent(sizeFactor, BtCancelVisible);
             genericLbl.Text = Lbl;
@@ -68,8 +73,16 @@ namespace System.Windows.Forms
 
         private void bt_Click(object sender, EventArgs e)
         {
-            if (sender==btOK)
-                this.DialogResult = System.Windows.Forms.DialogResult.OK;
+            if (sender == btOK)
+            {
+                if (OnOK != null)
+                {
+                    OnOK(genericInput);
+                    return; // Don't close the DialogBox
+                }
+                else
+                    this.DialogResult = System.Windows.Forms.DialogResult.OK;
+            }
             this.Close();
         }
 
