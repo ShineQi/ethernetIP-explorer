@@ -62,6 +62,7 @@
             this.openInterfaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addRemoteDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendListIdentityDiscoverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.explicitMessagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.readAgainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendForwardOpenTOToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -292,6 +293,7 @@
             // 
             this.propertyGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGrid.HelpVisible = false;
+            this.propertyGrid.LineColor = System.Drawing.SystemColors.ControlDark;
             this.propertyGrid.Location = new System.Drawing.Point(0, 13);
             this.propertyGrid.Name = "propertyGrid";
             this.propertyGrid.PropertySort = System.Windows.Forms.PropertySort.NoSort;
@@ -384,6 +386,7 @@
             this.openInterfaceToolStripMenuItem,
             this.addRemoteDeviceToolStripMenuItem,
             this.sendListIdentityDiscoverToolStripMenuItem,
+            this.explicitMessagesToolStripMenuItem,
             this.toolStripSeparator1,
             this.readAgainToolStripMenuItem,
             this.sendForwardOpenTOToolStripMenuItem,
@@ -422,6 +425,14 @@
             this.sendListIdentityDiscoverToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.sendListIdentityDiscoverToolStripMenuItem.Text = "Send ListIdentity (Discover)";
             this.sendListIdentityDiscoverToolStripMenuItem.Click += new System.EventHandler(this.sendListIdentityDiscoverToolStripMenuItem_Click);
+            // 
+            // explicitMessagesToolStripMenuItem
+            // 
+            this.explicitMessagesToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.email;
+            this.explicitMessagesToolStripMenuItem.Name = "explicitMessagesToolStripMenuItem";
+            this.explicitMessagesToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.explicitMessagesToolStripMenuItem.Text = "Explicit Messaging";
+            this.explicitMessagesToolStripMenuItem.Click += new System.EventHandler(this.explicitMessagesToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
@@ -657,6 +668,7 @@
         private System.Windows.Forms.ToolStripMenuItem arrayOfUINTToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem editAttributsDecodersToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem explicitMessagesToolStripMenuItem;
     }
 }
 

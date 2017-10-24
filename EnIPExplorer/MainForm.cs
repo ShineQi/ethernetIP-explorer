@@ -728,6 +728,12 @@ namespace EnIPExplorer
         }
 
         // Menu Item
+        private void explicitMessagesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new ExplicitMessages(devicesTreeView).ShowDialog();
+        }
+
+        // Menu Item
         // Delete a Device, a class, an instance, an attribut
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
