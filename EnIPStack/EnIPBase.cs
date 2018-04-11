@@ -53,13 +53,15 @@ namespace System.Net.EnIPStack
             }
         }
 
-        public static byte[] GetPath(ushort Class, ushort Instance, ushort? Attribut=null)
+        public static byte[] GetPath(ushort? Class, ushort Instance, ushort? Attribut=null)
         {
 
             byte[] path = new byte[12];
 
             int size=0;
-            Fit(path,ref size,Class,0x20);
+
+            if (Class != null)
+                Fit(path,ref size,Class.Value,0x20);
 
             // It seems that this Instance value is always required : 0 is used to access class data
             // Volume 1 : Figure 1-2.5 Instance #0 Example
@@ -390,7 +392,7 @@ namespace System.Net.EnIPStack
         // using a Connection_Path with more than 1 reference
         // 1 Path : path is for Consumption & Production
         // 2 Path : First path is for Consumption, second path is for Production.
-        public ForwardOpen_Packet(byte[] Connection_Path, bool p2p, bool T2O, bool O2T, ushort datasize, uint? ConnectionId=null) 
+        public ForwardOpen_Packet(byte[] Connection_Path, bool p2p, bool T2O, bool O2T, ushort T2Odatasize, ushort O2Tdatasize, uint? ConnectionId = null)
         {
 
             this.Connection_Path = Connection_Path;
@@ -398,7 +400,7 @@ namespace System.Net.EnIPStack
             if (ConnectionId == null)
             {
                 // volume 2 : 3-3.7.1.3 Pseudo-Random Connection ID Per Connection
-                _ConnectionId++;
+                _ConnectionId += 2;
                 _ConnectionId = _ConnectionId | (uint)(new Random().Next(65535) << 16);
             }
             else
@@ -407,7 +409,7 @@ namespace System.Net.EnIPStack
             if (O2T)
                 O2T_ConnectionId = _ConnectionId;
             if (T2O)
-                T2O_ConnectionId = _ConnectionId;
+                T2O_ConnectionId = _ConnectionId+1;
 
             // Volume 1:  chapter 3-5.5.1.1
             /* Sample for wireshark
@@ -422,14 +424,18 @@ namespace System.Net.EnIPStack
             {
                 // 2 bytes CIP class 1 sequence count + datasize bytes application data
                 if (p2p) T2O_ConnectionParameters = 0x4600; else T2O_ConnectionParameters = 0x2600;
-                T2O_ConnectionParameters += (ushort)(datasize + 2);
+                T2O_ConnectionParameters += (ushort)(T2Odatasize+2);
                 TransportTrigger = 0x01; // Client class 1, cyclic
             }
             if (O2T)
             {
                 // 2 bytes CIP class 1 sequence count + 4 bytes 32-bit real time header + datasize bytes application data
                 if (p2p) O2T_ConnectionParameters = 0x4600; else O2T_ConnectionParameters = 0x2600;
-                O2T_ConnectionParameters += (ushort)(datasize + 2 + 4);
+                if (O2Tdatasize != 0)
+                    O2T_ConnectionParameters += (ushort)(O2Tdatasize + 2 + 4);
+                else
+                    O2T_ConnectionParameters += (ushort)(2);
+
                 TransportTrigger = 0x81; // Server class 1
             }
 
@@ -509,7 +515,7 @@ namespace System.Net.EnIPStack
 
         public byte[] data;
 
-        public SequencedAddressItem(uint ConnectionId, uint SequenceNumber=0, byte[] data=null)
+        public SequencedAddressItem(uint ConnectionId=0, uint SequenceNumber=0, byte[] data=null)
         {
             this.ConnectionId = ConnectionId;
             this.SequenceNumber = SequenceNumber;
@@ -551,7 +557,7 @@ namespace System.Net.EnIPStack
         }
 
         public byte[] toByteArray(byte[] newdata=null)
-        {
+        {           
             byte[] retVal;
 
             if (newdata != null) data = newdata;    
@@ -563,8 +569,8 @@ namespace System.Net.EnIPStack
             }
             else
             {
-                Lenght2 = (ushort)data.Length;
-                retVal = new byte[20 + Lenght2];
+                Lenght2 = (ushort)(data.Length + 2 + 4); // +2 SequenceNumber bis (2 bytes !) +4 : 32 bits header
+                retVal = new byte[18 + Lenght2];
             }
 
             // Itemcount=2
@@ -579,9 +585,10 @@ namespace System.Net.EnIPStack
 
             if (Lenght2 != 0)
             {
-                // Don't really understand this sequence count, so put something
+                // Don't really understand this sequence count
                 Array.Copy(BitConverter.GetBytes((ushort)SequenceNumber), 0, retVal, 18, 2);
-                Array.Copy(data, 0, retVal, 20, Lenght2);
+                Array.Copy(BitConverter.GetBytes((uint)0x00000001), 0, retVal, 20, 4); // 32 bits header
+                Array.Copy(data, 0, retVal, 24, data.Length);
             }
 
             SequenceNumber++;

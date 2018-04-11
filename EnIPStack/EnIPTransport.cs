@@ -141,6 +141,12 @@ namespace System.Net.EnIPStack
             m_exclusive_conn.Send(b, b.Length, ep);
         }
 
+        public void Send(SequencedAddressItem Packet, IPEndPoint ep)
+        {
+            byte[] b=Packet.toByteArray();
+            m_exclusive_conn.Send(b, b.Length, ep);
+        }
+        
         // A lot of problems on Mono (Raspberry) to get the correct broadcast @
         // so this method is overridable (this allows the implementation of operating system specific code)
         // Marc solution http://stackoverflow.com/questions/8119414/how-to-query-the-subnet-masks-using-mono-on-linux for instance
