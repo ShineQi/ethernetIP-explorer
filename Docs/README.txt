@@ -61,7 +61,7 @@
 		  or a standard default of UINT, or a user defined : see Option menu.
 		  The decoder can be changed using the context popupmenu (see §2.8).
 	2.5 Advise : ForwardOpen T->O
-		- On attributs one could place a ForwardOpen T->O (Device to EnIPExplorer).
+		- On attributes one could place a ForwardOpen T->O (Device to EnIPExplorer).
 		  If accepted, the Class 1 device (Plc or other) will send back 
 		  the data by using Udp in point to point or multicast mode.
 		  Nothing is done with the data, Wireshark could be used to see them, or
@@ -69,7 +69,7 @@
 	2.6 Configure: ForwardOpen O->T
 		- Some job to do.
 	2.7 Save/Open Files
-		- The full Tree (from Devices to Attributs) could be save/load from
+		- The full Tree (from Devices to Attributes) could be save/load from
 		  a file. This file could be edit/modify using an spreadsheet (Excel or
 		  OpenOffice/LibreOffice for instance). The format isn't too complex
 		  to be infers. It must be strictly respected.
@@ -77,9 +77,9 @@
 		  difference appears. The names coming from the file are the winners.
 		- Several files could be open successively, the content are added.
 		- Save is not automatic, but must be done by hand.
-	2.8 User Decoders for Attributs
-		- Attributs could be decoded using a simple editor. A right click
-		  on an attribut shows a popup with an item "Decode Attribut As". 
+	2.8 User Decoders for Attributes
+		- Attributes could be decoded using a simple editor. A right click
+		  on an attribute shows a popup with an item "Decode Attribute As". 
 		  The list is build with the file saved using the TypeEditor present in
 		  the top level Menu : "Option"-"Edit User ....".
 		- The editor Grid could be filled with the description of the user types.
@@ -93,6 +93,9 @@
 		  not unicity).
 		  You can also modify the file using a text editor or a programmed code. 
 		  The format isn't too complex to be infers. It must be strictly respected.
+	2.9 Implicit messaging
+		  ForwardOpen T->O, O->T and Config. Drag/Drop the Attributes for each
+		  on the associated panel, when press Forward Open to begin.
 
 3.  SETTINGS OPTIONS
 	3.1 TCP_LAN_Timeout & TCP_WAN_Timeout

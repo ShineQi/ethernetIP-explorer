@@ -467,17 +467,20 @@ namespace System.Net.EnIPStack
 
             foreach (EnIPAttribut att in Atts)
             {
-                Cid = att.myInstance.myClass.Id;
-                if ((previousAtt!=null)&&(Cid == previousAtt.myInstance.myClass.Id))
-                    Cid = null;
+                if (att != null)
+                {
+                    Cid = att.myInstance.myClass.Id;
+                    if ((previousAtt != null) && (Cid == previousAtt.myInstance.myClass.Id))
+                        Cid = null;
 
-                Aid = ((att.Id == 3)&&(att.myInstance.myClass.Id==4)) ? null : (ushort?)att.Id;
+                    Aid = ((att.Id == 3) && (att.myInstance.myClass.Id == 4)) ? null : (ushort?)att.Id;
 
-                DataPath = EnIPPath.GetPath(Cid, att.myInstance.Id, Aid);
-                Array.Copy(DataPath, 0, FinalDataPath, offset, DataPath.Length);
-                offset += DataPath.Length;
+                    DataPath = EnIPPath.GetPath(Cid, att.myInstance.Id, Aid);
+                    Array.Copy(DataPath, 0, FinalDataPath, offset, DataPath.Length);
+                    offset += DataPath.Length;
 
-                previousAtt = att;
+                    previousAtt = att;
+                }
             }
 
             return new byte[] { 0x20, 0x04, 0x24, 0x97, 0x24, 0x96, 0x24, 0x64 }; // OK Pour T->O et O->T
@@ -489,7 +492,7 @@ namespace System.Net.EnIPStack
 
             byte[] DataPath = GetForwardOpenPath(new EnIPAttribut[] { Config, O2T, T2O });
 
-            if (WriteConfig == true) // Add data segment
+            if ((WriteConfig == true)&&(Config!=null)) // Add data segment
             {
                 byte[] FinaleFrame = new byte[DataPath.Length + 2 + Config.RawData.Length];
                 Array.Copy(DataPath, FinaleFrame, DataPath.Length);
@@ -515,12 +518,17 @@ namespace System.Net.EnIPStack
 
             if (Status == EnIPNetworkStatus.OnLine)
             {
-                O2T.O2T_ConnectionId = BitConverter.ToUInt32(packet, Offset); // badly made
-                O2T.SequenceItem = new SequencedAddressItem(O2T.O2T_ConnectionId,0, O2T.RawData); // ready to send
+                if (O2T != null)
+                {
+                    O2T.O2T_ConnectionId = BitConverter.ToUInt32(packet, Offset); // badly made
+                    O2T.SequenceItem = new SequencedAddressItem(O2T.O2T_ConnectionId, 0, O2T.RawData); // ready to send
+                }
 
-                T2O.Class1Enrolment();
-
-                T2O.T2O_ConnectionId = BitConverter.ToUInt32(packet, Offset + 4);
+                if (T2O != null)
+                {
+                    T2O.Class1Enrolment();
+                    T2O.T2O_ConnectionId = BitConverter.ToUInt32(packet, Offset + 4);
+                }
                 ClosePacket = new ForwardClose_Packet(FwPkt);
             }
 
@@ -548,6 +556,8 @@ namespace System.Net.EnIPStack
         public abstract EnIPNetworkStatus ReadDataFromNetwork();
         public virtual bool EncodeFromDecodedMembers() { return false; } // Encode the existing RawData with the decoded membrer (maybe modified)
         public abstract EnIPNetworkStatus WriteDataToNetwork();
+
+        public abstract String GetStrPath();
 
         public EnIPRemoteDevice RemoteDevice;
 
@@ -599,6 +609,12 @@ namespace System.Net.EnIPStack
         public override EnIPNetworkStatus WriteDataToNetwork()
         {
             return EnIPNetworkStatus.OnLineWriteRejected;
+        }
+
+
+        public override String GetStrPath()
+        {
+            return Id.ToString()+".0";
         }
 
         public override EnIPNetworkStatus ReadDataFromNetwork()
@@ -695,6 +711,12 @@ namespace System.Net.EnIPStack
         public override EnIPNetworkStatus WriteDataToNetwork()
         {
             return EnIPNetworkStatus.OnLineWriteRejected;
+        }
+
+
+        public override String GetStrPath()
+        {
+            return myClass.Id.ToString() + '.' + Id.ToString();
         }
 
         public override EnIPNetworkStatus ReadDataFromNetwork()
@@ -817,6 +839,11 @@ namespace System.Net.EnIPStack
         {
             byte[] DataPath = EnIPPath.GetPath(myInstance.myClass.Id, myInstance.Id, Id);
             return WriteDataToNetwork(DataPath, CIPServiceCodes.SetAttributeSingle);
+        }
+
+        public override String GetStrPath()
+        {
+            return myInstance.myClass.Id.ToString()+'.'+ myInstance.Id.ToString()+"."+ Id.ToString();
         }
 
         public override EnIPNetworkStatus ReadDataFromNetwork()

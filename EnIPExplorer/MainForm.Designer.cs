@@ -63,6 +63,7 @@
             this.addRemoteDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendListIdentityDiscoverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.explicitMessagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.implicitIOMessagingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.readAgainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendForwardOpenTOToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -159,7 +160,7 @@
             this.popupForwardToolStripMenuItem,
             this.popuForward2ToolStripMenuItem});
             this.MenuPopup.Name = "MenuPopup";
-            this.MenuPopup.Size = new System.Drawing.Size(241, 180);
+            this.MenuPopup.Size = new System.Drawing.Size(241, 202);
             // 
             // popupDeleteToolStripMenuItem
             // 
@@ -387,6 +388,7 @@
             this.addRemoteDeviceToolStripMenuItem,
             this.sendListIdentityDiscoverToolStripMenuItem,
             this.explicitMessagesToolStripMenuItem,
+            this.implicitIOMessagingToolStripMenuItem,
             this.toolStripSeparator1,
             this.readAgainToolStripMenuItem,
             this.sendForwardOpenTOToolStripMenuItem,
@@ -433,6 +435,14 @@
             this.explicitMessagesToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.explicitMessagesToolStripMenuItem.Text = "Explicit Messaging";
             this.explicitMessagesToolStripMenuItem.Click += new System.EventHandler(this.explicitMessagesToolStripMenuItem_Click);
+            // 
+            // implicitIOMessagingToolStripMenuItem
+            // 
+            this.implicitIOMessagingToolStripMenuItem.Image = global::EnIPExplorer.Properties.Resources.table_refresh;
+            this.implicitIOMessagingToolStripMenuItem.Name = "implicitIOMessagingToolStripMenuItem";
+            this.implicitIOMessagingToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.implicitIOMessagingToolStripMenuItem.Text = "Implicit (I/O) Messaging";
+            this.implicitIOMessagingToolStripMenuItem.Click += new System.EventHandler(this.implicitIOMessagingToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
@@ -669,6 +679,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem editAttributsDecodersToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem explicitMessagesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem implicitIOMessagingToolStripMenuItem;
     }
 }
 

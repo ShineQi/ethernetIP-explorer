@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "EnIPExplorer"
-#define MyAppVersion "0.9"
+#define MyAppVersion "1.0"
 #define MyAppPublisher "F. Chaxel"
 #define MyAppURL "http://sourceforge.net/projects/EnIPExplorer"
 #define MyAppExeName "EnIPExplorer.exe"

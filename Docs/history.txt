@@ -35,3 +35,6 @@
  - MessageRouter class decoder
  - Discovery process improvment 
  - Class attributs readed one by one if needed
+
+1.0.0
+ - Implicit messaging

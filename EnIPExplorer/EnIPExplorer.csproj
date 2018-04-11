@@ -95,6 +95,12 @@
       <DependentUpon>ExplicitMessages.cs</DependentUpon>
     </Compile>
     <Compile Include="GenericInputBox.cs" />
+    <Compile Include="ImplicitMessaging.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImplicitMessaging.Designer.cs">
+      <DependentUpon>ImplicitMessaging.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -115,6 +121,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ExplicitMessages.resx">
       <DependentUpon>ExplicitMessages.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImplicitMessaging.resx">
+      <DependentUpon>ImplicitMessaging.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
@@ -175,6 +184,7 @@
     </None>
     <None Include="ico\text_dropcaps.png" />
     <None Include="ico\email.png" />
+    <None Include="ico\table_refresh.png" />
     <Content Include="Search.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -213,6 +213,16 @@ namespace EnIPExplorer.Properties {
         /// <summary>
         ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap table_refresh {
+            get {
+                object obj = ResourceManager.GetObject("table_refresh", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap text_dropcaps {
             get {
                 object obj = ResourceManager.GetObject("text_dropcaps", resourceCulture);

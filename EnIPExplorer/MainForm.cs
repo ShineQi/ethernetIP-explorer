@@ -1060,6 +1060,12 @@ namespace EnIPExplorer
                 readAgainToolStripMenuItem_Click(null, null);
         }
 
+        private void implicitIOMessagingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (devicesTreeView.SelectedNode!=null)
+                new ImplicitMessaging(devicesTreeView).ShowDialog();
+        }
+
     }
 
     // Coming from Yabe @ Sourceforge, by Morten Kvistgaard
