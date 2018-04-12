@@ -185,6 +185,7 @@
     <None Include="ico\text_dropcaps.png" />
     <None Include="ico\email.png" />
     <None Include="ico\table_refresh.png" />
+    <None Include="ico\bullet_red.png" />
     <Content Include="Search.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

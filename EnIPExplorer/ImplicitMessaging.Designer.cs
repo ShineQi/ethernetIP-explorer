@@ -51,6 +51,9 @@
             this.checkWriteConfig = new System.Windows.Forms.CheckBox();
             this.buttonFw = new System.Windows.Forms.Button();
             this.tmrO2I = new System.Windows.Forms.Timer(this.components);
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.ImgInputActivity = new System.Windows.Forms.PictureBox();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -84,6 +87,9 @@
             this.splitContainer8.Panel2.SuspendLayout();
             this.splitContainer8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CycleTime)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ImgInputActivity)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -100,8 +106,8 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer8);
-            this.splitContainer1.Size = new System.Drawing.Size(644, 431);
-            this.splitContainer1.SplitterDistance = 377;
+            this.splitContainer1.Size = new System.Drawing.Size(876, 424);
+            this.splitContainer1.SplitterDistance = 370;
             this.splitContainer1.TabIndex = 0;
             // 
             // splitContainer2
@@ -117,8 +123,8 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.splitContainer3);
-            this.splitContainer2.Size = new System.Drawing.Size(644, 377);
-            this.splitContainer2.SplitterDistance = 214;
+            this.splitContainer2.Size = new System.Drawing.Size(876, 370);
+            this.splitContainer2.SplitterDistance = 200;
             this.splitContainer2.TabIndex = 0;
             // 
             // ClassView
@@ -126,7 +132,7 @@
             this.ClassView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ClassView.Location = new System.Drawing.Point(0, 0);
             this.ClassView.Name = "ClassView";
-            this.ClassView.Size = new System.Drawing.Size(214, 377);
+            this.ClassView.Size = new System.Drawing.Size(200, 370);
             this.ClassView.TabIndex = 0;
             // 
             // splitContainer3
@@ -142,8 +148,8 @@
             // splitContainer3.Panel2
             // 
             this.splitContainer3.Panel2.Controls.Add(this.splitContainer4);
-            this.splitContainer3.Size = new System.Drawing.Size(426, 377);
-            this.splitContainer3.SplitterDistance = 142;
+            this.splitContainer3.Size = new System.Drawing.Size(672, 370);
+            this.splitContainer3.SplitterDistance = 223;
             this.splitContainer3.TabIndex = 0;
             // 
             // splitContainer5
@@ -161,8 +167,8 @@
             // splitContainer5.Panel2
             // 
             this.splitContainer5.Panel2.Controls.Add(this.propertyGridConfig);
-            this.splitContainer5.Size = new System.Drawing.Size(142, 377);
-            this.splitContainer5.SplitterDistance = 54;
+            this.splitContainer5.Size = new System.Drawing.Size(223, 370);
+            this.splitContainer5.SplitterDistance = 52;
             this.splitContainer5.TabIndex = 0;
             // 
             // labelConfig
@@ -171,7 +177,7 @@
             this.labelConfig.Dock = System.Windows.Forms.DockStyle.Fill;
             this.labelConfig.Location = new System.Drawing.Point(0, 0);
             this.labelConfig.Name = "labelConfig";
-            this.labelConfig.Size = new System.Drawing.Size(140, 52);
+            this.labelConfig.Size = new System.Drawing.Size(221, 50);
             this.labelConfig.TabIndex = 1;
             this.labelConfig.Text = "Configuration\r\nDrag Drop to set";
             this.labelConfig.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -187,7 +193,7 @@
             this.propertyGridConfig.Location = new System.Drawing.Point(0, 0);
             this.propertyGridConfig.Name = "propertyGridConfig";
             this.propertyGridConfig.PropertySort = System.Windows.Forms.PropertySort.NoSort;
-            this.propertyGridConfig.Size = new System.Drawing.Size(140, 317);
+            this.propertyGridConfig.Size = new System.Drawing.Size(221, 312);
             this.propertyGridConfig.TabIndex = 0;
             this.propertyGridConfig.ToolbarVisible = false;
             this.propertyGridConfig.DragDrop += new System.Windows.Forms.DragEventHandler(this.Config_DragDrop);
@@ -206,8 +212,8 @@
             // splitContainer4.Panel2
             // 
             this.splitContainer4.Panel2.Controls.Add(this.splitContainer7);
-            this.splitContainer4.Size = new System.Drawing.Size(280, 377);
-            this.splitContainer4.SplitterDistance = 142;
+            this.splitContainer4.Size = new System.Drawing.Size(445, 370);
+            this.splitContainer4.SplitterDistance = 224;
             this.splitContainer4.TabIndex = 0;
             // 
             // splitContainer6
@@ -220,13 +226,14 @@
             // 
             // splitContainer6.Panel1
             // 
+            this.splitContainer6.Panel1.Controls.Add(this.pictureBox1);
             this.splitContainer6.Panel1.Controls.Add(this.labelOutput);
             // 
             // splitContainer6.Panel2
             // 
             this.splitContainer6.Panel2.Controls.Add(this.propertyGridOutput);
-            this.splitContainer6.Size = new System.Drawing.Size(142, 377);
-            this.splitContainer6.SplitterDistance = 54;
+            this.splitContainer6.Size = new System.Drawing.Size(224, 370);
+            this.splitContainer6.SplitterDistance = 52;
             this.splitContainer6.TabIndex = 0;
             // 
             // labelOutput
@@ -235,7 +242,7 @@
             this.labelOutput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.labelOutput.Location = new System.Drawing.Point(0, 0);
             this.labelOutput.Name = "labelOutput";
-            this.labelOutput.Size = new System.Drawing.Size(140, 52);
+            this.labelOutput.Size = new System.Drawing.Size(222, 50);
             this.labelOutput.TabIndex = 1;
             this.labelOutput.Text = "Output\r\nDrag Drop to set";
             this.labelOutput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -251,9 +258,10 @@
             this.propertyGridOutput.Location = new System.Drawing.Point(0, 0);
             this.propertyGridOutput.Name = "propertyGridOutput";
             this.propertyGridOutput.PropertySort = System.Windows.Forms.PropertySort.NoSort;
-            this.propertyGridOutput.Size = new System.Drawing.Size(140, 317);
+            this.propertyGridOutput.Size = new System.Drawing.Size(222, 312);
             this.propertyGridOutput.TabIndex = 0;
             this.propertyGridOutput.ToolbarVisible = false;
+            this.propertyGridOutput.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGridOutput_PropertyValueChanged);
             this.propertyGridOutput.DragDrop += new System.Windows.Forms.DragEventHandler(this.Output_DragDrop);
             this.propertyGridOutput.DragEnter += new System.Windows.Forms.DragEventHandler(this._DragEnter);
             // 
@@ -267,13 +275,15 @@
             // 
             // splitContainer7.Panel1
             // 
+            this.splitContainer7.Panel1.Controls.Add(this.ImgInputActivity);
+            this.splitContainer7.Panel1.Controls.Add(this.pictureBox2);
             this.splitContainer7.Panel1.Controls.Add(this.labelInput);
             // 
             // splitContainer7.Panel2
             // 
             this.splitContainer7.Panel2.Controls.Add(this.propertyGridInput);
-            this.splitContainer7.Size = new System.Drawing.Size(134, 377);
-            this.splitContainer7.SplitterDistance = 54;
+            this.splitContainer7.Size = new System.Drawing.Size(217, 370);
+            this.splitContainer7.SplitterDistance = 52;
             this.splitContainer7.TabIndex = 0;
             // 
             // labelInput
@@ -282,7 +292,7 @@
             this.labelInput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.labelInput.Location = new System.Drawing.Point(0, 0);
             this.labelInput.Name = "labelInput";
-            this.labelInput.Size = new System.Drawing.Size(132, 52);
+            this.labelInput.Size = new System.Drawing.Size(215, 50);
             this.labelInput.TabIndex = 1;
             this.labelInput.Text = "Input\r\nDrag Drop to set";
             this.labelInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -298,7 +308,7 @@
             this.propertyGridInput.Location = new System.Drawing.Point(0, 0);
             this.propertyGridInput.Name = "propertyGridInput";
             this.propertyGridInput.PropertySort = System.Windows.Forms.PropertySort.NoSort;
-            this.propertyGridInput.Size = new System.Drawing.Size(132, 317);
+            this.propertyGridInput.Size = new System.Drawing.Size(215, 312);
             this.propertyGridInput.TabIndex = 0;
             this.propertyGridInput.ToolbarVisible = false;
             this.propertyGridInput.DragDrop += new System.Windows.Forms.DragEventHandler(this.Input_DragDrop);
@@ -320,8 +330,8 @@
             // splitContainer8.Panel2
             // 
             this.splitContainer8.Panel2.Controls.Add(this.buttonFw);
-            this.splitContainer8.Size = new System.Drawing.Size(644, 50);
-            this.splitContainer8.SplitterDistance = 505;
+            this.splitContainer8.Size = new System.Drawing.Size(876, 50);
+            this.splitContainer8.SplitterDistance = 686;
             this.splitContainer8.TabIndex = 0;
             // 
             // CycleTime
@@ -382,7 +392,7 @@
             this.buttonFw.Dock = System.Windows.Forms.DockStyle.Fill;
             this.buttonFw.Location = new System.Drawing.Point(0, 0);
             this.buttonFw.Name = "buttonFw";
-            this.buttonFw.Size = new System.Drawing.Size(135, 50);
+            this.buttonFw.Size = new System.Drawing.Size(186, 50);
             this.buttonFw.TabIndex = 0;
             this.buttonFw.Text = "Forward Open";
             this.buttonFw.UseVisualStyleBackColor = true;
@@ -392,11 +402,45 @@
             // 
             this.tmrO2I.Tick += new System.EventHandler(this.tmrO2I_Tick);
             // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.pictureBox1.Image = global::EnIPExplorer.Properties.Resources.door_out;
+            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(16, 50);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBox1.TabIndex = 2;
+            this.pictureBox1.TabStop = false;
+            // 
+            // ImgInputActivity
+            // 
+            this.ImgInputActivity.Dock = System.Windows.Forms.DockStyle.Left;
+            this.ImgInputActivity.Image = global::EnIPExplorer.Properties.Resources.bullet_red;
+            this.ImgInputActivity.Location = new System.Drawing.Point(16, 0);
+            this.ImgInputActivity.Name = "ImgInputActivity";
+            this.ImgInputActivity.Size = new System.Drawing.Size(16, 50);
+            this.ImgInputActivity.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.ImgInputActivity.TabIndex = 3;
+            this.ImgInputActivity.TabStop = false;
+            this.ImgInputActivity.Visible = false;
+            // 
+            // pictureBox2
+            // 
+            this.pictureBox2.Dock = System.Windows.Forms.DockStyle.Left;
+            this.pictureBox2.Image = global::EnIPExplorer.Properties.Resources.door_in;
+            this.pictureBox2.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(16, 50);
+            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBox2.TabIndex = 2;
+            this.pictureBox2.TabStop = false;
+            // 
             // ImplicitMessaging
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(644, 431);
+            this.ClientSize = new System.Drawing.Size(876, 424);
             this.Controls.Add(this.splitContainer1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ImplicitMessaging";
@@ -424,10 +468,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).EndInit();
             this.splitContainer4.ResumeLayout(false);
             this.splitContainer6.Panel1.ResumeLayout(false);
+            this.splitContainer6.Panel1.PerformLayout();
             this.splitContainer6.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).EndInit();
             this.splitContainer6.ResumeLayout(false);
             this.splitContainer7.Panel1.ResumeLayout(false);
+            this.splitContainer7.Panel1.PerformLayout();
             this.splitContainer7.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer7)).EndInit();
             this.splitContainer7.ResumeLayout(false);
@@ -437,6 +483,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer8)).EndInit();
             this.splitContainer8.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.CycleTime)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ImgInputActivity)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -464,5 +513,8 @@
         private System.Windows.Forms.CheckBox checkWriteConfig;
         private System.Windows.Forms.NumericUpDown CycleTime;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox pictureBox2;
+        private System.Windows.Forms.PictureBox ImgInputActivity;
     }
 }

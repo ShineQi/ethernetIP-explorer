@@ -1,67 +1,80 @@
 Device IP;Name;Class;ClassName;Instance;InstanceName;Attribute;AttributeName
-//;;;;;;;
-// EnIPExplorer Device Tree, can be modified with a spreadsheet;;;;;;;
-// No empy line, comment first with a / char;;;;;;;
-// All comments removed by EnIPExplorer save As menu.;;;;;;;
-//;;;;;;;
-// Device IP & Name;;;;;;;
-100.75.137.5;WAGO 750-881 PFC ETHERNET;;;;;;
-// Class 1 under the Wago Plc;;;;;;;
-;;1;Identity  #1;;;;
-// instance 1 under the class 1;;;;;;;
-;;;;1;Instance #1;;
-// class 2;;;;;;;
-;;2;MessageRouter #2;;;;
-;;;;1;Instance #1;;
+// EnIPExplorer Device Tree, can be modified with a spreadsheet
+100.75.137.5;WAGO 750-881 PFC ETHERNET
+;;1;Identity  #1
+;;;;1;Instance #1
+;;2;MessageRouter #2
+;;;;1;Instance #1
 ;;;;;;1;ObjectList #1
-;;4;Assembly #4;;;;
-;;;;101;Instance #101 - Output;;
+;;4;Assembly #4
+;;;;101;Instance #101 - Output
 ;;;;;;3;Attribute #3
-;;;;107;Instance #107 - Input;;
+;;;;107;Instance #107 - Input
 ;;;;;;3;Attribute #3
-;;6;ConnectionManager  #6;;;;
-;;244;Port #244;;;;
-;;;;1;Instance #1;;
-;;245;TCPIPInterface #245;;;;
-;;;;1;Instance #1;;
-;;246;EthernetLink #246;;;;
-;;;;1;Instance #1;;
-;;;;2;Instance #2;;
-;;;;3;Instance #3 - InternalPort;;
-;;100;Proprietary #100;;;;
-;;101;Proprietary #101;;;;
-;;102;Proprietary #102;;;;
-;;103;Proprietary Analog Inputs #103;;;;
-;;;;1;Instance #1;;
+;;6;ConnectionManager  #6
+;;100;Proprietary #100
+;;101;Proprietary #101
+;;102;Proprietary #102
+;;103;Proprietary Analog Inputs #103
+;;;;1;Instance #1
 ;;;;;;1;First Analog Input #1 
-;;104;Proprietary #104;;;;
-;;105;Proprietary #105;;;;
-;;106;Proprietary #106;;;;
-;;107;Proprietary #107;;;;
-;;108;Proprietary #108;;;;
-;;109;Proprietary #109;;;;
-;;110;Proprietary #110;;;;
-;;111;I can put the name I want;;;;
-;;112;Proprietary #112;;;;
-// Next device;;;;;;;
-172.20.54.59;WAGO 750-881 PFC ETHERNET;;;;;;
-;;1;Identity  #1;;;;
-;;103;Proprietary Analog Inputs #103;;;;
-;;;;1;Instance #1;;
+;;104;Proprietary #104
+;;105;Proprietary #105
+;;106;Proprietary #106
+;;107;Proprietary #107
+;;108;Proprietary #108
+;;109;Proprietary #109
+;;110;Proprietary #110
+;;111;I can put the name I want
+;;112;Proprietary #112
+;;244;Port #244
+;;;;1;Instance #1
+;;245;TCPIPInterface #245
+;;;;1;Instance #1
+;;246;EthernetLink #246
+;;;;1;Instance #1
+;;;;2;Instance #2
+;;;;3;Instance #3 - InternalPort
+100.75.137.27;OpENer Rpi Ge2i
+;;1;Identity #1
+;;;;1;Instance #1
+;;2;MessageRouter #2
+;;;;1;Instance #1
+;;4;Assembly #4
+;;;;100;Input #100
+;;;;;;3;Attribute #3
+;;;;150;Output #150
+;;;;;;3;Attribute #3
+;;;;151;Config #151
+;;;;;;3;Attribute #3
+;;;;152;HeartBeat Input #152
+;;;;;;3;Attribute #3
+;;;;153;HeartBeat Listen #153
+;;;;;;3;Attribute #3
+;;;;154;Explicit #154
+;;;;;;3;Attribute #3
+;;6;ConnectionManager #6
+;;245;TCPIPInterface #245
+;;;;1;Instance #1
+;;246;EtherNetLink #246
+;;;;1;Instance #1
+172.20.54.59;WAGO 750-881 PFC ETHERNET
+;;1;Identity  #1
+;;103;Proprietary Analog Inputs #103
+;;;;1;Instance #1
 ;;;;;;1;First Analog Input #1 
-// Next device;;;;;;;
-172.20.54.119;Eurotherm Epack;;;;;;
-;;1;Identity  #1;;;;
-;;2;MessageRouter #2;;;;
-;;;;1;Instance #1;;
+172.20.54.119;Eurotherm Epack
+;;1;Identity  #1
+;;2;MessageRouter #2
+;;;;1;Instance #1
 ;;;;;;1;ObjectList #1
-;;4;Assembly #4;;;;
-;;;;100;Instance #100 - Input;;
+;;4;Assembly #4
+;;;;100;Instance #100 - Input
 ;;;;;;3;Attribute #3
-;;;;150;Instance #150 - Output;;
+;;;;150;Instance #150 - Output
 ;;;;;;3;Attribute #3
-;;6;ConnectionManager  #6;;;;
-;;245;TCPIPInterface #245;;;;
-;;;;1;Instance #1;;
-;;246;EthernetLink #246;;;;
-;;;;1;Instance #1;;
+;;6;ConnectionManager  #6
+;;245;TCPIPInterface #245
+;;;;1;Instance #1
+;;246;EthernetLink #246
+;;;;1;Instance #1

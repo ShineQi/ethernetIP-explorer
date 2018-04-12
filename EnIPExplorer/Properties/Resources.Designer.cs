@@ -103,6 +103,16 @@ namespace EnIPExplorer.Properties {
         /// <summary>
         ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap bullet_red {
+            get {
+                object obj = ResourceManager.GetObject("bullet_red", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap bullet_wrench {
             get {
                 object obj = ResourceManager.GetObject("bullet_wrench", resourceCulture);

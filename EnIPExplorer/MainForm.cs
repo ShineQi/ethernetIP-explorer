@@ -233,8 +233,6 @@ namespace EnIPExplorer
             Cursor Memcurs = this.Cursor;
 
             this.Cursor = Cursors.WaitCursor;
-            popupForwardToolStripMenuItem.Visible = false;
-            popuForward2ToolStripMenuItem.Visible = false;
 
             // It's a Device : top level
             if (e.Node.Tag is EnIPRemoteDevice)
@@ -354,8 +352,6 @@ namespace EnIPExplorer
                 popupAddCToolStripMenuItem.Visible = true;
                 popupAddIToolStripMenuItem.Visible = true;
                 popupAddAToolStripMenuItem.Visible = true;
-                popupForwardToolStripMenuItem.Visible = true;
-                popuForward2ToolStripMenuItem.Visible = true;
                 decodeAttributAsToolStripMenuItem.Visible = true;
                 popupDeleteToolStripMenuItem.Text = deleteToolStripMenuItem.Text = "Delete current Attribute";
             }
@@ -798,43 +794,6 @@ namespace EnIPExplorer
                 LastReadNetworkStatus = EnIPNetworkStatus.OffLine;
         }
 
-        // Menu Item
-        private void ForwardOpenToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (!(propertyGrid.SelectedObject is EnIPAttribut)) return;
-
-            bool p2p = true;
-
-            if ((sender == multicastToolStripMenuItem) || (sender == popupMulticastToolStripMenuItem))
-                p2p = false;
-
-            EnIPAttribut att = (EnIPAttribut)propertyGrid.SelectedObject;
-
-            int Duration = Properties.Settings.Default.ForwardOpenDuration_s;
-            if (Duration <= 0) Duration = 1;
-            if (Duration > 60) Duration = 60;
-            if (att.ForwardOpen(p2p, true, false, Properties.Settings.Default.ForwardOpenPeriod_ms, Duration)==EnIPNetworkStatus.OnLine)
-                Trace.WriteLine("ForwardOpen T->O OK, good luck with Wireshark or Class1 client sample source code");
-
-        }
-        // Menu Item
-        private void sendForwardOpenTOToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (!(propertyGrid.SelectedObject is EnIPAttribut)) return;
-
-            EnIPAttribut att = (EnIPAttribut)propertyGrid.SelectedObject;
-
-            if (att.RemoteDevice.VendorId==40)
-                if (MessageBox.Show("Wago PLC, do it at your own risk,\r\n this action could destroy it,\r\n Cancel please it's better", "Takes care", MessageBoxButtons.OKCancel, MessageBoxIcon.Question)
-                    == DialogResult.Cancel) return;
-
-
-            int Duration = Properties.Settings.Default.ForwardOpenDuration_s;
-            if (Duration <= 0) Duration = 1;
-            if (Duration > 60) Duration = 60;
-            if (att.ForwardOpen(true, false, true, 100, Duration) == EnIPNetworkStatus.OnLine)
-                 Trace.WriteLine("ForwardOpen O->T OK, close will be sent in "+Duration.ToString()+" seconds");
-        }
 
         // Recursive usage
         private void SaveFileEnIPOject(StreamWriter sw, string pre,TreeNodeCollection tnc)

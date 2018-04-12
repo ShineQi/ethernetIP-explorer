@@ -457,8 +457,7 @@ namespace System.Net.EnIPStack
         // Gives a compressed Path with a list of Attributs
         private byte[] GetForwardOpenPath(EnIPAttribut[] Atts)
         {
-            byte[] DataPath;
-            byte[] FinalDataPath = new byte[20];
+            byte[] ConstructDataPath = new byte[20];
             int offset = 0;
 
             ushort? Cid, Aid;
@@ -469,6 +468,8 @@ namespace System.Net.EnIPStack
             {
                 if (att != null)
                 {
+                    byte[] DataPath;
+
                     Cid = att.myInstance.myClass.Id;
                     if ((previousAtt != null) && (Cid == previousAtt.myInstance.myClass.Id))
                         Cid = null;
@@ -476,14 +477,17 @@ namespace System.Net.EnIPStack
                     Aid = ((att.Id == 3) && (att.myInstance.myClass.Id == 4)) ? null : (ushort?)att.Id;
 
                     DataPath = EnIPPath.GetPath(Cid, att.myInstance.Id, Aid);
-                    Array.Copy(DataPath, 0, FinalDataPath, offset, DataPath.Length);
+                    Array.Copy(DataPath, 0, ConstructDataPath, offset, DataPath.Length);
                     offset += DataPath.Length;
 
                     previousAtt = att;
                 }
             }
 
-            return new byte[] { 0x20, 0x04, 0x24, 0x97, 0x24, 0x96, 0x24, 0x64 }; // OK Pour T->O et O->T
+            byte[] FinalPath = new byte[offset];
+            Array.Copy(ConstructDataPath, 0, FinalPath, 0, offset);
+            return FinalPath;
+            //return new byte[] { 0x20, 0x04, 0x24, 0x97, 0x24, 0x96, 0x24, 0x64 }; // OK Pour T->O et O->T
         }
         
         public EnIPNetworkStatus ForwardOpen(bool p2p, EnIPAttribut Config, EnIPAttribut O2T, EnIPAttribut T2O, uint CycleTime, out ForwardClose_Packet ClosePacket, bool WriteConfig=false)

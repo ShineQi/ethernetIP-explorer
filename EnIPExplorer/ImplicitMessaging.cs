@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Net.EnIPStack;
+using System.Net;
 
 namespace EnIPExplorer
 {
@@ -35,6 +36,11 @@ namespace EnIPExplorer
             ClassView.ItemDrag += new ItemDragEventHandler(ClassView_ItemDrag);
 
             this.Text = "Implicit Messaging with " + baseNode.Text;
+
+            IPEndPoint LocalEp = new IPEndPoint(IPAddress.Any, 0x8AE);
+            // It's not a problem to do this with more than one remote device,
+            // the underlying udp socket is static
+            device.Class1Activate(LocalEp);
         }
 
         void ClassView_ItemDrag(object sender, ItemDragEventArgs e)
@@ -90,6 +96,9 @@ namespace EnIPExplorer
                 {
                     buttonFw.Text = "Forward Close";
                     tmrO2I.Enabled = true;
+
+                    if (Input!=null)
+                        Input.T2OEvent += new T2OEventHandler(Input_T2OEvent);
                 }
                 else
                     FwclosePacket = null;
@@ -102,7 +111,21 @@ namespace EnIPExplorer
                 device.ForwardClose(FwclosePacket);
                 buttonFw.Text = "Forward Open";
                 FwclosePacket = null;
+                if (Input != null)
+                    Input.T2OEvent -= new T2OEventHandler(Input_T2OEvent);
+                ImgInputActivity.Visible = false;
             }
+        }
+
+        void Input_T2OEvent(EnIPAttribut sender)
+        {
+            if (InvokeRequired)
+            {
+                BeginInvoke(new Action<EnIPAttribut>(Input_T2OEvent), new object[] { sender });
+                return;
+            }
+            propertyGridInput.Refresh();
+            ImgInputActivity.Visible = !ImgInputActivity.Visible;
         }
 
         private void tmrO2I_Tick(object sender, EventArgs e)
@@ -120,6 +143,16 @@ namespace EnIPExplorer
         {
             if (device.VendorId == 40)
                 MessageBox.Show("Wago PLC, do it at your own risk,\r\n some configurations could destroy it.\r\n Cancel it's better", "Takes care", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void propertyGridOutput_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        {
+            // Modification in a Decoded field : copy it into the Raw field
+            if ((e.ChangedItem.Parent != null) && (e.ChangedItem.Parent.Label == "DecodedMembers"))
+            {
+                Output.EncodeFromDecodedMembers();
+                propertyGridOutput.Refresh();
+            }
         }
 
     }
