@@ -60,15 +60,7 @@
 		- Decoder could be the default (depending of the class & attribut n°),
 		  or a standard default of UINT, or a user defined : see Option menu.
 		  The decoder can be changed using the context popupmenu (see §2.8).
-	2.5 Advise : ForwardOpen T->O
-		- On attributes one could place a ForwardOpen T->O (Device to EnIPExplorer).
-		  If accepted, the Class 1 device (Plc or other) will send back 
-		  the data by using Udp in point to point or multicast mode.
-		  Nothing is done with the data, Wireshark could be used to see them, or
-		  using the Class1 client sample.
-	2.6 Configure: ForwardOpen O->T
-		- Some job to do.
-	2.7 Save/Open Files
+	2.5 Save/Open Files
 		- The full Tree (from Devices to Attributes) could be save/load from
 		  a file. This file could be edit/modify using an spreadsheet (Excel or
 		  OpenOffice/LibreOffice for instance). The format isn't too complex
@@ -77,7 +69,7 @@
 		  difference appears. The names coming from the file are the winners.
 		- Several files could be open successively, the content are added.
 		- Save is not automatic, but must be done by hand.
-	2.8 User Decoders for Attributes
+	2.6 User Decoders for Attributes
 		- Attributes could be decoded using a simple editor. A right click
 		  on an attribute shows a popup with an item "Decode Attribute As". 
 		  The list is build with the file saved using the TypeEditor present in
@@ -93,7 +85,7 @@
 		  not unicity).
 		  You can also modify the file using a text editor or a programmed code. 
 		  The format isn't too complex to be infers. It must be strictly respected.
-	2.9 Implicit messaging
+	2.7 Implicit messaging
 		  ForwardOpen T->O, O->T and Config. Drag/Drop the Attributes for each
 		  on the associated panel, when press Forward Open to begin.
 
@@ -109,10 +101,6 @@
 		  - Used to fill the Textbox with this default value.
 	3.4 CSVSeparator
 		  - Value for treeview CSV file (spreadsheet compatible format) see §2.5.
-	3.5 ForwardOpen
-		  - Control parameters : requested cycle time (in ms) & duration (in sec.).
-		    If the cycle is 0 ms, then a ChangeOfstate request is used.
-			Duration is auto-adjusted in the range 1..60.
 
 4.  TESTS
 	The EnIPExplorer has been tested with really a too few number of others tools :

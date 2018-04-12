@@ -35,13 +35,17 @@
             this.ClassView = new System.Windows.Forms.TreeView();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.splitContainer5 = new System.Windows.Forms.SplitContainer();
+            this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.labelConfig = new System.Windows.Forms.Label();
             this.propertyGridConfig = new System.Windows.Forms.PropertyGrid();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.splitContainer6 = new System.Windows.Forms.SplitContainer();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.labelOutput = new System.Windows.Forms.Label();
             this.propertyGridOutput = new System.Windows.Forms.PropertyGrid();
             this.splitContainer7 = new System.Windows.Forms.SplitContainer();
+            this.ImgInputActivity = new System.Windows.Forms.PictureBox();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.labelInput = new System.Windows.Forms.Label();
             this.propertyGridInput = new System.Windows.Forms.PropertyGrid();
             this.splitContainer8 = new System.Windows.Forms.SplitContainer();
@@ -50,10 +54,7 @@
             this.checkP2P = new System.Windows.Forms.CheckBox();
             this.checkWriteConfig = new System.Windows.Forms.CheckBox();
             this.buttonFw = new System.Windows.Forms.Button();
-            this.tmrO2I = new System.Windows.Forms.Timer(this.components);
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.ImgInputActivity = new System.Windows.Forms.PictureBox();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.tmrO2T = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -70,6 +71,7 @@
             this.splitContainer5.Panel1.SuspendLayout();
             this.splitContainer5.Panel2.SuspendLayout();
             this.splitContainer5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).BeginInit();
             this.splitContainer4.Panel1.SuspendLayout();
             this.splitContainer4.Panel2.SuspendLayout();
@@ -78,18 +80,18 @@
             this.splitContainer6.Panel1.SuspendLayout();
             this.splitContainer6.Panel2.SuspendLayout();
             this.splitContainer6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer7)).BeginInit();
             this.splitContainer7.Panel1.SuspendLayout();
             this.splitContainer7.Panel2.SuspendLayout();
             this.splitContainer7.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ImgInputActivity)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer8)).BeginInit();
             this.splitContainer8.Panel1.SuspendLayout();
             this.splitContainer8.Panel2.SuspendLayout();
             this.splitContainer8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CycleTime)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ImgInputActivity)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -162,6 +164,7 @@
             // 
             // splitContainer5.Panel1
             // 
+            this.splitContainer5.Panel1.Controls.Add(this.pictureBox3);
             this.splitContainer5.Panel1.Controls.Add(this.labelConfig);
             // 
             // splitContainer5.Panel2
@@ -170,6 +173,17 @@
             this.splitContainer5.Size = new System.Drawing.Size(223, 370);
             this.splitContainer5.SplitterDistance = 52;
             this.splitContainer5.TabIndex = 0;
+            // 
+            // pictureBox3
+            // 
+            this.pictureBox3.Dock = System.Windows.Forms.DockStyle.Left;
+            this.pictureBox3.Image = global::EnIPExplorer.Properties.Resources.bullet_wrench;
+            this.pictureBox3.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox3.Name = "pictureBox3";
+            this.pictureBox3.Size = new System.Drawing.Size(16, 50);
+            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBox3.TabIndex = 2;
+            this.pictureBox3.TabStop = false;
             // 
             // labelConfig
             // 
@@ -196,6 +210,7 @@
             this.propertyGridConfig.Size = new System.Drawing.Size(221, 312);
             this.propertyGridConfig.TabIndex = 0;
             this.propertyGridConfig.ToolbarVisible = false;
+            this.propertyGridConfig.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGridConfig_PropertyValueChanged);
             this.propertyGridConfig.DragDrop += new System.Windows.Forms.DragEventHandler(this.Config_DragDrop);
             this.propertyGridConfig.DragEnter += new System.Windows.Forms.DragEventHandler(this._DragEnter);
             // 
@@ -236,6 +251,17 @@
             this.splitContainer6.SplitterDistance = 52;
             this.splitContainer6.TabIndex = 0;
             // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.pictureBox1.Image = global::EnIPExplorer.Properties.Resources.door_out;
+            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(16, 50);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBox1.TabIndex = 2;
+            this.pictureBox1.TabStop = false;
+            // 
             // labelOutput
             // 
             this.labelOutput.AllowDrop = true;
@@ -244,7 +270,7 @@
             this.labelOutput.Name = "labelOutput";
             this.labelOutput.Size = new System.Drawing.Size(222, 50);
             this.labelOutput.TabIndex = 1;
-            this.labelOutput.Text = "Output\r\nDrag Drop to set";
+            this.labelOutput.Text = "Output (O->T)\r\nDrag Drop to set";
             this.labelOutput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.labelOutput.DragDrop += new System.Windows.Forms.DragEventHandler(this.Output_DragDrop);
             this.labelOutput.DragEnter += new System.Windows.Forms.DragEventHandler(this._DragEnter);
@@ -286,6 +312,29 @@
             this.splitContainer7.SplitterDistance = 52;
             this.splitContainer7.TabIndex = 0;
             // 
+            // ImgInputActivity
+            // 
+            this.ImgInputActivity.Dock = System.Windows.Forms.DockStyle.Left;
+            this.ImgInputActivity.Image = global::EnIPExplorer.Properties.Resources.bullet_red;
+            this.ImgInputActivity.Location = new System.Drawing.Point(16, 0);
+            this.ImgInputActivity.Name = "ImgInputActivity";
+            this.ImgInputActivity.Size = new System.Drawing.Size(16, 50);
+            this.ImgInputActivity.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.ImgInputActivity.TabIndex = 3;
+            this.ImgInputActivity.TabStop = false;
+            this.ImgInputActivity.Visible = false;
+            // 
+            // pictureBox2
+            // 
+            this.pictureBox2.Dock = System.Windows.Forms.DockStyle.Left;
+            this.pictureBox2.Image = global::EnIPExplorer.Properties.Resources.door_in;
+            this.pictureBox2.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(16, 50);
+            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBox2.TabIndex = 2;
+            this.pictureBox2.TabStop = false;
+            // 
             // labelInput
             // 
             this.labelInput.AllowDrop = true;
@@ -294,7 +343,7 @@
             this.labelInput.Name = "labelInput";
             this.labelInput.Size = new System.Drawing.Size(215, 50);
             this.labelInput.TabIndex = 1;
-            this.labelInput.Text = "Input\r\nDrag Drop to set";
+            this.labelInput.Text = "Input (T->O)\r\nDrag Drop to set";
             this.labelInput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.labelInput.DragDrop += new System.Windows.Forms.DragEventHandler(this.Input_DragDrop);
             this.labelInput.DragEnter += new System.Windows.Forms.DragEventHandler(this._DragEnter);
@@ -331,12 +380,12 @@
             // 
             this.splitContainer8.Panel2.Controls.Add(this.buttonFw);
             this.splitContainer8.Size = new System.Drawing.Size(876, 50);
-            this.splitContainer8.SplitterDistance = 686;
+            this.splitContainer8.SplitterDistance = 655;
             this.splitContainer8.TabIndex = 0;
             // 
             // CycleTime
             // 
-            this.CycleTime.Location = new System.Drawing.Point(382, 17);
+            this.CycleTime.Location = new System.Drawing.Point(334, 17);
             this.CycleTime.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -359,11 +408,11 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(320, 21);
+            this.label1.Location = new System.Drawing.Point(397, 20);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(56, 13);
+            this.label1.Size = new System.Drawing.Size(78, 13);
             this.label1.TabIndex = 2;
-            this.label1.Text = "CycleTime";
+            this.label1.Text = "CycleTime (ms)";
             // 
             // checkP2P
             // 
@@ -372,19 +421,19 @@
             this.checkP2P.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkP2P.Location = new System.Drawing.Point(187, 20);
             this.checkP2P.Name = "checkP2P";
-            this.checkP2P.Size = new System.Drawing.Size(46, 17);
+            this.checkP2P.Size = new System.Drawing.Size(89, 17);
             this.checkP2P.TabIndex = 1;
-            this.checkP2P.Text = "P2P";
+            this.checkP2P.Text = "Point to Point";
             this.checkP2P.UseVisualStyleBackColor = true;
             // 
             // checkWriteConfig
             // 
             this.checkWriteConfig.AutoSize = true;
-            this.checkWriteConfig.Location = new System.Drawing.Point(13, 21);
+            this.checkWriteConfig.Location = new System.Drawing.Point(12, 19);
             this.checkWriteConfig.Name = "checkWriteConfig";
-            this.checkWriteConfig.Size = new System.Drawing.Size(81, 17);
+            this.checkWriteConfig.Size = new System.Drawing.Size(84, 17);
             this.checkWriteConfig.TabIndex = 0;
-            this.checkWriteConfig.Text = "WriteConfig";
+            this.checkWriteConfig.Text = "Write Config";
             this.checkWriteConfig.UseVisualStyleBackColor = true;
             // 
             // buttonFw
@@ -392,49 +441,15 @@
             this.buttonFw.Dock = System.Windows.Forms.DockStyle.Fill;
             this.buttonFw.Location = new System.Drawing.Point(0, 0);
             this.buttonFw.Name = "buttonFw";
-            this.buttonFw.Size = new System.Drawing.Size(186, 50);
+            this.buttonFw.Size = new System.Drawing.Size(217, 50);
             this.buttonFw.TabIndex = 0;
             this.buttonFw.Text = "Forward Open";
             this.buttonFw.UseVisualStyleBackColor = true;
             this.buttonFw.Click += new System.EventHandler(this.buttonFw_Click);
             // 
-            // tmrO2I
+            // tmrO2T
             // 
-            this.tmrO2I.Tick += new System.EventHandler(this.tmrO2I_Tick);
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.pictureBox1.Image = global::EnIPExplorer.Properties.Resources.door_out;
-            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(16, 50);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pictureBox1.TabIndex = 2;
-            this.pictureBox1.TabStop = false;
-            // 
-            // ImgInputActivity
-            // 
-            this.ImgInputActivity.Dock = System.Windows.Forms.DockStyle.Left;
-            this.ImgInputActivity.Image = global::EnIPExplorer.Properties.Resources.bullet_red;
-            this.ImgInputActivity.Location = new System.Drawing.Point(16, 0);
-            this.ImgInputActivity.Name = "ImgInputActivity";
-            this.ImgInputActivity.Size = new System.Drawing.Size(16, 50);
-            this.ImgInputActivity.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.ImgInputActivity.TabIndex = 3;
-            this.ImgInputActivity.TabStop = false;
-            this.ImgInputActivity.Visible = false;
-            // 
-            // pictureBox2
-            // 
-            this.pictureBox2.Dock = System.Windows.Forms.DockStyle.Left;
-            this.pictureBox2.Image = global::EnIPExplorer.Properties.Resources.door_in;
-            this.pictureBox2.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(16, 50);
-            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pictureBox2.TabIndex = 2;
-            this.pictureBox2.TabStop = false;
+            this.tmrO2T.Tick += new System.EventHandler(this.tmrO2I_Tick);
             // 
             // ImplicitMessaging
             // 
@@ -460,9 +475,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
             this.splitContainer3.ResumeLayout(false);
             this.splitContainer5.Panel1.ResumeLayout(false);
+            this.splitContainer5.Panel1.PerformLayout();
             this.splitContainer5.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).EndInit();
             this.splitContainer5.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             this.splitContainer4.Panel1.ResumeLayout(false);
             this.splitContainer4.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).EndInit();
@@ -472,20 +489,20 @@
             this.splitContainer6.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).EndInit();
             this.splitContainer6.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.splitContainer7.Panel1.ResumeLayout(false);
             this.splitContainer7.Panel1.PerformLayout();
             this.splitContainer7.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer7)).EndInit();
             this.splitContainer7.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.ImgInputActivity)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.splitContainer8.Panel1.ResumeLayout(false);
             this.splitContainer8.Panel1.PerformLayout();
             this.splitContainer8.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer8)).EndInit();
             this.splitContainer8.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.CycleTime)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ImgInputActivity)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -508,7 +525,7 @@
         private System.Windows.Forms.Label labelInput;
         private System.Windows.Forms.SplitContainer splitContainer8;
         private System.Windows.Forms.Button buttonFw;
-        private System.Windows.Forms.Timer tmrO2I;
+        private System.Windows.Forms.Timer tmrO2T;
         private System.Windows.Forms.CheckBox checkP2P;
         private System.Windows.Forms.CheckBox checkWriteConfig;
         private System.Windows.Forms.NumericUpDown CycleTime;
@@ -516,5 +533,6 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.PictureBox ImgInputActivity;
+        private System.Windows.Forms.PictureBox pictureBox3;
     }
 }

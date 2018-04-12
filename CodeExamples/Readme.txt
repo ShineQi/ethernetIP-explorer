@@ -22,5 +22,5 @@ Class1Sampleclient2
 	One or two attributes can be null, so all these options are OK
 	(Config,Output) (Config,Input) (Output) (Input) (Output,Input)
 	and (Config,Output,Input)
-	This code, working without modification with OpENer basic sample.
+	This code, is working without modification with OpENer basic sample.
 

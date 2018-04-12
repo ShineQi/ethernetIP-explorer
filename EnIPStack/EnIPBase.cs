@@ -430,7 +430,8 @@ namespace System.Net.EnIPStack
             if (O2T)
             {
                 // 2 bytes CIP class 1 sequence count + 4 bytes 32-bit real time header + datasize bytes application data
-                if (p2p) O2T_ConnectionParameters = 0x4600; else O2T_ConnectionParameters = 0x2600;
+                // if (p2p) O2T_ConnectionParameters = 0x4600; else O2T_ConnectionParameters = 0x2600;
+                O2T_ConnectionParameters = 0x4600;
                 if (O2Tdatasize != 0)
                     O2T_ConnectionParameters += (ushort)(O2Tdatasize + 2 + 4);
                 else

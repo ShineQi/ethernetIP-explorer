@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Net.EnIPStack;
 using System.Net;
+using System.Net.EnIPStack.ObjectsLibrary;
 
 namespace EnIPExplorer
 {
@@ -16,6 +17,7 @@ namespace EnIPExplorer
         EnIPAttribut Config, Input, Output;
         EnIPRemoteDevice device;
         ForwardClose_Packet FwclosePacket = null;
+        String MCastAddress=null;
 
         public ImplicitMessaging(TreeView devicetreeView)
         {
@@ -37,10 +39,28 @@ namespace EnIPExplorer
 
             this.Text = "Implicit Messaging with " + baseNode.Text;
 
-            IPEndPoint LocalEp = new IPEndPoint(IPAddress.Any, 0x8AE);
-            // It's not a problem to do this with more than one remote device,
-            // the underlying udp socket is static
-            device.Class1Activate(LocalEp);
+            try
+            {
+                IPEndPoint LocalEp = new IPEndPoint(IPAddress.Parse(Properties.Settings.Default.DefaultIPInterface), 0x8AE);
+                // It's not a problem to do this with more than one remote device,
+                // the underlying udp socket is static
+                device.Class1Activate(LocalEp);
+            }
+            catch { }
+
+        }
+
+        void GetMultiCastAdress()
+        {
+            try
+            {
+                EnIPClass Class245 = new EnIPClass(device, 245);
+                EnIPInstance Instance1 = new EnIPInstance(Class245, 1, typeof(CIP_TCPIPInterface_instance));
+                Instance1.ReadDataFromNetwork();
+
+                MCastAddress=(Instance1.DecodedMembers as CIP_TCPIPInterface_instance).Mcast_Config.Mcast_Start_Addr;
+            }
+            catch {}
         }
 
         void ClassView_ItemDrag(object sender, ItemDragEventArgs e)
@@ -77,16 +97,24 @@ namespace EnIPExplorer
 
         private void Output_DragDrop(object sender, DragEventArgs e)
         {
-            _DragDrop(e, labelOutput, propertyGridOutput, "Output", ref Output);
+            _DragDrop(e, labelOutput, propertyGridOutput, "Output (O->T)", ref Output);
         }
 
         private void Input_DragDrop(object sender, DragEventArgs e)
         {
-            _DragDrop(e, labelInput, propertyGridInput, "Input", ref Input);
+            _DragDrop(e, labelInput, propertyGridInput, "Input (T->O)", ref Input);
         }
 
         private void buttonFw_Click(object sender, EventArgs e)
         {
+            if (!checkP2P.Checked) // multicast mode, get first @ by device query
+                if (MCastAddress == null)
+                {
+                    GetMultiCastAdress();
+                    if (MCastAddress != null)
+                        device.Class1AddMulticast(MCastAddress); // I will be possible to Join the 32 consecutives @ to be sure
+                }
+
             if (FwclosePacket == null)
             {
                 EnIPNetworkStatus result = device.ForwardOpen(checkP2P.Checked, Config, Output, Input, 
@@ -95,7 +123,7 @@ namespace EnIPExplorer
                 if (result == EnIPNetworkStatus.OnLine)
                 {
                     buttonFw.Text = "Forward Close";
-                    tmrO2I.Enabled = true;
+                    tmrO2T.Enabled = true;
 
                     if (Input!=null)
                         Input.T2OEvent += new T2OEventHandler(Input_T2OEvent);
@@ -106,9 +134,9 @@ namespace EnIPExplorer
 
             else
             {
-                tmrO2I.Interval = (int)CycleTime.Value;
-                tmrO2I.Enabled = false;
-                device.ForwardClose(FwclosePacket);
+                tmrO2T.Interval = (int)CycleTime.Value;
+                tmrO2T.Enabled = false;
+                device.ForwardClose(Input, FwclosePacket);
                 buttonFw.Text = "Forward Open";
                 FwclosePacket = null;
                 if (Input != null)
@@ -136,7 +164,7 @@ namespace EnIPExplorer
         private void ImplicitMessaging_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (FwclosePacket!=null)
-                device.ForwardClose(FwclosePacket);
+                device.ForwardClose(Input, FwclosePacket);
         }
 
         private void ImplicitMessaging_Load(object sender, EventArgs e)
@@ -152,6 +180,16 @@ namespace EnIPExplorer
             {
                 Output.EncodeFromDecodedMembers();
                 propertyGridOutput.Refresh();
+            }
+        }
+
+        private void propertyGridConfig_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        {
+            // Modification in a Decoded field : copy it into the Raw field
+            if ((e.ChangedItem.Parent != null) && (e.ChangedItem.Parent.Label == "DecodedMembers"))
+            {
+                Config.EncodeFromDecodedMembers();
+                propertyGridConfig.Refresh();
             }
         }
 

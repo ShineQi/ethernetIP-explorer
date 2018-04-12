@@ -212,7 +212,7 @@ namespace System.Net.EnIPStack
 
         public void Class1AddMulticast(String IP)
         {
-            if (UdpListener == null)
+            if (UdpListener != null)
                 UdpListener.JoinMulticastGroup(IP);
         }
 
@@ -220,6 +220,12 @@ namespace System.Net.EnIPStack
         {
             if (UdpListener != null)
                 UdpListener.ItemMessageReceived += new ItemMessageReceivedHandler(att.On_ItemMessageReceived);
+        }
+
+        public void Class1AttributUnEnrolment(EnIPAttribut att)
+        {
+            if (UdpListener != null)
+                UdpListener.ItemMessageReceived -= new ItemMessageReceivedHandler(att.On_ItemMessageReceived);
         }
 
         public void Class1SendO2T(SequencedAddressItem Item)
@@ -501,7 +507,7 @@ namespace System.Net.EnIPStack
                 byte[] FinaleFrame = new byte[DataPath.Length + 2 + Config.RawData.Length];
                 Array.Copy(DataPath, FinaleFrame, DataPath.Length);
                 FinaleFrame[DataPath.Length] = 0x80;
-                FinaleFrame[DataPath.Length + 1] = (byte)(Config.RawData.Length/2);
+                FinaleFrame[DataPath.Length + 1] = (byte)(Config.RawData.Length/2); // Certainly the lenght is always even !!!
                 Array.Copy(Config.RawData, 0, FinaleFrame, DataPath.Length + 2, Config.RawData.Length);
                 DataPath = FinaleFrame;
             }
@@ -539,11 +545,15 @@ namespace System.Net.EnIPStack
             return Status;
         }
 
-        public EnIPNetworkStatus ForwardClose(ForwardClose_Packet ClosePacket)
+        public EnIPNetworkStatus ForwardClose(EnIPAttribut T2O, ForwardClose_Packet ClosePacket)
         {
             int Offset = 0;
             int Lenght = 0;
             byte[] packet;
+
+            if (T2O != null)
+                T2O.Class1UnEnrolment();
+
             return SendUCMM_RR_Packet(EnIPPath.GetPath(6, 1), CIPServiceCodes.ForwardClose, ClosePacket.toByteArray(), ref Offset, ref Lenght, out packet);
         }
     }
@@ -877,6 +887,11 @@ namespace System.Net.EnIPStack
         public void Class1Enrolment()
         {
             RemoteDevice.Class1AttributEnrolment(this);
+        }
+
+        public void Class1UnEnrolment()
+        {
+            RemoteDevice.Class1AttributUnEnrolment(this);
         }
 
         public void Class1UpdateO2T()
