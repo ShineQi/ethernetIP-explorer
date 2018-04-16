@@ -350,12 +350,53 @@ namespace System.Net.EnIPStack
         }        
     }
 
+    public class ForwardOpen_Config
+    {
+        public bool IsO2T=false;
+        public bool O2T_Exculsive=false;
+        public bool O2T_P2P=true;
+        public byte O2T_Priority = 0; //00=Low; 01=High; 10=Scheduled; 11=Urgent
+        public ushort O2T_datasize=0;
+        public uint O2T_RPI=200*1000; // 200 ms
+
+        public bool IsT2O = false;
+        public bool T2O_Exculsive = false;
+        public bool T2O_P2P = true;
+        public byte T2O_Priority = 0; //00=Low; 01=High; 10=Scheduled; 11=Urgent
+        public ushort T2O_datasize=0;
+        public uint T2O_RPI=200*1000; // 200 ms
+
+        public ForwardOpen_Config()
+        {
+        }
+
+        public ForwardOpen_Config(EnIPAttribut Output, EnIPAttribut Input, bool InputP2P, uint cycleTime)
+        {
+            if (Output != null)
+            {
+                IsO2T = true;
+                O2T_datasize = (ushort)Output.RawData.Length;
+                O2T_RPI = cycleTime; // in microsecond,  here same for the two direction
+                O2T_P2P = true; // by default not in P2P in this direction
+            }
+            if (Input != null)
+            {
+                IsT2O = true;
+                T2O_datasize = (ushort)Input.RawData.Length;
+                T2O_RPI = cycleTime; // in microsecond, here same for the two direction
+                T2O_P2P = InputP2P;
+            }
+        }
+    }
+
     // Volume 1 : Table 3-5.16 Forward_Open
     // class for both request and response
     // A lot of ushort in the bullshit specification, but byte in fact
     // .. Codesys 3.5 EIP scanner, help a lot
     public class ForwardOpen_Packet
     {
+        public bool IsLargeForwardOpen = false;
+
         // TimeOut (duration) in ms = 2^Priority_TimeTick * Timeout_Ticks
         // So with Priority_TimeTick=10, Timeout_Ticks is ~ the number of seconds
         // FIXME:
@@ -378,10 +419,10 @@ namespace System.Net.EnIPStack
         public byte[] Reserved = new byte[3];
         // It's O2T_API for reply, in microseconde
         public uint O2T_RPI=0;
-        public ushort O2T_ConnectionParameters;
+        public uint O2T_ConnectionParameters; // size OK for ForwardOpen & LargeForwardOpen
         // It's T2A_API for reply
         public uint T2O_RPI = 0;
-        public ushort T2O_ConnectionParameters;
+        public uint T2O_ConnectionParameters; // size OK for ForwardOpen & LargeForwardOpen
         // volume 1 : Figure 3-4.2 Transport Class Trigger Attribute
         public byte TransportTrigger;
         public byte Connection_Path_Size;
@@ -392,8 +433,11 @@ namespace System.Net.EnIPStack
         // using a Connection_Path with more than 1 reference
         // 1 Path : path is for Consumption & Production
         // 2 Path : First path is for Consumption, second path is for Production.
-        public ForwardOpen_Packet(byte[] Connection_Path, bool p2p, bool T2O, bool O2T, ushort T2Odatasize, ushort O2Tdatasize, uint? ConnectionId = null)
+        public ForwardOpen_Packet(byte[] Connection_Path, ForwardOpen_Config conf, uint? ConnectionId = null)
         {
+
+            if ((conf.O2T_datasize > 511-2) || (conf.T2O_datasize > 511-6))
+                IsLargeForwardOpen = true;
 
             this.Connection_Path = Connection_Path;
 
@@ -406,13 +450,12 @@ namespace System.Net.EnIPStack
             else
                 _ConnectionId = ConnectionId.Value;
 
-            if (O2T)
+            if (conf.IsO2T)
                 O2T_ConnectionId = _ConnectionId;
-            if (T2O)
-                T2O_ConnectionId = _ConnectionId+1;
-
+            if (conf.IsT2O)
+                T2O_ConnectionId = _ConnectionId + 1;
+            /*
             // Volume 1:  chapter 3-5.5.1.1
-            /* Sample for wireshark
             T->O Network Connection Parameters: 0x463b
             0... .... .... .... = Owner: Exclusive (0)
             .10. .... .... .... = Connection Type: Point to Point (2)
@@ -420,28 +463,67 @@ namespace System.Net.EnIPStack
             .... ..1. .... .... = Connection Size Type: Variable (1)
             .... ...0 0011 1011 = Connection Size: 59
             */
-            if (T2O)
+            if (conf.IsT2O)
             {
-                // 2 bytes CIP class 1 sequence count + datasize bytes application data
-                if (p2p) T2O_ConnectionParameters = 0x4600; else T2O_ConnectionParameters = 0x2600;
-                T2O_ConnectionParameters += (ushort)(T2Odatasize+2);
-                TransportTrigger = 0x01; // Client class 1, cyclic
-            }
-            if (O2T)
-            {
-                // 2 bytes CIP class 1 sequence count + 4 bytes 32-bit real time header + datasize bytes application data
-                // if (p2p) O2T_ConnectionParameters = 0x4600; else O2T_ConnectionParameters = 0x2600;
-                O2T_ConnectionParameters = 0x4600;
-                if (O2Tdatasize != 0)
-                    O2T_ConnectionParameters += (ushort)(O2Tdatasize + 2 + 4);
+                T2O_ConnectionParameters = 0x0200; // Variable data size
+                T2O_ConnectionParameters = (uint)(T2O_ConnectionParameters + (conf.T2O_Priority & 0x03) << 10);
+                if (conf.T2O_P2P)
+                    T2O_ConnectionParameters = T2O_ConnectionParameters | 0x4000;
                 else
-                    O2T_ConnectionParameters += (ushort)(2);
+                    T2O_ConnectionParameters = T2O_ConnectionParameters | 0x2000;
+
+                if (conf.O2T_Exculsive)
+                    T2O_ConnectionParameters = T2O_ConnectionParameters | 0x8000;
+
+                if (IsLargeForwardOpen)
+                {
+                    T2O_ConnectionParameters = (T2O_ConnectionParameters << 16) + conf.T2O_datasize + 2;
+                }
+                else
+                    T2O_ConnectionParameters += (ushort)(conf.T2O_datasize + 2);
+
+                TransportTrigger = 0x01; // Client class 1, cyclic
+
+                T2O_RPI = conf.T2O_RPI;
+            }
+            if (conf.IsO2T)
+            {
+
+                O2T_ConnectionParameters = 0x0200; // Variable data size
+                O2T_ConnectionParameters = (uint)(O2T_ConnectionParameters + (conf.O2T_Priority&0x03) << 10);
+                if (conf.O2T_P2P)
+                    O2T_ConnectionParameters = O2T_ConnectionParameters|0x4000;
+                else
+                    O2T_ConnectionParameters = O2T_ConnectionParameters | 0x2000;
+                
+                if (conf.O2T_Exculsive)
+                    O2T_ConnectionParameters = O2T_ConnectionParameters | 0x8000;
+
+
+                // 2 bytes CIP class 1 sequence count + 4 bytes 32-bit real time header + datasize bytes application data
+                if (conf.O2T_P2P) O2T_ConnectionParameters = 0x4600; else O2T_ConnectionParameters = 0x2600;
+
+                if (IsLargeForwardOpen)
+                {
+                    if (conf.O2T_datasize != 0)
+                        O2T_ConnectionParameters = (O2T_ConnectionParameters << 16) + conf.O2T_datasize + 2 + 4;
+                    else
+                        O2T_ConnectionParameters = (O2T_ConnectionParameters << 16) + 2;
+                }
+                else
+                {
+                    if (conf.O2T_datasize != 0)
+                        O2T_ConnectionParameters += (ushort)(conf.O2T_datasize + 2 + 4);
+                    else
+                        O2T_ConnectionParameters += (ushort)(2);
+                }
 
                 TransportTrigger = 0x81; // Server class 1
+
+                O2T_RPI = conf.O2T_RPI;
             }
 
         }
-
         public void SetTriggerType(TransportClassTriggerAttribute type)
         {
             TransportTrigger = (byte)((TransportTrigger & 0x8F) | (byte)type);
@@ -452,6 +534,7 @@ namespace System.Net.EnIPStack
         {
             int PathSize = Connection_Path.Length / 2 + (Connection_Path.Length % 2);
             Connection_Path_Size = (byte)PathSize;
+            int shift = 0; // ForwardOpen or LargeForwardOpen
 
             byte[] fwopen=new byte[36+PathSize*2];
 
@@ -465,12 +548,27 @@ namespace System.Net.EnIPStack
             fwopen[18] = ConnectionTimeoutMultiplier;
             Array.Copy(Reserved, 0, fwopen, 19, 3);
             Array.Copy(BitConverter.GetBytes(O2T_RPI), 0, fwopen, 22, 4);
-            Array.Copy(BitConverter.GetBytes(O2T_ConnectionParameters), 0, fwopen, 26, 2);
-            Array.Copy(BitConverter.GetBytes(T2O_RPI), 0, fwopen, 28, 4);
-            Array.Copy(BitConverter.GetBytes(T2O_ConnectionParameters), 0, fwopen, 32, 2);
-            fwopen[34] = TransportTrigger;
-            fwopen[35] = Connection_Path_Size;
-            Array.Copy(Connection_Path, 0, fwopen, 36, Connection_Path.Length);
+            if (IsLargeForwardOpen)
+            {
+                Array.Copy(BitConverter.GetBytes(O2T_ConnectionParameters), 0, fwopen, 26, 4);
+                shift = 2;
+            }
+            else
+                Array.Copy(BitConverter.GetBytes((ushort)O2T_ConnectionParameters), 0, fwopen, 26, 2);
+
+            Array.Copy(BitConverter.GetBytes(T2O_RPI), 0, fwopen, 28 + shift, 4);
+
+            if (IsLargeForwardOpen)
+            {
+                Array.Copy(BitConverter.GetBytes(T2O_ConnectionParameters), 0, fwopen, 32 + shift, 4);
+                shift = 4;
+            }
+            else
+                Array.Copy(BitConverter.GetBytes((ushort)T2O_ConnectionParameters), 0, fwopen, 32 + shift, 2);
+
+            fwopen[34 + shift] = TransportTrigger;
+            fwopen[35 + shift] = Connection_Path_Size;
+            Array.Copy(Connection_Path, 0, fwopen, 36 + shift, Connection_Path.Length);
 
             return fwopen;
         }

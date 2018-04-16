@@ -154,7 +154,7 @@ namespace System.Net.EnIPStack
         GroupSync = 0x1C,
         ForwardClose = 0x4E,
         UnconnectedSend = 0x52,
-        ForwardOpen = 0x54,     // Todo Volume 1 : Table 3-5.16
+        ForwardOpen = 0x54,  
         LargeForwardOpen = 0x5B
 
     }

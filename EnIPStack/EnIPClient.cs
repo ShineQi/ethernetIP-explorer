@@ -495,36 +495,40 @@ namespace System.Net.EnIPStack
             return FinalPath;
             //return new byte[] { 0x20, 0x04, 0x24, 0x97, 0x24, 0x96, 0x24, 0x64 }; // OK Pour T->O et O->T
         }
-        
-        public EnIPNetworkStatus ForwardOpen(bool p2p, EnIPAttribut Config, EnIPAttribut O2T, EnIPAttribut T2O, uint CycleTime, out ForwardClose_Packet ClosePacket, bool WriteConfig=false)
+
+        public EnIPNetworkStatus ForwardOpen(EnIPAttribut Config, EnIPAttribut O2T, EnIPAttribut T2O, out ForwardClose_Packet ClosePacket, uint CycleTime, bool P2P = false, bool WriteConfig = false)
+        {
+            ForwardOpen_Config conf = new ForwardOpen_Config(O2T, T2O, P2P, CycleTime);
+            return ForwardOpen(Config, O2T, T2O, out ClosePacket, conf, WriteConfig);
+        }
+
+        public EnIPNetworkStatus ForwardOpen(EnIPAttribut Config, EnIPAttribut O2T, EnIPAttribut T2O, out ForwardClose_Packet ClosePacket, ForwardOpen_Config conf, bool WriteConfig=false)
         {
             ClosePacket = null;
 
             byte[] DataPath = GetForwardOpenPath(new EnIPAttribut[] { Config, O2T, T2O });
 
-            if ((WriteConfig == true)&&(Config!=null)) // Add data segment
+            if ((WriteConfig == true) && (Config != null)) // Add data segment
             {
                 byte[] FinaleFrame = new byte[DataPath.Length + 2 + Config.RawData.Length];
                 Array.Copy(DataPath, FinaleFrame, DataPath.Length);
                 FinaleFrame[DataPath.Length] = 0x80;
-                FinaleFrame[DataPath.Length + 1] = (byte)(Config.RawData.Length/2); // Certainly the lenght is always even !!!
+                FinaleFrame[DataPath.Length + 1] = (byte)(Config.RawData.Length / 2); // Certainly the lenght is always even !!!
                 Array.Copy(Config.RawData, 0, FinaleFrame, DataPath.Length + 2, Config.RawData.Length);
                 DataPath = FinaleFrame;
             }
 
-            ForwardOpen_Packet FwPkt = new ForwardOpen_Packet(DataPath, p2p, T2O != null, O2T != null, 
-                                                                T2O==null ? (ushort)0 :(ushort)T2O.RawData.Length, 
-                                                                O2T==null ? (ushort)0:(ushort)O2T.RawData.Length);
-            FwPkt.T2O_RPI = CycleTime * 1000;
-            FwPkt.O2T_RPI = CycleTime * 1000;
-
-            if (CycleTime == 0) FwPkt.SetTriggerType(TransportClassTriggerAttribute.ChangeOfState);
+            ForwardOpen_Packet FwPkt = new ForwardOpen_Packet(DataPath, conf);
 
             int Offset = 0;
             int Lenght = 0;
             byte[] packet;
 
-            EnIPNetworkStatus Status = SendUCMM_RR_Packet(EnIPPath.GetPath(6, 1), CIPServiceCodes.ForwardOpen, FwPkt.toByteArray(), ref Offset, ref Lenght, out packet);
+            EnIPNetworkStatus Status;
+            if (FwPkt.IsLargeForwardOpen)
+                Status = SendUCMM_RR_Packet(EnIPPath.GetPath(6, 1), CIPServiceCodes.LargeForwardOpen, FwPkt.toByteArray(), ref Offset, ref Lenght, out packet);
+            else
+                Status = SendUCMM_RR_Packet(EnIPPath.GetPath(6, 1), CIPServiceCodes.ForwardOpen, FwPkt.toByteArray(), ref Offset, ref Lenght, out packet);
 
             if (Status == EnIPNetworkStatus.OnLine)
             {
@@ -543,7 +547,7 @@ namespace System.Net.EnIPStack
             }
 
             return Status;
-        }
+        }        
 
         public EnIPNetworkStatus ForwardClose(EnIPAttribut T2O, ForwardClose_Packet ClosePacket)
         {
@@ -924,77 +928,15 @@ namespace System.Net.EnIPStack
             if (T2OEvent != null)
                 T2OEvent(this);
         }
-
+        
         public EnIPNetworkStatus ForwardOpen(bool p2p, bool T2O, bool O2T, uint CycleTime, int DurationSecond)
         {
-            if (RawData == null) return EnIPNetworkStatus.OnLineForwardOpenReject;
-
-            byte[] DataPath;
-
-            if (Id == 3) // volume 1, § 3-5.5.1.10.2, Attribut 3 is implicit
-                DataPath = EnIPPath.GetPath(myInstance.myClass.Id, myInstance.Id);
-            else
-                DataPath = EnIPPath.GetPath(myInstance.myClass.Id, myInstance.Id, Id);
-
-            ForwardOpen_Packet FwPkt = new ForwardOpen_Packet(DataPath, p2p, T2O, O2T, (ushort)RawData.Length, (ushort)RawData.Length);
-            if (T2O)
-            {
-                // Change ForwardOpen_Packet default value
-                FwPkt.T2O_RPI = CycleTime * 1000;
-            }
-            if (O2T)
-            {
-                // Change ForwardOpen_Packet default value
-                FwPkt.O2T_RPI = CycleTime * 1000;
-            }
-
-            if (CycleTime == 0) FwPkt.SetTriggerType(TransportClassTriggerAttribute.ChangeOfState);
-
-            int Offset = 0;
-            int Lenght = 0;
-            byte[] packet;
-
-            Status = RemoteDevice.SendUCMM_RR_Packet(EnIPPath.GetPath(6, 1), CIPServiceCodes.ForwardOpen, FwPkt.toByteArray(), ref Offset, ref Lenght, out packet);
-            // Offset is ready set at the beginning of data : ie ForwardOpen_Packet response
-
-            closePkt = null;
-
-            if (Status == EnIPNetworkStatus.OnLine)
-            {
-                O2T_ConnectionId = BitConverter.ToUInt32(packet, Offset); // badly made
-                SequenceItem = new SequencedAddressItem(O2T_ConnectionId,0,RawData); // ready to send
-                T2O_ConnectionId = BitConverter.ToUInt32(packet, Offset + 4);
-                // Send a close later
-                if (DurationSecond >= 0)
-                {
-
-                    closePkt = new ForwardClose_Packet(FwPkt);
-                    byte[] closePktnew = closePkt.toByteArray();
-
-                    ThreadPool.QueueUserWorkItem(
-                        (o) =>
-                        {
-                            Thread.Sleep(DurationSecond * 1000);
-
-                            int Offset2 = 0;
-                            int Lenght2 = 0;
-
-                            RemoteDevice.SendUCMM_RR_Packet(EnIPPath.GetPath(6, 1), CIPServiceCodes.ForwardClose, closePktnew, ref Offset2, ref Lenght2, out packet);
-                        }
-                    );
-                }
-            }
-            return Status;
+            return EnIPNetworkStatus.OffLine;
         }
 
         public EnIPNetworkStatus ForwardClose()
         {
-            if (closePkt == null) return EnIPNetworkStatus.OnLineForwardOpenReject;
-
-            int Offset = 0;
-            int Lenght = 0;
-            byte[] packet;
-            return RemoteDevice.SendUCMM_RR_Packet(EnIPPath.GetPath(6, 1), CIPServiceCodes.ForwardClose, closePkt.toByteArray(), ref Offset, ref Lenght, out packet);
+            return EnIPNetworkStatus.OffLine;
         }
     }
 }

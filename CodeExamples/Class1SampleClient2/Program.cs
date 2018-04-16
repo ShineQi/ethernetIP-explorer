@@ -71,10 +71,13 @@ namespace Class1SampleClient2
             OpENer.Class1Activate(LocalEp);
 
             // ForwardOpen in P2P, cycle 200 ms
-            ForwardClose_Packet ClosePacket;
+            ForwardOpen_Config conf = new ForwardOpen_Config(Outputs, Inputs, true, 200*1000);
+            // here can change conf for exemple to set Exclusive use, change priority or CycleTime not equal in the both direction
+
             // Attributes order cannot be changed, last optional attribute true
             // will write the config value Config.RawData (modifies it after ReadDataFromNetwork before this call)
-            EnIPNetworkStatus result=OpENer.ForwardOpen(true, Config, Outputs, Inputs, 200, out ClosePacket, true);
+            ForwardClose_Packet ClosePacket;
+            EnIPNetworkStatus result = OpENer.ForwardOpen(Config, Outputs, Inputs, out ClosePacket, conf, false);
 
             if (result == EnIPNetworkStatus.OnLine)
             {
@@ -86,9 +89,9 @@ namespace Class1SampleClient2
                 {
                     Outputs.RawData[0] = (byte)(Outputs.RawData[0] + 1);
                     Outputs.Class1UpdateO2T(); // must be called even if no data changed to maintain the link (Heartbeat)
-                    Thread.Sleep(100);
+                    Thread.Sleep(200);
                 }
-                OpENer.ForwardClose(ClosePacket);
+                OpENer.ForwardClose(Inputs, ClosePacket);
             }
             else
                 Console.WriteLine("Fail");

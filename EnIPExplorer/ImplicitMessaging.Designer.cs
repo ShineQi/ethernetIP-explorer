@@ -55,6 +55,7 @@
             this.checkWriteConfig = new System.Windows.Forms.CheckBox();
             this.buttonFw = new System.Windows.Forms.Button();
             this.tmrO2T = new System.Windows.Forms.Timer(this.components);
+            this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -385,7 +386,7 @@
             // 
             // CycleTime
             // 
-            this.CycleTime.Location = new System.Drawing.Point(334, 17);
+            this.CycleTime.Location = new System.Drawing.Point(436, 17);
             this.CycleTime.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -408,7 +409,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(397, 20);
+            this.label1.Location = new System.Drawing.Point(499, 20);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(78, 13);
             this.label1.TabIndex = 2;
@@ -419,7 +420,7 @@
             this.checkP2P.AutoSize = true;
             this.checkP2P.Checked = true;
             this.checkP2P.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkP2P.Location = new System.Drawing.Point(187, 20);
+            this.checkP2P.Location = new System.Drawing.Point(208, 18);
             this.checkP2P.Name = "checkP2P";
             this.checkP2P.Size = new System.Drawing.Size(89, 17);
             this.checkP2P.TabIndex = 1;
@@ -450,6 +451,12 @@
             // tmrO2T
             // 
             this.tmrO2T.Tick += new System.EventHandler(this.tmrO2I_Tick);
+            // 
+            // notifyIcon1
+            // 
+            this.notifyIcon1.Text = "notifyIcon1";
+            this.notifyIcon1.Visible = true;
+            this.notifyIcon1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseDoubleClick);
             // 
             // ImplicitMessaging
             // 
@@ -534,5 +541,6 @@
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.PictureBox ImgInputActivity;
         private System.Windows.Forms.PictureBox pictureBox3;
+        private System.Windows.Forms.NotifyIcon notifyIcon1;
     }
 }

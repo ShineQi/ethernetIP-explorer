@@ -371,7 +371,7 @@ namespace EnIPExplorer
         // Menu Item
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(this, "Ethernet/IP Explorer - EnIPExplorer\nVersion Beta " + this.GetType().Assembly.GetName().Version + "\nBy Frederic Chaxel - Copyright 2016,2017\n" +
+            MessageBox.Show(this, "Ethernet/IP Explorer - EnIPExplorer\nVersion " + this.GetType().Assembly.GetName().Version + "\nBy Frederic Chaxel - Copyright 2016..2018\n" +
                 "\nReferences:\n\t http://sourceforge.net/projects/EnIPExplorer" +
                 "\n\t http://sourceforge.net/projects/yetanotherbacnetexplorer/" +
                 "\n\t http://www.famfamfam.com/"+

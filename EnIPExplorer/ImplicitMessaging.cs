@@ -117,12 +117,13 @@ namespace EnIPExplorer
 
             if (FwclosePacket == null)
             {
-                EnIPNetworkStatus result = device.ForwardOpen(checkP2P.Checked, Config, Output, Input, 
-                                                (uint)CycleTime.Value, out FwclosePacket, checkWriteConfig.Checked);
+                // CycleTime in microseconds
+                EnIPNetworkStatus result = device.ForwardOpen(Config, Output, Input, out FwclosePacket, (uint)(CycleTime.Value * 1000), checkP2P.Checked, checkWriteConfig.Checked);
 
                 if (result == EnIPNetworkStatus.OnLine)
                 {
                     buttonFw.Text = "Forward Close";
+                    tmrO2T.Interval = (int)CycleTime.Value; // here in ms it's a Windows timer
                     tmrO2T.Enabled = true;
 
                     if (Input!=null)
@@ -134,7 +135,6 @@ namespace EnIPExplorer
 
             else
             {
-                tmrO2T.Interval = (int)CycleTime.Value;
                 tmrO2T.Enabled = false;
                 device.ForwardClose(Input, FwclosePacket);
                 buttonFw.Text = "Forward Open";
@@ -191,6 +191,11 @@ namespace EnIPExplorer
                 Config.EncodeFromDecodedMembers();
                 propertyGridConfig.Refresh();
             }
+        }
+
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+
         }
 
     }

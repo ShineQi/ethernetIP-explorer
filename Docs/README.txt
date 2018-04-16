@@ -9,7 +9,8 @@
 		Ethernet/IP devices. 
 		The project was created in order to test/teach/learn and evaluate the 
 		protocol.		
-	
+		This application is running on Windows but also on Linux with mono installed.
+			
 		This document is subject to change.
 
 	1.2 CREDITS
