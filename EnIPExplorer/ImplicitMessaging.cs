@@ -137,7 +137,7 @@ namespace EnIPExplorer
             {
                 tmrO2T.Enabled = false;
                 device.ForwardClose(Input, FwclosePacket);
-                buttonFw.Text = "Forward Open";
+                buttonFw.Text = "(Large)Forward Open";
                 FwclosePacket = null;
                 if (Input != null)
                     Input.T2OEvent -= new T2OEventHandler(Input_T2OEvent);

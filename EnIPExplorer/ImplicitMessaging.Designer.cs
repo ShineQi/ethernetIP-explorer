@@ -444,7 +444,7 @@
             this.buttonFw.Name = "buttonFw";
             this.buttonFw.Size = new System.Drawing.Size(217, 50);
             this.buttonFw.TabIndex = 0;
-            this.buttonFw.Text = "Forward Open";
+            this.buttonFw.Text = "(Large)Forward Open";
             this.buttonFw.UseVisualStyleBackColor = true;
             this.buttonFw.Click += new System.EventHandler(this.buttonFw_Click);
             // 

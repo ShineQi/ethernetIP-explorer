@@ -928,12 +928,13 @@ namespace System.Net.EnIPStack
             if (T2OEvent != null)
                 T2OEvent(this);
         }
-        
+
+        [Obsolete("See Class1SampleClient2 sample : use ForwardOpen() on the EnIPRemoteDevice object")]
         public EnIPNetworkStatus ForwardOpen(bool p2p, bool T2O, bool O2T, uint CycleTime, int DurationSecond)
         {
             return EnIPNetworkStatus.OffLine;
         }
-
+        [Obsolete("See Class1SampleClient2 sample : use ForwardClose() on the EnIPRemoteDevice object")]
         public EnIPNetworkStatus ForwardClose()
         {
             return EnIPNetworkStatus.OffLine;
