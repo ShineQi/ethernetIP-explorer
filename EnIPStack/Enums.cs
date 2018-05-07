@@ -253,6 +253,7 @@ namespace System.Net.EnIPStack
         USINT,
         UINT,
         UDINT,
+        ULINT,
         STRING,
         SHORT_STRING,
         BYTE,
