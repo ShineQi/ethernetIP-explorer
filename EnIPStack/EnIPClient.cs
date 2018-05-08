@@ -461,7 +461,7 @@ namespace System.Net.EnIPStack
         }
 
         // Gives a compressed Path with a list of Attributs
-        private byte[] GetForwardOpenPath(EnIPAttribut[] Atts)
+        private byte[] GetForwardOpenPath(EnIPAttribut Config, EnIPAttribut O2T, EnIPAttribut T2O)
         {
             byte[] ConstructDataPath = new byte[20];
             int offset = 0;
@@ -469,6 +469,8 @@ namespace System.Net.EnIPStack
             ushort? Cid, Aid;
 
             EnIPAttribut previousAtt = null;
+
+            EnIPAttribut[] Atts =new EnIPAttribut[] {Config, O2T, T2O };
 
             foreach (EnIPAttribut att in Atts)
             {
@@ -482,7 +484,7 @@ namespace System.Net.EnIPStack
 
                     Aid = ((att.Id == 3) && (att.myInstance.myClass.Id == 4)) ? null : (ushort?)att.Id;
 
-                    DataPath = EnIPPath.GetPath(Cid, att.myInstance.Id, Aid);
+                    DataPath = EnIPPath.GetPath(Cid, att.myInstance.Id, Aid, att != Config);
                     Array.Copy(DataPath, 0, ConstructDataPath, offset, DataPath.Length);
                     offset += DataPath.Length;
 
@@ -493,7 +495,8 @@ namespace System.Net.EnIPStack
             byte[] FinalPath = new byte[offset];
             Array.Copy(ConstructDataPath, 0, FinalPath, 0, offset);
             return FinalPath;
-            //return new byte[] { 0x20, 0x04, 0x24, 0x97, 0x24, 0x96, 0x24, 0x64 }; // OK Pour T->O et O->T
+
+            // return something like  0x20, 0x04, 0x24, 0x80, 0x2C, 0x66, 0x2C, 0x65
         }
 
         public EnIPNetworkStatus ForwardOpen(EnIPAttribut Config, EnIPAttribut O2T, EnIPAttribut T2O, out ForwardClose_Packet ClosePacket, uint CycleTime, bool P2P = false, bool WriteConfig = false)
@@ -506,16 +509,20 @@ namespace System.Net.EnIPStack
         {
             ClosePacket = null;
 
-            byte[] DataPath = GetForwardOpenPath(new EnIPAttribut[] { Config, O2T, T2O });
+            byte[] DataPath = GetForwardOpenPath(Config, O2T, T2O );
 
             if ((WriteConfig == true) && (Config != null)) // Add data segment
             {
+
+                DataPath = EnIPPath.AddDataSegment(DataPath, Config.RawData);
+                /*
                 byte[] FinaleFrame = new byte[DataPath.Length + 2 + Config.RawData.Length];
                 Array.Copy(DataPath, FinaleFrame, DataPath.Length);
                 FinaleFrame[DataPath.Length] = 0x80;
                 FinaleFrame[DataPath.Length + 1] = (byte)(Config.RawData.Length / 2); // Certainly the lenght is always even !!!
                 Array.Copy(Config.RawData, 0, FinaleFrame, DataPath.Length + 2, Config.RawData.Length);
                 DataPath = FinaleFrame;
+                */
             }
 
             ForwardOpen_Packet FwPkt = new ForwardOpen_Packet(DataPath, conf);

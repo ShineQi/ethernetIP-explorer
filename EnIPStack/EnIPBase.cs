@@ -53,7 +53,7 @@ namespace System.Net.EnIPStack
             }
         }
 
-        public static byte[] GetPath(ushort? Class, ushort Instance, ushort? Attribut=null)
+        public static byte[] GetPath(ushort? Class, ushort Instance, ushort? Attribut=null, bool IsConnectionPoint=false)
         {
 
             byte[] path = new byte[12];
@@ -65,7 +65,10 @@ namespace System.Net.EnIPStack
 
             // It seems that this Instance value is always required : 0 is used to access class data
             // Volume 1 : Figure 1-2.5 Instance #0 Example
-            Fit(path, ref size, Instance, 0x24);
+            if (IsConnectionPoint)
+                Fit(path, ref size, Instance, 0x2C); // sure it's not the good way to encode 2C instead of 24            
+            else
+                Fit(path, ref size, Instance, 0x24);
    
             if (Attribut != null)
                 Fit(path, ref size, Attribut.Value, 0x30);
@@ -424,7 +427,7 @@ namespace System.Net.EnIPStack
         public uint T2O_RPI = 0;
         public uint T2O_ConnectionParameters; // size OK for ForwardOpen & LargeForwardOpen
         // volume 1 : Figure 3-4.2 Transport Class Trigger Attribute
-        public byte TransportTrigger;
+        public byte TransportTrigger=0x01; // Client class 1, cyclic;
         public byte Connection_Path_Size;
         public byte[] Connection_Path;
 
@@ -465,7 +468,7 @@ namespace System.Net.EnIPStack
             */
             if (conf.IsT2O)
             {
-                T2O_ConnectionParameters = 0x0200; // Variable data size
+                T2O_ConnectionParameters = 0x0000; // Fixed Datasize, Variable data size is 0x0200
                 T2O_ConnectionParameters = (uint)(T2O_ConnectionParameters + (conf.T2O_Priority & 0x03) << 10);
                 if (conf.T2O_P2P)
                     T2O_ConnectionParameters = T2O_ConnectionParameters | 0x4000;
@@ -482,14 +485,12 @@ namespace System.Net.EnIPStack
                 else
                     T2O_ConnectionParameters += (ushort)(conf.T2O_datasize + 2);
 
-                TransportTrigger = 0x01; // Client class 1, cyclic
-
                 T2O_RPI = conf.T2O_RPI;
             }
             if (conf.IsO2T)
             {
 
-                O2T_ConnectionParameters = 0x0200; // Variable data size
+                O2T_ConnectionParameters = 0x0000; // Fixed Datasize, Variable data size is 0x0200
                 O2T_ConnectionParameters = (uint)(O2T_ConnectionParameters + (conf.O2T_Priority&0x03) << 10);
                 if (conf.O2T_P2P)
                     O2T_ConnectionParameters = O2T_ConnectionParameters|0x4000;
@@ -517,8 +518,6 @@ namespace System.Net.EnIPStack
                     else
                         O2T_ConnectionParameters += (ushort)(2);
                 }
-
-                TransportTrigger = 0x81; // Server class 1
 
                 O2T_RPI = conf.O2T_RPI;
             }
