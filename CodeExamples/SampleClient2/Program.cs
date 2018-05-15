@@ -69,7 +69,7 @@ namespace SampleClient2
                     EPack.Connect();
                 if (!EPack.IsConnected())
                     return;
-
+                
                 // all data will be put in the byte[] RawData member of EnIPInstanceAttribut 
                 // ... but decoded in the DecoderMemeber
                 if (AllInputs.ReadDataFromNetwork() == EnIPNetworkStatus.OnLine)

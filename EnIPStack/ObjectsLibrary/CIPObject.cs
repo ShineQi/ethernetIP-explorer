@@ -251,7 +251,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
             }
             return null;
         }
-        public void GetShortString(ref int Idx, byte[] buf, Int64? val)
+        public void SetShortString(ref int Idx, byte[] buf, Int64? val)
         {
             throw new Exception(); // Not working todaty : buf size change could occure
         }

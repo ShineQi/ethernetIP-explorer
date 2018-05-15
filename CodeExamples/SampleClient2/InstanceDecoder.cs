@@ -64,5 +64,15 @@ namespace SampleClient2
 
             return false;
         }
+
+        public void Encode(byte[] b)
+        {
+            int Idx=0;
+            SetUInt16(ref Idx, b, AnalogInput);
+            SetUInt16(ref Idx, b, Frequency);
+            SetUInt16(ref Idx, b, Current);
+            SetUInt16(ref Idx, b, Voltage);
+        }
+
     }
 }

@@ -217,7 +217,10 @@ namespace EnIPExplorer
                 foreach (UserAttribut ua in t.Lattr)
                 {
                     // Property declaration such as : public UInt16? MyField {get; set; }
-                    sb.Append("public " + CIPType2dotNET[(byte)ua.type] + "? " + GetName(ua.name, provider) + " " + "{ get; set; }");
+                    if ((ua.type == CIPType.SHORT_STRING) || (ua.type == CIPType.STRING))
+                        sb.Append("public " + CIPType2dotNET[(byte)ua.type] + " " + GetName(ua.name, provider) + " " + "{ get; set; }");
+                    else
+                        sb.Append("public " + CIPType2dotNET[(byte)ua.type] + "? " + GetName(ua.name, provider) + " " + "{ get; set; }");
                     
                     // property decoding such as MyField=GetUInt16(ref Idx, b);
                     // property encoding such as SetUInt16(ref Idx, b, MyField);

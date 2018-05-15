@@ -358,14 +358,20 @@ namespace System.Net.EnIPStack
         public bool IsO2T=false;
         public bool O2T_Exculsive=false;
         public bool O2T_P2P=true;
-        public byte O2T_Priority = 0; //00=Low; 01=High; 10=Scheduled; 11=Urgent
+        /// <summary>
+        /// 0=Low; 1=High; 2=Scheduled; 3=Urgent
+        /// </summary>
+        public byte O2T_Priority = 0; 
         public ushort O2T_datasize=0;
         public uint O2T_RPI=200*1000; // 200 ms
 
         public bool IsT2O = false;
         public bool T2O_Exculsive = false;
         public bool T2O_P2P = true;
-        public byte T2O_Priority = 0; //00=Low; 01=High; 10=Scheduled; 11=Urgent
+        /// <summary>
+        /// 0=Low; 1=High; 2=Scheduled; 3=Urgent
+        /// </summary>
+        public byte T2O_Priority = 0; 
         public ushort T2O_datasize=0;
         public uint T2O_RPI=200*1000; // 200 ms
 
@@ -380,7 +386,7 @@ namespace System.Net.EnIPStack
                 IsO2T = true;
                 O2T_datasize = (ushort)Output.RawData.Length;
                 O2T_RPI = cycleTime; // in microsecond,  here same for the two direction
-                O2T_P2P = true; // by default not in P2P in this direction
+                O2T_P2P = true; // by default in this direction
             }
             if (Input != null)
             {
