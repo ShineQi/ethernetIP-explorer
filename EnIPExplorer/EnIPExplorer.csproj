@@ -95,6 +95,7 @@
       <DependentUpon>ExplicitMessages.cs</DependentUpon>
     </Compile>
     <Compile Include="GenericInputBox.cs" />
+    <Compile Include="HexConverter.cs" />
     <Compile Include="ImplicitMessaging.cs">
       <SubType>Form</SubType>
     </Compile>

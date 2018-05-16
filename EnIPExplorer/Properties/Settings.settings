@@ -47,8 +47,8 @@
     <Setting Name="IdHexDisplay" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="IdHexPrefix" Type="System.String" Scope="User">
-      <Value Profile="(Default)">0x</Value>
+    <Setting Name="IntegerHexDisplay" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

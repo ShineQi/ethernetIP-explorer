@@ -205,13 +205,13 @@ namespace EnIPExplorer.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0x")]
-        public string IdHexPrefix {
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IntegerHexDisplay {
             get {
-                return ((string)(this["IdHexPrefix"]));
+                return ((bool)(this["IntegerHexDisplay"]));
             }
             set {
-                this["IdHexPrefix"] = value;
+                this["IntegerHexDisplay"] = value;
             }
         }
     }

@@ -52,6 +52,7 @@ namespace EnIPExplorer
 
         public MainForm()
         {
+
             InitializeComponent();
             Trace.Listeners.Add(new MyTraceListener(this));
 
@@ -76,6 +77,16 @@ namespace EnIPExplorer
             devicesTreeView.TreeViewNodeSorter = new NodeSorter();
             
             UserDecoderMgmt();
+
+            // Change the typeconverter to allows Hex display in the Property Grid
+            TypeDescriptor.AddAttributes(typeof(Byte), new Attribute[] {new TypeConverterAttribute(typeof(HexTypeConverter<Byte>))} );
+            TypeDescriptor.AddAttributes(typeof(UInt16), new Attribute[] { new TypeConverterAttribute(typeof(HexTypeConverter<UInt16>)) });
+            TypeDescriptor.AddAttributes(typeof(UInt32), new Attribute[] { new TypeConverterAttribute(typeof(HexTypeConverter<UInt32>)) });
+            TypeDescriptor.AddAttributes(typeof(UInt64), new Attribute[] { new TypeConverterAttribute(typeof(HexTypeConverter<UInt64>)) });
+            TypeDescriptor.AddAttributes(typeof(SByte), new Attribute[] { new TypeConverterAttribute(typeof(HexTypeConverter<SByte>)) });
+            TypeDescriptor.AddAttributes(typeof(Int16), new Attribute[] { new TypeConverterAttribute(typeof(HexTypeConverter<Int16>)) });
+            TypeDescriptor.AddAttributes(typeof(Int32), new Attribute[] { new TypeConverterAttribute(typeof(HexTypeConverter<Int32>)) });
+            TypeDescriptor.AddAttributes(typeof(Int64), new Attribute[] { new TypeConverterAttribute(typeof(HexTypeConverter<Int64>)) });
         }
 
         void UserDecoderMgmt()
@@ -108,7 +119,7 @@ namespace EnIPExplorer
         string IdStr(int Id)
         {
             if (Properties.Settings.Default.IdHexDisplay)
-                return Properties.Settings.Default.IdHexPrefix + Convert.ToString(Id, 16).ToUpper();
+                return "0x" + Convert.ToString(Id, 16).ToUpper();
             else
                 return Id.ToString();
         }
@@ -342,8 +353,12 @@ namespace EnIPExplorer
                 LastReadNetworkStatus=ReadRet = Att.ReadDataFromNetwork();
 
                 // filter properties list for only the given attribut
+                // remove instance undecoded bytes if exist
                 if (Att.DecodedMembers != null)
-                    Att.DecodedMembers.FilterAttribut(Att.Id); 
+                {
+                    Att.DecodedMembers.FilterAttribut(Att.Id);
+                    Att.DecodedMembers.Remain_Undecoded_Bytes = null;
+                }
 
                 // In the Grid
                 propertyGrid.SelectedObject = Att;
@@ -632,6 +647,8 @@ namespace EnIPExplorer
             }
             else
                 tmrUpdate.Enabled = false;
+
+            propertyGrid.Refresh();
         }
 
         // Save the current Settings
