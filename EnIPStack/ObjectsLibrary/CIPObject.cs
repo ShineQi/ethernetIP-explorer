@@ -217,7 +217,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
             Idx += 8;
             return ret;
         }
-        public void SetDouble(ref int Idx, byte[] buf, UInt64? val)
+        public void SetDouble(ref int Idx, byte[] buf, Double? val)
         {
             if (val == null) return;
             Array.Copy(BitConverter.GetBytes(val.Value), 0, buf, Idx, 8);
