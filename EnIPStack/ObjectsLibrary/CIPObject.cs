@@ -177,7 +177,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
             Idx += 4;
             return ret;
         }
-        public void SetInt32(ref int Idx, byte[] buf, UInt32? val)
+        public void SetInt32(ref int Idx, byte[] buf, Int32? val)
         {
             if (val == null) return;
             Array.Copy(BitConverter.GetBytes(val.Value), 0, buf, Idx, 4);
