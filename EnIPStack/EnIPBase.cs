@@ -541,7 +541,12 @@ namespace System.Net.EnIPStack
             Connection_Path_Size = (byte)PathSize;
             int shift = 0; // ForwardOpen or LargeForwardOpen
 
-            byte[] fwopen=new byte[36+PathSize*2];
+            byte[] fwopen;
+
+            if (IsLargeForwardOpen)
+                fwopen = new byte[36 + PathSize * 2 + 4];
+            else
+                fwopen = new byte[36 + PathSize * 2];
 
             fwopen[0] = Priority_TimeTick;
             fwopen[1] = Timeout_Ticks;
