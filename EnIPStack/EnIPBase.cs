@@ -418,8 +418,10 @@ namespace System.Net.EnIPStack
         public uint O2T_ConnectionId;
         public uint T2O_ConnectionId;
 
-        // Assume only one client in this application
-        public static ushort ConnectionSerialNumber= (ushort)new Random().Next(65535);
+        // shared 
+        private static ushort GlobalConnectionSerialNumber = (ushort)new Random().Next(65535);
+
+        public ushort ConnectionSerialNumber;
         public static ushort OriginatorVendorId = 0xFADA;
         public static uint OriginatorSerialNumber = 0x8BADF00D;
 
@@ -444,6 +446,8 @@ namespace System.Net.EnIPStack
         // 2 Path : First path is for Consumption, second path is for Production.
         public ForwardOpen_Packet(byte[] Connection_Path, ForwardOpen_Config conf, uint? ConnectionId = null)
         {
+
+            ConnectionSerialNumber = GlobalConnectionSerialNumber++;
 
             if ((conf.O2T_datasize > 511-2) || (conf.T2O_datasize > 511-6))
                 IsLargeForwardOpen = true;
