@@ -550,12 +550,13 @@ namespace System.Net.EnIPStack
                     T2O.Class1Enrolment();
                     T2O.T2O_ConnectionId = BitConverter.ToUInt32(packet, Offset + 4);
                 }
-                ClosePacket = new ForwardClose_Packet(FwPkt);
+                ClosePacket = new ForwardClose_Packet(FwPkt, T2O);
             }
 
             return Status;
-        }        
+        }
 
+        [Obsolete("use ForwardClose(ClosePacket) instead")]
         public EnIPNetworkStatus ForwardClose(EnIPAttribut T2O, ForwardClose_Packet ClosePacket)
         {
             int Offset = 0;
@@ -564,6 +565,18 @@ namespace System.Net.EnIPStack
 
             if (T2O != null)
                 T2O.Class1UnEnrolment();
+
+            return SendUCMM_RR_Packet(EnIPPath.GetPath(6, 1), CIPServiceCodes.ForwardClose, ClosePacket.toByteArray(), ref Offset, ref Lenght, out packet);
+        }
+
+        public EnIPNetworkStatus ForwardClose(ForwardClose_Packet ClosePacket)
+        {
+            int Offset = 0;
+            int Lenght = 0;
+            byte[] packet;
+
+            if (ClosePacket.T2O != null)
+                ClosePacket.T2O.Class1UnEnrolment();
 
             return SendUCMM_RR_Packet(EnIPPath.GetPath(6, 1), CIPServiceCodes.ForwardClose, ClosePacket.toByteArray(), ref Offset, ref Lenght, out packet);
         }

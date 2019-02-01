@@ -76,8 +76,8 @@ namespace Class1SampleClient2
 
             // Attributes order cannot be changed, last optional attribute true
             // will write the config value Config.RawData (modifies it after ReadDataFromNetwork before this call)
-            ForwardClose_Packet ClosePacket;
-            EnIPNetworkStatus result = OpENer.ForwardOpen(Config, Outputs, Inputs, out ClosePacket, conf, false);
+            ForwardClose_Packet CloseData;
+            EnIPNetworkStatus result = OpENer.ForwardOpen(Config, Outputs, Inputs, out CloseData, conf, false);
 
             if (result == EnIPNetworkStatus.OnLine)
             {
@@ -91,7 +91,7 @@ namespace Class1SampleClient2
                     Outputs.Class1UpdateO2T(); // must be called even if no data changed to maintain the link (Heartbeat)
                     Thread.Sleep(200);
                 }
-                OpENer.ForwardClose(Inputs, ClosePacket);
+                OpENer.ForwardClose(CloseData);
             }
             else
                 Console.WriteLine("Fail");

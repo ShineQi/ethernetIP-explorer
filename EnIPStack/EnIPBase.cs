@@ -591,9 +591,13 @@ namespace System.Net.EnIPStack
     public class ForwardClose_Packet
     {
         ForwardOpen_Packet OrignalPkt;
-        public ForwardClose_Packet(ForwardOpen_Packet FwOpen)
+
+        public EnIPAttribut T2O { get; private set; }
+
+        public ForwardClose_Packet(ForwardOpen_Packet FwOpen, EnIPAttribut T2O)
         {
             OrignalPkt = FwOpen;
+            this.T2O = T2O;
         }
         // by now only use for request
         public byte[] toByteArray()
