@@ -601,7 +601,7 @@ namespace System.Net.EnIPStack
             byte[] fwclose = new byte[12 + OrignalPkt.Connection_Path_Size * 2];
             fwclose[0] = OrignalPkt.Priority_TimeTick;
             fwclose[1] = OrignalPkt.Timeout_Ticks;
-            Array.Copy(BitConverter.GetBytes(ForwardOpen_Packet.ConnectionSerialNumber), 0, fwclose, 2, 2);
+            Array.Copy(BitConverter.GetBytes(OrignalPkt.ConnectionSerialNumber), 0, fwclose, 2, 2);
             Array.Copy(BitConverter.GetBytes(ForwardOpen_Packet.OriginatorVendorId), 0, fwclose, 4, 2);
             Array.Copy(BitConverter.GetBytes(ForwardOpen_Packet.OriginatorSerialNumber), 0, fwclose, 6, 4);
             fwclose[10] = OrignalPkt.Connection_Path_Size;
