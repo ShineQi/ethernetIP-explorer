@@ -78,3 +78,20 @@ Device IP;Name;Class;ClassName;Instance;InstanceName;Attribute;AttributeName
 ;;;;1;Instance #1
 ;;246;EthernetLink #246
 ;;;;1;Instance #1
+192.168.62.132;UniversalRobot
+;;1;Identity #1
+;;;;1;Instance #1
+;;2;MessageRouter #2
+;;;;1;Instance #1
+;;4;Assembly #4
+;;;;1;Config
+;;;;;;3;Attribute #3
+;;;;100;Inputs
+;;;;;;3;Attribute #3
+;;;;112;Outputs
+;;;;;;3;Attribute #3
+;;6;ConnectionManager #6
+;;245;TCPIPInterface #245
+;;;;1;Instance #1
+;;246;EtherNetLink #246
+;;;;1;Instance #1

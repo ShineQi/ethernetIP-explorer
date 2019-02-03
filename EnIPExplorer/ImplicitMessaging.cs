@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Net.EnIPStack;
 using System.Net;
 using System.Net.EnIPStack.ObjectsLibrary;
+using System.Reflection;
 
 namespace EnIPExplorer
 {
@@ -136,7 +137,7 @@ namespace EnIPExplorer
             else
             {
                 tmrO2T.Enabled = false;
-                device.ForwardClose(Input, FwclosePacket);
+                device.ForwardClose(FwclosePacket);
                 buttonFw.Text = "(Large)Forward Open";
                 FwclosePacket = null;
                 if (Input != null)
@@ -144,7 +145,7 @@ namespace EnIPExplorer
                 ImgInputActivity.Visible = false;
             }
         }
-
+     
         void Input_T2OEvent(EnIPAttribut sender)
         {
             if (InvokeRequired)
@@ -152,7 +153,8 @@ namespace EnIPExplorer
                 BeginInvoke(new Action<EnIPAttribut>(Input_T2OEvent), new object[] { sender });
                 return;
             }
-            propertyGridInput.Refresh();
+            //propertyGridInput.Refresh();
+            MainForm.SoftRefreshPropertyGrid(propertyGridInput);
             ImgInputActivity.Visible = !ImgInputActivity.Visible;
         }
 
@@ -164,7 +166,7 @@ namespace EnIPExplorer
         private void ImplicitMessaging_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (FwclosePacket!=null)
-                device.ForwardClose(Input, FwclosePacket);
+                device.ForwardClose(FwclosePacket);
         }
 
         private void ImplicitMessaging_Load(object sender, EventArgs e)

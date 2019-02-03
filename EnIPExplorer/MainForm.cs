@@ -39,6 +39,7 @@ using System.Net;
 using System.IO;
 using System.Net.EnIPStack.ObjectsLibrary;
 using System.Collections;
+using System.Reflection;
 
 namespace EnIPExplorer
 {
@@ -799,13 +800,27 @@ namespace EnIPExplorer
                 tn.Text = Input.genericInput.Text;
         }
 
+        // https://stackoverflow.com/questions/288893/how-to-prevent-scroll-on-refresh-in-a-propertygrid
+        public static void SoftRefreshPropertyGrid(PropertyGrid propertyGrid)
+        {
+            var peMain = propertyGrid.GetType().GetField("peMain",BindingFlags.NonPublic | BindingFlags.Instance).GetValue(propertyGrid) as System.Windows.Forms.GridItem;
+            if (peMain != null)
+            {
+                var refreshMethod = peMain.GetType().GetMethod("Refresh");
+                if (refreshMethod != null)
+                {
+                    refreshMethod.Invoke(peMain, null);
+                    propertyGrid.Invalidate(true);
+                }
+            }
+        }
         // Menu Item
         private void readAgainToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (propertyGrid.SelectedObject is EnIPCIPObject)
             {
                 LastReadNetworkStatus = (propertyGrid.SelectedObject as EnIPCIPObject).ReadDataFromNetwork();
-                propertyGrid.Refresh();
+               SoftRefreshPropertyGrid( propertyGrid);
             }
             else
                 LastReadNetworkStatus = EnIPNetworkStatus.OffLine;
