@@ -243,24 +243,26 @@ namespace System.Net.EnIPStack
         ApplicationObject = 0x20
     }
 
+    //Volume 1 :Table C-6.1 Identification Codes and Descriptions of Elementary Data Types
     public enum CIPType : byte
     {
-        BOOL,
-        SINT,
-        INT,
-        DINT,
-        LINT,
-        USINT,
-        UINT,
-        UDINT,
-        ULINT,
-        STRING,
-        SHORT_STRING,
-        BYTE,
-        WORD,
-        DWORD,
-        LWORD,
-        REAL,
-        LREAL
+
+        BOOL, //=0xC1,
+        SINT, //=0xC2,
+        INT, //=0xC3,
+        DINT, //=0xC4,
+        LINT, //=0xC5,
+        USINT, //=0xC6,
+        UINT, //=0xC7,
+        UDINT, //=0xC8,
+        ULINT, //=0xC9,
+        STRING, //=0xD0,
+        SHORT_STRING, //=0xDA,
+        BYTE, //=0xD1,
+        WORD, //=0xD2,
+        DWORD, //=0xD3,
+        LWORD, //=0xD4,
+        REAL, //=0xCA,
+        LREAL, //=0xCB
     }
 }

@@ -100,7 +100,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
             return ret;
         }
         public void Setbyte(ref int Idx, byte[] buf, byte? val)
-        {
+        { 
             if (val == null) return;
             Array.Copy(BitConverter.GetBytes(val.Value), 0, buf, Idx, 1);
             Idx++;
@@ -151,7 +151,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
             Idx += 1;
             return ret;
         }
-        public void Setbyte(ref int Idx, byte[] buf, sbyte? val)
+        public void Setsbyte(ref int Idx, byte[] buf, sbyte? val)
         {
             if (val == null) return;
             Array.Copy(BitConverter.GetBytes(val.Value), 0, buf, Idx, 1);
