@@ -1,3 +1,7 @@
+Decode_STRING
+str;STRING
+Decode_UINT
+val;UINT
 MyInputs_4_100_3
 PV;UINT
 Frequency;UINT
