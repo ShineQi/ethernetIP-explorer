@@ -11,7 +11,7 @@
 
 *  Explicit & Implicit messaging basic client source codes.
 ---
-EtherNet/IP™ is a registered trademark of ODVA, Inc.
+[EtherNet/IP™](https://www.odva.org/Technology-Standards/EtherNet-IP/Overview) is a registered trademark of [ODVA, Inc.](https://www.odva.org/)
 
 ## Releases & Downloads
 
