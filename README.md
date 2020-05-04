@@ -11,6 +11,9 @@
 
 *  Explicit & Implicit messaging basic client source codes.
 
+## Releases & Downloads
+
+*  [EthernetIP-Explorer 1.2.1](https://github.com/tswaehn/ethernetIP-explorer/releases/download/1.2.1/SetupEnIPExplorer_1.2.1.exe)
 
 ## screenshots
 
@@ -20,6 +23,13 @@
 ![image4](/Docs/image4.png)
 ![image5](/Docs/image5.png)
 ![image6](/Docs/image6.png)
+
+## Requirement for building
+
+*  Visual Studio
+*  C# Plugin
+*  Inno Setup (for building the setup installer on windows)
+
 
 ## notes on windows building
 
