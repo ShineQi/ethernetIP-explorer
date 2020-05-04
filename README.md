@@ -10,12 +10,14 @@
 *  Full open source code.
 
 *  Explicit & Implicit messaging basic client source codes.
+---
+EtherNet/IP™ is a registered trademark of ODVA, Inc.
 
 ## Releases & Downloads
 
-*  [EthernetIP-Explorer 1.2.1](https://github.com/tswaehn/ethernetIP-explorer/releases/download/1.2.1/SetupEnIPExplorer_1.2.1.exe)
+*  [EthernetIP-Explorer 1.2.1](https://github.com/tswaehn/ethernetIP-explorer/releases/download/1.2.1/SetupEnIPExplorer_1.2.1.exe) (win x86)
 
-## screenshots
+## Screenshots
 
 ![image1](/Docs/image1.png)
 ![image2](/Docs/image2.png)
@@ -24,14 +26,14 @@
 ![image5](/Docs/image5.png)
 ![image6](/Docs/image6.png)
 
-## Requirement for building
+## Requirements for building
 
 *  Visual Studio
 *  C# Plugin
 *  Inno Setup (for building the setup installer on windows)
 
 
-## notes on windows building
+## Notes on building for windows
 
 Download SnapShot on Windows 10
 
@@ -41,5 +43,4 @@ To unblock all files, open a PowerShell window, move to the directory where all 
 
 gci -recurse  | Unblock-File 
 
----
-EtherNet/IP™ is a registered trademark of ODVA, Inc.
+
