@@ -5,3 +5,7 @@ A lot of files (.resx and some others) are marked block by Windows, and Visual S
 To unblock all files, open a PowerShell window, move to the directory where all files are extracted then type the command :
 
 gci -recurse  | Unblock-File 
+
+
+---
+EtherNet/IP™ is a registered trademark of ODVA, Inc.
