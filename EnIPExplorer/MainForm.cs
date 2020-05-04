@@ -387,11 +387,12 @@ namespace EnIPExplorer
         // Menu Item
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(this, "Ethernet/IP Explorer - EnIPExplorer\nVersion " + this.GetType().Assembly.GetName().Version + "\nBy Frederic Chaxel - Copyright 2016..2018\n" +
-                "\nReferences:\n\t http://sourceforge.net/projects/EnIPExplorer" +
-                "\n\t http://sourceforge.net/projects/yetanotherbacnetexplorer/" +
-                "\n\t http://www.famfamfam.com/"+
-                "\n\t http://www.jrsoftware.org/isinfo.php"
+            MessageBox.Show(this, "Ethernet/IP Explorer - EnIPExplorer\nVersion " + this.GetType().Assembly.GetName().Version + "\nBy Frederic Chaxel - Copyright © 2020\n" +
+                "\nReferences: " + 
+                "\n http://sourceforge.net/projects/EnIPExplorer" +
+                "\n http://sourceforge.net/projects/yetanotherbacnetexplorer/" +
+                "\n http://www.famfamfam.com/"+
+                "\n http://www.jrsoftware.org/isinfo.php"
                 , "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
