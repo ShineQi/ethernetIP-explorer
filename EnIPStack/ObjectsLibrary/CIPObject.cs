@@ -235,7 +235,7 @@ namespace System.Net.EnIPStack.ObjectsLibrary
             }
             return null;
         }
-        public void SetString(ref int Idx, byte[] buf, Int64? val)
+        public void SetString(ref int Idx, byte[] buf, String val)
         {
             throw new Exception();// Not working todaty : buf size change could occure
         }
