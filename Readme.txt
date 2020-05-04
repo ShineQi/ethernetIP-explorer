@@ -6,12 +6,12 @@ To unblock all files, open a PowerShell window, move to the directory where all 
 
 gci -recurse  | Unblock-File 
 
-![image1](https://github.com/tswaehn/ethernetIP-explorer/blob/master/Docs/image1.png)
-![image2](https://github.com/tswaehn/ethernetIP-explorer/blob/master/Docs/image2.png)
-![image3](https://github.com/tswaehn/ethernetIP-explorer/blob/master/Docs/image3.png)
-![image4](https://github.com/tswaehn/ethernetIP-explorer/blob/master/Docs/image4.png)
-![image5](https://github.com/tswaehn/ethernetIP-explorer/blob/master/Docs/image5.png)
-![image6](https://github.com/tswaehn/ethernetIP-explorer/blob/master/Docs/image6.png)
+![image1](/Docs/image1.png)
+![image2](/Docs/image2.png)
+![image3](/Docs/image3.png)
+![image4](/Docs/image4.png)
+![image5](/Docs/image5.png)
+![image6](/Docs/image6.png)
 
 ---
 EtherNet/IP™ is a registered trademark of ODVA, Inc.
